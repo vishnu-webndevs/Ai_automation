@@ -28,6 +28,10 @@ type PageRow = {
   status: 'draft' | 'published';
   updated_at: string;
   sections_count?: number;
+  seo?: {
+    noindex?: boolean;
+    nofollow?: boolean;
+  } | null;
   locked_status?: {
     is_locked: boolean;
     locked_at: string | null;
@@ -77,6 +81,8 @@ const PageManager = () => {
 
   // SEO/Conflict States
   const [checkKeyword, setCheckKeyword] = useState('');
+  const [noIndex, setNoIndex] = useState(false);
+  const [noFollow, setNoFollow] = useState(false);
   const [conflicts, setConflicts] = useState<KeywordConflict[]>([]);
   const [checkingConflicts, setCheckingConflicts] = useState(false);
   const [conflictChecked, setConflictChecked] = useState(false);
@@ -249,6 +255,8 @@ const PageManager = () => {
     // Reset states
     setVersions([]);
     setCheckKeyword(row.title); // Default to title
+    setNoIndex(!!row.seo?.noindex);
+    setNoFollow(!!row.seo?.nofollow);
     setConflicts([]);
     setConflictChecked(false);
 
@@ -280,6 +288,25 @@ const PageManager = () => {
     } catch (e) {
         console.error("Failed to restore version", e);
         alert('Failed to restore version');
+    }
+  };
+
+  const saveSeoSettings = async () => {
+    if (!currentDetailId) return;
+    setLoading(true);
+    try {
+        await updatePage(currentDetailId, {
+            seo: {
+                noindex: noIndex,
+                nofollow: noFollow
+            }
+        });
+        setDetailsModalOpen(false);
+        fetchRows(); // Refresh data
+    } catch (e: any) {
+        setError(e?.response?.data?.message || 'Failed to save SEO settings');
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -656,6 +683,35 @@ const PageManager = () => {
 
         {activeTab === 'seo' && (
             <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Search Engine Visibility</h3>
+                    <div className="space-y-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                checked={noIndex} 
+                                onChange={(e) => setNoIndex(e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">No Index (Exclude from Search Engines & Sitemap)</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                checked={noFollow} 
+                                onChange={(e) => setNoFollow(e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">No Follow (Do not follow links on this page)</span>
+                        </label>
+                    </div>
+                    <div className="mt-3">
+                         <Button size="sm" onClick={saveSeoSettings} disabled={loading}>
+                            Save SEO Settings
+                         </Button>
+                    </div>
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Primary Keyword</label>
                     <div className="flex gap-2">

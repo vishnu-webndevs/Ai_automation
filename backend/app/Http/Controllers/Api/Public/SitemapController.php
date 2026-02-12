@@ -31,8 +31,11 @@ class SitemapController extends Controller
             } else {
                 // Fallback to live Page data
                 $pages = Page::query()
-                    ->select(['slug', 'updated_at'])
+                    ->select(['id', 'slug', 'updated_at'])
                     ->where('status', 'published')
+                    ->whereDoesntHave('seo', function ($q) {
+                        $q->where('noindex', true);
+                    })
                     ->orderBy('updated_at', 'desc')
                     ->get();
 

@@ -34,10 +34,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="shrink-0 mr-4">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
-                T
-              </div>
-              <span className="font-semibold text-lg tracking-tight text-white hidden sm:block">Totan AI</span>
+              <img src="/totan_ai_logo.png" alt="Totan AI" className="w-[80px] h-auto group-hover:scale-110 transition-transform" />
             </Link>
           </div>
 

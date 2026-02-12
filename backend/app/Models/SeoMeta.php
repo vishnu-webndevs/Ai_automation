@@ -12,11 +12,14 @@ class SeoMeta extends Model
     protected $table = 'seo_meta';
 
     protected $fillable = [
-        'page_id', 'meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'schema_json'
+        'page_id', 'meta_title', 'meta_description', 'meta_keywords', 'canonical_url', 'schema_json',
+        'noindex', 'nofollow'
     ];
 
     protected $casts = [
         'schema_json' => 'array',
+        'noindex' => 'boolean',
+        'nofollow' => 'boolean',
     ];
 
     public function page()

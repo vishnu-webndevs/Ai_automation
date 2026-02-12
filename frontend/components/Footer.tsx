@@ -26,9 +26,9 @@ const Footer: React.FC = () => {
         <div className="border-t border-slate-800 pt-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
             <div className="col-span-2 lg:col-span-1">
                <a href="#" className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold">O</div>
+                  <img src="/logo.png" alt="Totan AI" className="w-8 h-8 rounded-full" />
                </a>
-               <p className="text-slate-500 text-sm">© Cruip.com - All rights reserved.</p>
+               <p className="text-slate-500 text-sm">© Totan.ai - All rights reserved.</p>
             </div>
 
             {/* Dynamic Footer Menu */}

@@ -60,6 +60,7 @@ const App: React.FC = () => {
 
           {/* Static Pages */}
           <Route path="login" element={<SignIn />} />
+          <Route path="signin" element={<SignIn />} />
           <Route path="signup" element={<SignUp />} />
           <Route path="style-guide" element={<StyleGuide />} />
           <Route path="changelog" element={<Changelog />} />

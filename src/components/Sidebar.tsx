@@ -152,12 +152,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 bg-slate-950">
         <Link to="/web-admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <span className="text-white font-bold text-xl">T</span>
-            </div>
-            <span className="text-xl font-bold text-white tracking-wide">
-                Totan<span className="text-indigo-400">.ai</span>
-            </span>
+            <img src="/totan_ai_logo.png" alt="Totan.ai Logo" className="w-[80px] h-auto " />
         </Link>
 
         <button

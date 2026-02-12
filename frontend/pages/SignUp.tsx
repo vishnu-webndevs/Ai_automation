@@ -77,6 +77,13 @@ const SignUp: React.FC = () => {
           {error && (
             <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-md">
                 {error}
+                {error.includes('email has already been taken') && (
+                    <div className="mt-2">
+                        <Link to="/signin" className="font-medium text-red-400 hover:text-red-300 underline">
+                            Click here to Sign In instead
+                        </Link>
+                    </div>
+                )}
             </div>
           )}
           
