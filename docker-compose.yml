@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Laravel Backend (Port 8000)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: totan/backend
+    container_name: totan-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www
+    environment:
+      - APP_PORT=8000
+      - APP_HOST=0.0.0.0
+    command: php artisan serve --host=0.0.0.0 --port=8000
+    networks:
+      - totan-network
+
+  # Admin Panel (Root, Port 3000)
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: totan/admin
+    container_name: totan-admin
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000/api
+    # command: npm run dev -- --host 0.0.0.0 --port 3000
+    networks:
+      - totan-network
+    depends_on:
+      - backend
+
+  # Frontend Website (Frontend folder, Port 3001)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: totan/frontend
+    container_name: totan-frontend
+    ports:
+      - "3001:3001"
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000/api
+    # command: npm run dev -- --host 0.0.0.0 --port 3001
+    networks:
+      - totan-network
+    depends_on:
+      - backend
+
+networks:
+  totan-network:
+    driver: bridge
