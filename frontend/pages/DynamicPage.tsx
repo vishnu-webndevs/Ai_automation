@@ -5,6 +5,7 @@ import { pageService } from '../services/api';
 import SeoHead from '../components/seo/SeoHead';
 import BlockRenderer from '../components/BlockRenderer';
 import { STATIC_PAGES } from '../data/static-fallbacks';
+import { getTemplateComponent } from '../templates/TemplateLoader';
 
 const DynamicPage: React.FC = () => {
     const params = useParams();
@@ -26,7 +27,13 @@ const DynamicPage: React.FC = () => {
         return null;
     }, [apiPage, slug]);
 
-    // Check if the first block is a Hero block to avoid double padding
+    // Check if template exists
+    const TemplateComponent = useMemo(() => {
+        if (!page?.template_slug) return null;
+        return getTemplateComponent(page.template_slug);
+    }, [page?.template_slug]);
+
+    // Check if the first block is a Hero block to avoid double padding (only for default layout)
     const hasHero = useMemo(() => {
         if (!page?.sections?.length) return false;
         const firstSection = [...page.sections].sort((a, b) => a.sort_order - b.sort_order)[0];
@@ -59,6 +66,17 @@ const DynamicPage: React.FC = () => {
         );
     }
 
+    // Render Template if available
+    if (TemplateComponent) {
+        return (
+            <>
+                <SeoHead meta={page.seo_meta} defaultTitle={page.title} />
+                <TemplateComponent page={page} />
+            </>
+        );
+    }
+
+    // Default Layout Rendering
     return (
         <div className={`relative ${!hasHero ? 'pt-24' : ''}`}>
             <SeoHead meta={page.seo_meta} defaultTitle={page.title} />

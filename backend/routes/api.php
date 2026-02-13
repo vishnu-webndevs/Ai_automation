@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\LockController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Api\Admin\PageController;
+use App\Http\Controllers\Api\Admin\PageTemplateController;
 use App\Http\Controllers\Api\Public\MenuController as PublicMenuController;
 use App\Http\Controllers\Api\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\Public\SitemapController;
@@ -91,6 +92,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/pages/{id}/duplicate', [PageController::class, 'duplicate']);
         Route::post('/ai/generate-page', [PageController::class, 'generateContent'])->middleware('throttle:ai-generation');
         Route::post('/ai/generate-page-bulk', [PageController::class, 'bulkGenerate'])->middleware('throttle:ai-generation');
+
+        // Page Templates
+        Route::get('/page-templates', [PageTemplateController::class, 'index']);
+        Route::post('/pages/{id}/apply-template', [PageTemplateController::class, 'apply']);
 
         Route::middleware(['admin.permission:manage_menus'])->group(function () {
             Route::get('/menus', [AdminMenuController::class, 'index']);

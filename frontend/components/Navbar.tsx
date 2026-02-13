@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="shrink-0 mr-4">
             <Link to="/" className="flex items-center gap-2 group">
-              <img src="/totan_ai_logo.png" alt="Totan AI" className="w-[80px] h-auto group-hover:scale-110 transition-transform" />
+              <img src="/totan_ai_logo.png" alt="Totan AI" className="w-[120px] h-auto group-hover:scale-110 transition-transform" />
             </Link>
           </div>
 

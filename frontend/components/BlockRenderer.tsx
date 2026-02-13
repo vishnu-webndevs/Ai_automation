@@ -9,6 +9,8 @@ import LogoTicker from './LogoTicker';
 import WhyTrust from './WhyTrust';
 import MobileSection from './MobileSection';
 import BentoGrid from './BentoGrid';
+import BlogGrid from './BlogGrid';
+import Newsletter from './Newsletter';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface BlockRendererProps {
@@ -42,9 +44,16 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
 
     switch (type) {
         case 'hero':
-            return <Hero {...content} />;
+        case 'hero_simple':
+        case 'hero_split':
+            return <Hero 
+                heading={content.title || content.heading} 
+                subheading={content.subtitle || content.subheading}
+                {...content} 
+            />;
         
         case 'features':
+        case 'features_grid':
             return <Features {...content} />;
 
         case 'bento_grid':
@@ -64,6 +73,13 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
         
         case 'mobile_section':
             return <MobileSection {...content} />;
+
+        case 'blog-grid':
+        case 'blog-list':
+            return <BlogGrid {...content} />;
+
+        case 'newsletter':
+            return <Newsletter {...content} />;
 
         case 'text':
             return (

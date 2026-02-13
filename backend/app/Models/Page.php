@@ -11,7 +11,7 @@ class Page extends Model
 {
     use HasFactory, AuditLoggable, HasLock;
 
-    protected $fillable = ['title', 'slug', 'type', 'status', 'template', 'locked_at', 'locked_by'];
+    protected $fillable = ['title', 'slug', 'type', 'status', 'template', 'template_slug', 'locked_at', 'locked_by'];
 
     protected $casts = [
         'locked_at' => 'datetime',

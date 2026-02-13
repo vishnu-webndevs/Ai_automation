@@ -18,7 +18,7 @@ export interface ContentBlock {
     type?: string; // Fallback for legacy/static data
     content: Record<string, any>;
     content_json?: Record<string, any>; // API response field
-    sort_order: number;
+    order: number;
 }
 
 export interface PageSection {
@@ -26,7 +26,7 @@ export interface PageSection {
     name: string;
     type: string; // 'default', 'full-width', etc.
     content: Record<string, any>;
-    sort_order: number;
+    order: number;
     blocks: ContentBlock[];
 }
 
@@ -48,6 +48,7 @@ export interface ServiceCategory {
     name: string;
     slug: string;
     description: string;
+    icon?: string;
 }
 
 export interface Industry {
@@ -86,52 +87,26 @@ export interface Integration {
     is_active: boolean;
 }
 
+export interface BlogCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    pages_count?: number;
+}
+
 export interface Page {
     id: number;
     title: string;
     slug: string;
     type?: string; // 'static', 'blog', etc.
     status: 'published' | 'draft' | 'archived';
-    template: string;
+    template_slug?: string;
     seo_meta: SeoMeta | null;
     sections: PageSection[];
     services?: Service[];
     industries?: Industry[];
     use_cases?: UseCase[];
-    solutions?: Solution[];
-    integrations?: Integration[];
-    blog_categories?: any[];
-    blog_tags?: any[];
-    created_at: string;
-    updated_at: string;
-}
-
-export interface BlogCategory {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    pages_count?: number;
-    pages?: Page[];
-}
-
-export interface MenuItem {
-    id: number;
-    label: string;
-    url: string;
-    target: '_blank' | '_self';
-    order: number;
-    children: MenuItem[];
-}
-
-export interface Menu {
-    id: number;
-    name: string;
-    location: string; // 'navbar', 'footer', 'social'
-    items: MenuItem[];
-}
-
-export interface ApiResponse<T> {
-    data: T;
-    message?: string;
+    created_at?: string;
+    updated_at?: string;
 }

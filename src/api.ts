@@ -177,4 +177,13 @@ export const checkKeywordConflicts = async (keyword: string, page_id?: number) =
     return api.post('/pages/check-keyword-conflicts', { keyword, page_id });
 };
 
+// Template System
+export const listPageTemplates = async () => {
+    return api.get('/page-templates');
+};
+
+export const applyPageTemplate = async (pageId: number, templateId: number) => {
+    return api.post(`/pages/${pageId}/apply-template`, { template_id: templateId });
+};
+
 export default api;

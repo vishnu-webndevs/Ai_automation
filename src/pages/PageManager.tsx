@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Card, CardBody, CardHeader } from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
+import { TemplateLibraryModal } from '../components/templates/TemplateLibraryModal';
 import {
   bulkUpdatePageStatus,
   duplicatePage,
@@ -86,6 +87,15 @@ const PageManager = () => {
   const [conflicts, setConflicts] = useState<KeywordConflict[]>([]);
   const [checkingConflicts, setCheckingConflicts] = useState(false);
   const [conflictChecked, setConflictChecked] = useState(false);
+
+  // Template Modal
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [templatePageId, setTemplatePageId] = useState<number | null>(null);
+
+  const openTemplateModal = (id: number) => {
+    setTemplatePageId(id);
+    setTemplateModalOpen(true);
+  };
 
   const publicBaseUrl = useMemo(() => {
     const url = (import.meta as any).env?.VITE_PUBLIC_SITE_URL;
@@ -542,7 +552,10 @@ const PageManager = () => {
                           ) : (
                             <>
                               <Button size="sm" variant="secondary" outline onClick={() => startEdit(row)} disabled={loading || (row.locked_status?.is_locked ?? false)}>
-                                Edit
+                                Quick Edit
+                              </Button>
+                              <Button size="sm" variant="primary" onClick={() => navigate(`/web-admin/pages/editor?pageId=${row.id}`)} disabled={loading || (row.locked_status?.is_locked ?? false)}>
+                                Edit Content
                               </Button>
                               <Button size="sm" variant="secondary" outline onClick={() => openPreview(row.slug)} disabled={loading}>
                                 Preview
@@ -552,6 +565,9 @@ const PageManager = () => {
                               </Button>
                               <Button size="sm" variant="secondary" outline onClick={() => onDuplicate(row.id)} disabled={loading}>
                                 Duplicate
+                              </Button>
+                              <Button size="sm" variant="secondary" outline onClick={() => openTemplateModal(row.id)} disabled={loading}>
+                                Template
                               </Button>
                               <Button size="sm" variant="warning" outline onClick={() => openRegenerate(row.id)} disabled={loading}>
                                 Regenerate AI
@@ -760,6 +776,19 @@ const PageManager = () => {
             </Button>
         </div>
       </Modal>
+      <TemplateLibraryModal
+        isOpen={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        pageId={templatePageId!}
+        onTemplateApplied={() => {
+            setTemplateModalOpen(false);
+            if (templatePageId) {
+                navigate(`/web-admin/pages/editor?pageId=${templatePageId}`);
+            } else {
+                fetchRows();
+            }
+        }}
+      />
     </div>
   );
 };

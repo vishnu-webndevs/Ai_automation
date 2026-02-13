@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-slate-800 pt-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
             <div className="col-span-2 lg:col-span-1">
                <a href="#" className="flex items-center gap-2 mb-4">
-                  <img src="/logo.png" alt="Totan AI" className="w-8 h-8 rounded-full" />
+                  <img src="/totan_ai_logo.png" alt="Totan AI" className="w-[120px] h-auto" />
                </a>
                <p className="text-slate-500 text-sm">© Totan.ai - All rights reserved.</p>
             </div>

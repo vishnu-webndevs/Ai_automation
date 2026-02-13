@@ -96,9 +96,10 @@ const Pricing: React.FC<PricingProps> = ({
                   {plan.cta_text || 'Get Started'} {plan.featured ? '→' : ''}
                </Link>
                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f, i) => (
+                  {(plan.features || []).map((f, i) => (
                      <li key={i} className={`flex items-center gap-3 text-sm ${plan.featured ? 'text-slate-300' : 'text-slate-400'}`}>
-                        <Check size={14} className="text-purple-400" /> {f}
+                        <Check className={`w-4 h-4 ${plan.featured ? 'text-purple-400' : 'text-purple-500'}`} />
+                        {f}
                      </li>
                   ))}
                </ul>

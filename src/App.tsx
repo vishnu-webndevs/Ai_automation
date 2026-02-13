@@ -14,6 +14,7 @@ const RootRedirect = () => {
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const PageManager = lazy(() => import('./pages/PageManager'));
+const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageGenerator = lazy(() => import('./pages/PageGenerator'));
 const ServicesManager = lazy(() => import('./pages/ServicesManager'));
 const IndustriesManager = lazy(() => import('./pages/IndustriesManager'));
@@ -69,6 +70,7 @@ function App() {
             
             <Route element={<ProtectedRoute permission="manage_pages" />}>
                 <Route path="pages" element={<PageManager />} />
+                <Route path="pages/editor" element={<PageEditor />} />
             </Route>
             
             <Route element={<ProtectedRoute permission="generate_ai" />}>
