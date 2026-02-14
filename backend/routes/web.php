@@ -4,7 +4,7 @@ use App\Http\Controllers\Public\PageRenderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json(['message' => 'API is running']);
 });
 
 Route::get('/robots.txt', function () {

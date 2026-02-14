@@ -245,12 +245,35 @@ const PageEditor = () => {
                                 <div key={block.id || bIndex} className="space-y-4">
                                     {/* Dynamic Fields based on Block Type */}
                                     <div className="grid grid-cols-1 gap-4">
-                                        {(block.block_type === 'hero' || block.block_type === 'hero_simple') && (
+                                        {(block.block_type === 'hero' || block.block_type === 'hero_simple' || block.block_type === 'hero_split') && (
                                             <>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-500 mb-1">Layout</label>
+                                                        <select
+                                                            className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white"
+                                                            value={block.content_json?.layout || 'center'}
+                                                            onChange={(e) => updateBlockContent(sIndex, bIndex, 'layout', e.target.value)}
+                                                        >
+                                                            <option value="center">Center (Default)</option>
+                                                            <option value="left">Image Left</option>
+                                                            <option value="right">Image Right</option>
+                                                            <option value="top">Image Top</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-500 mb-1">Custom Image</label>
+                                                        <Input 
+                                                            value={block.content_json?.image || ''} 
+                                                            onChange={(e) => updateBlockContent(sIndex, bIndex, 'image', e.target.value)}
+                                                            placeholder="Image URL (optional)"
+                                                        />
+                                                    </div>
+                                                </div>
                                                 <div>
                                                     <label className="block text-xs font-medium text-gray-500 mb-1">Heading</label>
                                                     <Input 
-                                                        value={block.content_json?.heading || ''} 
+                                                        value={block.content_json?.heading || block.content_json?.title || ''} 
                                                         onChange={(e) => updateBlockContent(sIndex, bIndex, 'heading', e.target.value)}
                                                         placeholder="Enter main heading..."
                                                     />
@@ -259,7 +282,7 @@ const PageEditor = () => {
                                                     <label className="block text-xs font-medium text-gray-500 mb-1">Subheading</label>
                                                     <textarea 
                                                         className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
-                                                        value={block.content_json?.subheading || ''} 
+                                                        value={block.content_json?.subheading || block.content_json?.subtitle || ''} 
                                                         onChange={(e) => updateBlockContent(sIndex, bIndex, 'subheading', e.target.value)}
                                                         rows={2}
                                                         placeholder="Enter subheading text..."
@@ -268,7 +291,106 @@ const PageEditor = () => {
                                             </>
                                         )}
 
-                                        {block.block_type === 'text' && (
+                                        {(block.block_type === 'features' || block.block_type === 'features_grid') && (
+                                            <>
+                                                <div className="mb-4">
+                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Layout</label>
+                                                    <select
+                                                        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-purple-500 outline-none bg-white"
+                                                        value={block.content_json?.layout || 'left'}
+                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'layout', e.target.value)}
+                                                    >
+                                                        <option value="left">Text Left, Image Right (Default)</option>
+                                                        <option value="right">Image Left, Text Right</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Heading</label>
+                                                    <Input 
+                                                        value={block.content_json?.heading || block.content_json?.title || ''} 
+                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'heading', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Subheading</label>
+                                                    <Input 
+                                                        value={block.content_json?.subheading || ''} 
+                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'subheading', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="space-y-3 mt-2">
+                                                    <label className="block text-xs font-medium text-gray-500">Features List</label>
+                                                    {(block.content_json?.features || []).map((feature: any, fIndex: number) => (
+                                                        <div key={fIndex} className="p-3 bg-gray-50 rounded border border-gray-200 flex gap-2">
+                                                            <div className="flex-1 space-y-2">
+                                                                <Input 
+                                                                    value={feature.title || ''}
+                                                                    onChange={(e) => {
+                                                                        const newFeatures = [...(block.content_json?.features || [])];
+                                                                        newFeatures[fIndex] = { ...feature, title: e.target.value };
+                                                                        updateBlockContent(sIndex, bIndex, 'features', newFeatures);
+                                                                    }}
+                                                                    placeholder="Feature Title"
+                                                                />
+                                                                <Input 
+                                                                    value={feature.description || ''}
+                                                                    onChange={(e) => {
+                                                                        const newFeatures = [...(block.content_json?.features || [])];
+                                                                        newFeatures[fIndex] = { ...feature, description: e.target.value };
+                                                                        updateBlockContent(sIndex, bIndex, 'features', newFeatures);
+                                                                    }}
+                                                                    placeholder="Description"
+                                                                />
+                                                            </div>
+                                                            <button 
+                                                                onClick={() => {
+                                                                    const newFeatures = [...(block.content_json?.features || [])];
+                                                                    newFeatures.splice(fIndex, 1);
+                                                                    updateBlockContent(sIndex, bIndex, 'features', newFeatures);
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700 self-center"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    <Button 
+                                                        size="sm" 
+                                                        variant="secondary" 
+                                                        onClick={() => {
+                                                            const newFeatures = [...(block.content_json?.features || []), { title: 'New Feature', description: '', icon: 'Zap' }];
+                                                            updateBlockContent(sIndex, bIndex, 'features', newFeatures);
+                                                        }}
+                                                    >
+                                                        Add Feature
+                                                    </Button>
+                                                </div>
+                                             </>
+                                         )}
+
+                                         {block.block_type === 'pricing' && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
+                                                    <Input 
+                                                        value={block.content_json?.title || ''} 
+                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'title', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Subtitle</label>
+                                                    <Input 
+                                                        value={block.content_json?.subtitle || ''} 
+                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'subtitle', e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="bg-blue-50 p-3 rounded text-sm text-blue-700">
+                                                    Pricing plans can be edited in the JSON view below.
+                                                </div>
+                                            </>
+                                         )}
+ 
+                                         {block.block_type === 'text' && (
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-500 mb-1">Content (HTML allowed)</label>
                                                 <textarea 

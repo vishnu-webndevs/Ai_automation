@@ -11,6 +11,7 @@ export interface FeaturesProps {
   heading?: string;
   subheading?: string;
   items?: FeatureItem[];
+  layout?: 'left' | 'right';
 }
 
 const Features: React.FC<FeaturesProps> = ({
@@ -20,7 +21,8 @@ const Features: React.FC<FeaturesProps> = ({
     { title: 'Simplify your security', description: '' },
     { title: 'Customer identity', description: '' },
     { title: 'Adaptable authentication', description: '' }
-  ]
+  ],
+  layout = 'left'
 }) => {
   return (
     <section className="py-20 relative">
@@ -31,7 +33,7 @@ const Features: React.FC<FeaturesProps> = ({
         
         {/* Feature 1: Simplify */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
+          <div className={layout === 'right' ? 'md:order-2' : ''}>
             <div className="text-purple-400 font-medium mb-2">The security first platform</div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{heading}</h2>
             <p className="text-slate-400 text-lg mb-8">{subheading}</p>
@@ -45,7 +47,7 @@ const Features: React.FC<FeaturesProps> = ({
               ))}
             </ul>
           </div>
-          <div className="relative">
+          <div className={`relative ${layout === 'right' ? 'md:order-1' : ''}`}>
              <div className="aspect-square rounded-2xl bg-slate-800/50 border border-slate-700/50 p-8 relative overflow-hidden group">
                 {/* Abstract Grid visual */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)]" />

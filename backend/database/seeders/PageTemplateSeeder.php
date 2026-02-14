@@ -20,10 +20,11 @@ class PageTemplateSeeder extends Seeder
                             'type' => 'hero',
                             'order' => 1,
                             'content' => [
-                                'title' => 'Modern Blog Hero',
-                                'subtitle' => 'Latest insights and stories',
+                                'heading' => 'Modern Blog Hero',
+                                'subheading' => 'Latest insights and stories',
                                 'bg_color' => 'bg-slate-900',
-                                'text_color' => 'text-white'
+                                'text_color' => 'text-white',
+                                'layout' => 'center'
                             ]
                         ],
                         [
@@ -55,8 +56,9 @@ class PageTemplateSeeder extends Seeder
                             'type' => 'hero_simple',
                             'order' => 1,
                             'content' => [
-                                'title' => 'Classic Blog',
-                                'subtitle' => 'Timeless wisdom'
+                                'heading' => 'Classic Blog',
+                                'subheading' => 'Timeless wisdom',
+                                'layout' => 'left'
                             ]
                         ],
                         [
@@ -80,21 +82,23 @@ class PageTemplateSeeder extends Seeder
                             'type' => 'hero_split',
                             'order' => 1,
                             'content' => [
-                                'title' => 'Launch Your Startup',
-                                'subtitle' => 'The best platform for growth',
+                                'heading' => 'Launch Your Startup',
+                                'subheading' => 'The best platform for growth',
                                 'cta_primary' => 'Get Started',
-                                'cta_secondary' => 'Learn More'
+                                'cta_secondary' => 'Learn More',
+                                'layout' => 'right'
                             ]
                         ],
                         [
                             'type' => 'features_grid',
                             'order' => 2,
                             'content' => [
-                                'title' => 'Why Choose Us',
+                                'heading' => 'Why Choose Us',
+                                'layout' => 'left',
                                 'features' => [
-                                    ['title' => 'Fast', 'icon' => 'zap'],
-                                    ['title' => 'Secure', 'icon' => 'shield'],
-                                    ['title' => 'Scalable', 'icon' => 'chart']
+                                    ['title' => 'Fast', 'icon' => 'zap', 'description' => 'Blazing fast performance'],
+                                    ['title' => 'Secure', 'icon' => 'shield', 'description' => 'Bank-grade security'],
+                                    ['title' => 'Scalable', 'icon' => 'chart', 'description' => 'Grows with you']
                                 ]
                             ]
                         ],

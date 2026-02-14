@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ContentBlock } from '../types';
+import { ContentBlock, Page } from '../types';
 import Hero from './Hero';
 import Features from './Features';
 import Pricing from './Pricing';
@@ -15,6 +15,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface BlockRendererProps {
     block: ContentBlock;
+    page?: Page;
 }
 
 const FAQItem = ({ item }: { item: { question: string; answer: string } }) => {
@@ -37,7 +38,7 @@ const FAQItem = ({ item }: { item: { question: string; answer: string } }) => {
     );
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
     // Handle potential API vs Static data differences
     const type = block.block_type || block.type;
     const content = block.content || block.content_json || {};
@@ -46,9 +47,18 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
         case 'hero':
         case 'hero_simple':
         case 'hero_split':
+            const heroMeta = page ? {
+                date: page.created_at ? new Date(page.created_at).toLocaleDateString() : undefined,
+                categories: (page as any).blog_categories?.map((c: any) => c.name),
+                author: 'Totan Team'
+            } : undefined;
+
             return <Hero 
                 heading={content.title || content.heading} 
                 subheading={content.subtitle || content.subheading}
+                image={content.image || page?.seo_meta?.og_image}
+                layout={content.layout}
+                meta={heroMeta}
                 {...content} 
             />;
         
