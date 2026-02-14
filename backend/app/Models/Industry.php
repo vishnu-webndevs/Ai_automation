@@ -10,7 +10,7 @@ class Industry extends Model
 {
     use HasFactory, HasLock;
 
-    protected $fillable = ['name', 'slug', 'description', 'icon', 'is_active', 'locked_at', 'locked_by'];
+    protected $fillable = ['name', 'slug', 'template_slug', 'description', 'icon', 'is_active', 'locked_at', 'locked_by'];
 
     protected $casts = [
         'locked_at' => 'datetime',

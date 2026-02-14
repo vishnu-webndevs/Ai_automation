@@ -13,6 +13,7 @@ class Integration extends Model
     protected $fillable = [
         'name',
         'slug',
+        'template_slug',
         'description',
         'icon',
         'is_active',

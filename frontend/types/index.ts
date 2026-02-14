@@ -95,6 +95,23 @@ export interface BlogCategory {
     pages_count?: number;
 }
 
+export interface MenuItem {
+    id: number;
+    label: string;
+    url: string;
+    target?: string;
+    show_on?: string;
+    is_visible?: boolean;
+    children?: MenuItem[];
+}
+
+export interface Menu {
+    id?: number;
+    name?: string;
+    location: string;
+    items: MenuItem[];
+}
+
 export interface Page {
     id: number;
     title: string;
@@ -107,6 +124,7 @@ export interface Page {
     services?: Service[];
     industries?: Industry[];
     use_cases?: UseCase[];
+    blog_categories?: BlogCategory[];
     created_at?: string;
     updated_at?: string;
 }

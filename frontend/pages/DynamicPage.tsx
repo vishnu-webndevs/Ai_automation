@@ -36,9 +36,9 @@ const DynamicPage: React.FC = () => {
     // Check if the first block is a Hero block to avoid double padding (only for default layout)
     const hasHero = useMemo(() => {
         if (!page?.sections?.length) return false;
-        const firstSection = [...page.sections].sort((a, b) => a.sort_order - b.sort_order)[0];
+        const firstSection = [...page.sections].sort((a, b) => a.order - b.order)[0];
         if (!firstSection?.blocks?.length) return false;
-        const firstBlock = [...firstSection.blocks].sort((a, b) => a.sort_order - b.sort_order)[0];
+        const firstBlock = [...firstSection.blocks].sort((a, b) => a.order - b.order)[0];
         const type = firstBlock.block_type || firstBlock.type;
         return type === 'hero';
     }, [page]);
@@ -82,13 +82,13 @@ const DynamicPage: React.FC = () => {
             <SeoHead meta={page.seo_meta} defaultTitle={page.title} />
             
             {/* Render Sections */}
-            {page.sections?.sort((a, b) => a.sort_order - b.sort_order).map((section) => (
+            {page.sections?.sort((a, b) => a.order - b.order).map((section) => (
                 <section 
                     key={section.id} 
                     className={`relative ${section.type === 'full-width' ? 'w-full' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'}`}
                 >
                     {/* Render Blocks within Section */}
-                    {section.blocks?.sort((a, b) => a.sort_order - b.sort_order).map((block) => (
+                    {section.blocks?.sort((a, b) => a.order - b.order).map((block) => (
                         <BlockRenderer key={block.id} block={block} />
                     ))}
                 </section>

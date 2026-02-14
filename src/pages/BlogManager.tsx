@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Sparkles } from 'lucide-react';
 import { api } from '../api';
 import type { Blog, BlogCategory } from '../types';
 import Modal from '../components/ui/Modal';
+import ImagePicker from '../components/media/ImagePicker';
 
 const BlogManager = () => {
     const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -271,6 +272,15 @@ const BlogManager = () => {
                                 />
                             </div>
                         )}
+
+                        <div className="md:col-span-2">
+                            <ImagePicker
+                                label="Featured Image"
+                                value={currentBlog.featured_image || ''}
+                                onChange={(val) => setCurrentBlog({ ...currentBlog, featured_image: val })}
+                                placeholder="Select featured image..."
+                            />
+                        </div>
 
                         <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>

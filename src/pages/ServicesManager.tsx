@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink } from 'lucide-react';
-import { api, toggleLock, FRONTEND_URL } from '../api';
+import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
 import type { Service } from '../types';
 import Modal from '../components/ui/Modal';
+import Dropdown from '../components/ui/Dropdown';
+
+type TemplateSummary = { id: number; name: string; slug: string };
 
 // Extend Service type locally if not updated globally yet
 interface ServiceWithLock extends Service {
@@ -17,6 +20,7 @@ interface ServiceWithLock extends Service {
 
 const ServicesManager = () => {
     const [services, setServices] = useState<ServiceWithLock[]>([]);
+    const [templates, setTemplates] = useState<TemplateSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentService, setCurrentService] = useState<Partial<ServiceWithLock>>({});
@@ -61,6 +65,16 @@ const ServicesManager = () => {
         const t = setTimeout(fetchData, 300);
         return () => clearTimeout(t);
     }, [fetchData]);
+
+    useEffect(() => {
+        listPageTemplates()
+            .then(res => {
+                const raw = Array.isArray(res.data) ? res.data : [];
+                const rows: TemplateSummary[] = (raw as unknown as TemplateSummary[]);
+                setTemplates(rows);
+            })
+            .catch(err => console.error('Failed to load templates', err));
+    }, []);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -151,6 +165,7 @@ const ServicesManager = () => {
                             <tr>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('name')}>Name</th>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('slug')}>Slug</th>
+                                <th className="px-6 py-4">Template</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('updated_at')}>Last Updated</th>
                                 <th className="px-6 py-4 text-center">Lock</th>
@@ -160,11 +175,11 @@ const ServicesManager = () => {
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading services...</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">Loading services...</td>
                                 </tr>
                             ) : services.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">No services found.</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">No services found.</td>
                                 </tr>
                             ) : (
                                 services.map((service) => (
@@ -178,6 +193,11 @@ const ServicesManager = () => {
                                         <td className="px-6 py-4">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
                                                 {service.slug}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm text-gray-600">
+                                                {service.template_slug || 'Default'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -209,6 +229,37 @@ const ServicesManager = () => {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Dropdown
+                                                    label="Template"
+                                                    items={[
+                                                        {
+                                                            label: 'Default (clear)',
+                                                            onClick: async () => {
+                                                                if (service.locked_status?.is_locked) return;
+                                                                try {
+                                                                    await api.patch(`/services/${service.id}`, { template_slug: '' });
+                                                                    fetchData();
+                                                                } catch (e) {
+                                                                    console.error('Failed to clear template', e);
+                                                                }
+                                                            }
+                                                        },
+                                                        { divider: true, label: 'divider' },
+                                                        ...templates.map((t) => ({
+                                                            label: t.name,
+                                                            onClick: async () => {
+                                                                if (service.locked_status?.is_locked) return;
+                                                                try {
+                                                                    await api.patch(`/services/${service.id}`, { template_slug: t.slug });
+                                                                    fetchData();
+                                                                } catch (e) {
+                                                                    console.error('Failed to set template', e);
+                                                                }
+                                                            }
+                                                        }))
+                                                    ]}
+                                                    variant="light"
+                                                />
                                                 <button 
                                                     onClick={() => window.open(`${FRONTEND_URL}/services/${service.slug}`, '_blank')}
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -311,6 +362,19 @@ const ServicesManager = () => {
                             onChange={(e) => setCurrentService({ ...currentService, slug: e.target.value })}
                             placeholder="Auto-generated if empty"
                         />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Page Template</label>
+                        <select
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            value={currentService.template_slug || ''}
+                            onChange={(e) => setCurrentService({ ...currentService, template_slug: e.target.value })}
+                        >
+                            <option value="">Default Template</option>
+                             {templates.map((t) => (
+                                <option key={t.id} value={t.slug}>{t.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>

@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { History, AlertTriangle, CheckCircle } from 'lucide-react';
+import { History, AlertTriangle, CheckCircle, Edit, FileText, Eye, EyeOff, Copy, LayoutTemplate, Wand, Lock, Unlock } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Card, CardBody, CardHeader } from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import { TemplateLibraryModal } from '../components/templates/TemplateLibraryModal';
 import {
+  createPage,
   bulkUpdatePageStatus,
   duplicatePage,
   listPages,
@@ -19,7 +20,6 @@ import {
   toggleLock
 } from '../api';
 import type { PageVersion, KeywordConflict } from '../types';
-import { Lock, Unlock } from 'lucide-react';
 
 type PageRow = {
   id: number;
@@ -92,6 +92,13 @@ const PageManager = () => {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [templatePageId, setTemplatePageId] = useState<number | null>(null);
 
+  // Manual Create Modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newSlug, setNewSlug] = useState('');
+  const [newType, setNewType] = useState('page');
+  const [creating, setCreating] = useState(false);
+
   const openTemplateModal = (id: number) => {
     setTemplatePageId(id);
     setTemplateModalOpen(true);
@@ -113,6 +120,7 @@ const PageManager = () => {
       const res = await listPages({
         q: q || undefined,
         type: type || undefined,
+        exclude_type: type ? undefined : 'blog',
         status: (status as any) || undefined,
         sort,
         dir,
@@ -335,6 +343,35 @@ const PageManager = () => {
     }
   };
 
+  const handleNewTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setNewTitle(val);
+    // Simple slugify
+    const slug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    setNewSlug(slug);
+  };
+
+  const handleCreateManual = async () => {
+    if (!newTitle || !newSlug) return;
+    
+    setCreating(true);
+    setError(null);
+    try {
+        const res = await createPage({
+            title: newTitle,
+            slug: newSlug,
+            type: newType,
+            status: 'draft'
+        });
+        
+        // Navigate to editor
+        navigate(`/web-admin/pages/editor?pageId=${res.data.id}`);
+    } catch (e: any) {
+        setError(e?.response?.data?.message || 'Failed to create page');
+        setCreating(false);
+    }
+  };
+
   const toggleSort = (field: string) => {
     if (sort === field) {
       setDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -348,9 +385,16 @@ const PageManager = () => {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Pages</h1>
-        <Button onClick={() => navigate('/web-admin/ai-generator')} disabled={loading}>
-          New Page (AI)
-        </Button>
+        <div className="flex gap-2">
+            <Button variant="secondary" outline onClick={() => setCreateModalOpen(true)} disabled={loading}>
+                <Edit className="w-4 h-4 mr-2" />
+                Create Manual
+            </Button>
+            <Button onClick={() => navigate('/web-admin/ai-generator')} disabled={loading}>
+                <Wand className="w-4 h-4 mr-2" />
+                New Page (AI)
+            </Button>
+        </div>
       </div>
 
       <Card className="mb-6">
@@ -366,6 +410,7 @@ const PageManager = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Type</label>
               <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="service, blog, industry..." />
+              <p className="text-xs text-gray-500 mt-1">Note: "blog" pages are hidden by default. Type "blog" here to see them.</p>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Status</label>
@@ -550,28 +595,63 @@ const PageManager = () => {
                               </Button>
                             </>
                           ) : (
-                            <>
-                              <Button size="sm" variant="secondary" outline onClick={() => startEdit(row)} disabled={loading || (row.locked_status?.is_locked ?? false)}>
-                                Quick Edit
-                              </Button>
-                              <Button size="sm" variant="primary" onClick={() => navigate(`/web-admin/pages/editor?pageId=${row.id}`)} disabled={loading || (row.locked_status?.is_locked ?? false)}>
-                                Edit Content
-                              </Button>
-                              <Button size="sm" variant="secondary" outline onClick={() => openPreview(row.slug)} disabled={loading}>
-                                Preview
-                              </Button>
-                              <Button size="sm" onClick={() => onTogglePublish(row.id)} disabled={loading}>
-                                {row.status === 'published' ? 'Unpublish' : 'Publish'}
-                              </Button>
-                              <Button size="sm" variant="secondary" outline onClick={() => onDuplicate(row.id)} disabled={loading}>
-                                Duplicate
-                              </Button>
-                              <Button size="sm" variant="secondary" outline onClick={() => openTemplateModal(row.id)} disabled={loading}>
-                                Template
-                              </Button>
-                              <Button size="sm" variant="warning" outline onClick={() => openRegenerate(row.id)} disabled={loading}>
-                                Regenerate AI
-                              </Button>
+                            <div className="flex items-center gap-1">
+                              <button 
+                                onClick={() => startEdit(row)} 
+                                disabled={loading || (row.locked_status?.is_locked ?? false)}
+                                className="p-1 text-gray-500 hover:text-blue-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Quick Edit"
+                              >
+                                <Edit size={18} />
+                              </button>
+                              <button 
+                                onClick={() => navigate(`/web-admin/pages/editor?pageId=${row.id}`)} 
+                                disabled={loading || (row.locked_status?.is_locked ?? false)}
+                                className="p-1 text-gray-500 hover:text-blue-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Edit Content"
+                              >
+                                <FileText size={18} />
+                              </button>
+                              <button 
+                                onClick={() => openPreview(row.slug)} 
+                                disabled={loading}
+                                className="p-1 text-gray-500 hover:text-green-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Preview"
+                              >
+                                <Eye size={18} />
+                              </button>
+                              <button 
+                                onClick={() => onTogglePublish(row.id)} 
+                                disabled={loading}
+                                className={`p-1 rounded hover:bg-gray-100 disabled:opacity-50 ${row.status === 'published' ? 'text-amber-500 hover:text-amber-600' : 'text-green-500 hover:text-green-600'}`}
+                                title={row.status === 'published' ? 'Unpublish' : 'Publish'}
+                              >
+                                {row.status === 'published' ? <EyeOff size={18} /> : <CheckCircle size={18} />}
+                              </button>
+                              <button 
+                                onClick={() => onDuplicate(row.id)} 
+                                disabled={loading}
+                                className="p-1 text-gray-500 hover:text-purple-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Duplicate"
+                              >
+                                <Copy size={18} />
+                              </button>
+                              <button 
+                                onClick={() => openTemplateModal(row.id)} 
+                                disabled={loading}
+                                className="p-1 text-gray-500 hover:text-indigo-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Template"
+                              >
+                                <LayoutTemplate size={18} />
+                              </button>
+                              <button 
+                                onClick={() => openRegenerate(row.id)} 
+                                disabled={loading}
+                                className="p-1 text-gray-500 hover:text-pink-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Regenerate AI"
+                              >
+                                <Wand size={18} />
+                              </button>
                               <button 
                                 onClick={() => openDetails(row, 'history')}
                                 className="p-1 text-gray-500 hover:text-blue-600 rounded hover:bg-gray-100"
@@ -586,7 +666,7 @@ const PageManager = () => {
                                 >
                                 {row.locked_status?.is_locked ? <Unlock size={18} /> : <Lock size={18} />}
                               </button>
-                            </>
+                            </div>
                           )}
                         </div>
                       </td>
@@ -776,6 +856,57 @@ const PageManager = () => {
             </Button>
         </div>
       </Modal>
+
+      <Modal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title="Create New Page"
+      >
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <Input value={newTitle} onChange={handleNewTitleChange} placeholder="Page Title (e.g. About Us)" />
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Slug</label>
+                <div className="flex gap-2">
+                    <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="page-slug" />
+                    <Button 
+                        size="sm" 
+                        variant="secondary" 
+                        onClick={() => checkSlug(newSlug, 0)} 
+                        disabled={!newSlug || slugChecking}
+                    >
+                        {slugChecking ? 'Checking...' : 'Check'}
+                    </Button>
+                </div>
+                {slugAvailable === true && <p className="text-xs text-green-600 mt-1">Slug is available</p>}
+                {slugAvailable === false && <p className="text-xs text-red-600 mt-1">Slug is already taken</p>}
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Type</label>
+                <select 
+                    className="w-full border border-gray-300 rounded-md p-2 text-sm"
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value)}
+                >
+                    <option value="page">Standard Page</option>
+                    <option value="blog">Blog Post</option>
+                    <option value="service">Service Page</option>
+                    <option value="industry">Industry Page</option>
+                    <option value="landing">Landing Page</option>
+                </select>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+                <Button variant="secondary" onClick={() => setCreateModalOpen(false)}>Cancel</Button>
+                <Button onClick={handleCreateManual} disabled={creating || !newTitle || !newSlug || slugAvailable === false}>
+                    {creating ? 'Creating...' : 'Create Page'}
+                </Button>
+            </div>
+        </div>
+      </Modal>
+
       <TemplateLibraryModal
         isOpen={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}

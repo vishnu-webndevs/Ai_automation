@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Save, Plus, Trash2, ArrowUp, ArrowDown, Layout } from 'lucide-react';
+import ImagePicker from '../components/media/ImagePicker';
 
 // Default content generators for blocks
 const getDefaultContent = (type: string) => {
@@ -262,10 +263,10 @@ const PageEditor = () => {
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-xs font-medium text-gray-500 mb-1">Custom Image</label>
-                                                        <Input 
+                                                        <ImagePicker 
+                                                            label="Custom Image"
                                                             value={block.content_json?.image || ''} 
-                                                            onChange={(e) => updateBlockContent(sIndex, bIndex, 'image', e.target.value)}
+                                                            onChange={(val) => updateBlockContent(sIndex, bIndex, 'image', val)}
                                                             placeholder="Image URL (optional)"
                                                         />
                                                     </div>

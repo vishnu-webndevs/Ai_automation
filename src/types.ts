@@ -10,6 +10,7 @@ export interface Service {
     id: number;
     name: string;
     slug: string;
+    template_slug?: string;
     category_id?: number;
     description?: string;
     is_active: boolean;
@@ -20,6 +21,7 @@ export interface Industry {
     id: number;
     name: string;
     slug: string;
+    template_slug?: string;
     description?: string;
     is_active: boolean;
 }
@@ -28,6 +30,7 @@ export interface UseCase {
     id: number;
     name: string;
     slug: string;
+    template_slug?: string;
     description?: string;
     is_active: boolean;
 }
@@ -133,4 +136,21 @@ export interface KeywordConflict {
     keyword: string;
     conflicting_page_id: number;
     conflicting_page_title: string;
+}
+
+export interface MediaRow {
+    id: number;
+    url: string;
+    webp_url?: string | null;
+    path: string;
+    webp_path?: string | null;
+    file_name: string;
+    original_name?: string | null;
+    mime_type?: string | null;
+    size_bytes: number;
+    width?: number | null;
+    height?: number | null;
+    alt_text: string;
+    usages_count?: number;
+    created_at: string;
 }

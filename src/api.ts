@@ -56,6 +56,7 @@ export const logoutAdmin = async () => {
 
 export const listPages = async (params?: {
     type?: string;
+    exclude_type?: string;
     status?: 'draft' | 'published';
     q?: string;
     sort?: string;
@@ -175,6 +176,30 @@ export const restorePageVersion = async (id: number, version_id: number) => {
 
 export const checkKeywordConflicts = async (keyword: string, page_id?: number) => {
     return api.post('/pages/check-keyword-conflicts', { keyword, page_id });
+};
+
+export const listServices = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/services', { params });
+};
+
+export const listServiceCategories = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/service-categories', { params });
+};
+
+export const listIndustries = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/industries', { params });
+};
+
+export const listUseCases = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/use-cases', { params });
+};
+
+export const listSolutions = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/solutions', { params });
+};
+
+export const listIntegrations = async (params?: { q?: string; per_page?: number; page?: number; sort?: string; dir?: 'asc' | 'desc' }) => {
+    return api.get('/integrations', { params });
 };
 
 // Template System

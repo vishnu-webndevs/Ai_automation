@@ -131,6 +131,10 @@ Route::prefix('admin')->group(function () {
             Route::apiResource('service-categories', ServiceCategoryController::class);
             Route::apiResource('industries', IndustryController::class);
             Route::apiResource('use-cases', UseCaseController::class);
+            
+            // Read-only access for Menu Manager
+            Route::get('/solutions', [PublicSolutionController::class, 'index']);
+            Route::get('/integrations', [PublicIntegrationController::class, 'index']);
         });
 
         // Advanced Blog System

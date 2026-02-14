@@ -49,6 +49,10 @@ class PageController extends Controller
             $query->where('type', $validated['type']);
         }
 
+        if ($request->has('exclude_type')) {
+            $query->where('type', '!=', $request->input('exclude_type'));
+        }
+
         if (!empty($validated['status'])) {
             $query->where('status', $validated['status']);
         }
