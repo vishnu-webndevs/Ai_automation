@@ -22,9 +22,13 @@ const DynamicPage: React.FC = () => {
 
     // Use API data if available, otherwise check static fallback
     const page = useMemo(() => {
-        if (apiPage) return apiPage;
-        if (STATIC_PAGES[slug]) return STATIC_PAGES[slug];
-        return null;
+        let resolved = apiPage || STATIC_PAGES[slug] || null;
+
+        if (resolved && !resolved.template_slug && slug === 'contact-us') {
+            resolved = { ...resolved, template_slug: 'contact-dark' };
+        }
+
+        return resolved;
     }, [apiPage, slug]);
 
     // Check if template exists

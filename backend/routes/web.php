@@ -9,8 +9,8 @@ Route::get('/', function () {
 
 Route::get('/robots.txt', function () {
     $env = config('app.env');
-    $baseUrl = rtrim(env('PUBLIC_SITE_URL', config('app.url')), '/');
-    $sitemapUrl = $baseUrl . '/api/sitemap.xml';
+    $baseUrl = rtrim(env('FRONTEND_URL', env('PUBLIC_SITE_URL', config('app.url'))), '/');
+    $sitemapUrl = $baseUrl . '/sitemap.xml';
 
     if ($env !== 'production') {
         return response("User-agent: *\nDisallow: /\n", 200)->header('Content-Type', 'text/plain; charset=UTF-8');

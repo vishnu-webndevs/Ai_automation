@@ -1,9 +1,12 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Github, Twitter, Linkedin } from 'lucide-react';
 import useSWR from 'swr';
 import { menuService } from '../services/api';
 
 const Footer: React.FC = () => {
+  const location = useLocation();
+  const hideCta = location.pathname === '/contact-us';
   const { data: menuData } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
 
   return (
@@ -13,15 +16,19 @@ const Footer: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
-        {/* CTA Section */}
-        <div className="text-center mb-20">
-           <div className="text-purple-400 font-medium mb-2">The security first platform</div>
-           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Take control of your business</h2>
-           <p className="text-slate-400 max-w-2xl mx-auto mb-10">All the lorem ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.</p>
-           <button className="px-8 py-3 rounded-full bg-white text-slate-900 font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-purple-500/20">
+        {/* CTA Section (hidden on Contact page) */}
+        {!hideCta && (
+          <div className="text-center mb-20">
+            <div className="text-purple-400 font-medium mb-2">The security first platform</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Take control of your business</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto mb-10">
+              All the lorem ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.
+            </p>
+            <button className="px-8 py-3 rounded-full bg-white text-slate-900 font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-purple-500/20">
               Get Started
-           </button>
-        </div>
+            </button>
+          </div>
+        )}
 
         <div className="border-t border-slate-800 pt-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
             <div className="col-span-2 lg:col-span-1">

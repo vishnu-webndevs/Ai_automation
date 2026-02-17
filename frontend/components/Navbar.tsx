@@ -15,10 +15,22 @@ const DesktopMenuItem = ({ item }: { item: MenuItem }) => {
     if (hasChildren) {
         return (
             <div className="relative group">
-                <button className={`flex items-center gap-1 ${linkClass(item.url)} group-hover:text-white outline-none`}>
-                    {item.label}
-                    <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
-                </button>
+                <div className="flex items-center gap-1">
+                    <Link
+                        to={item.url}
+                        className={linkClass(item.url)}
+                        target={item.target}
+                    >
+                        {item.label}
+                    </Link>
+                    <button
+                        type="button"
+                        className="text-slate-300 group-hover:text-white outline-none"
+                        aria-label={`Open ${item.label} menu`}
+                    >
+                        <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+                    </button>
+                </div>
                 
                 {/* Dropdown */}
                 <div className="absolute left-0 top-full pt-4 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
@@ -53,13 +65,24 @@ const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => 
     if (hasChildren) {
         return (
             <div className="flex flex-col w-full">
-                <button 
-                    onClick={() => setIsOpen(!isOpen)} 
-                    className="flex items-center justify-between text-slate-300 hover:text-white py-3 px-4 w-full text-left"
-                >
-                    <span>{item.label}</span>
-                    <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
+                <div className="flex items-center justify-between text-slate-300 hover:text-white py-3 px-4 w-full">
+                    <Link
+                        to={item.url}
+                        onClick={closeMenu}
+                        className="flex-1 text-left"
+                        target={item.target}
+                    >
+                        {item.label}
+                    </Link>
+                    <button 
+                        type="button"
+                        onClick={() => setIsOpen(!isOpen)} 
+                        className="ml-2 text-slate-300 hover:text-white"
+                        aria-label={`Toggle ${item.label} submenu`}
+                    >
+                        <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                </div>
                 
                 {isOpen && (
                     <div className="bg-white/5 rounded-lg mx-4 mb-2 overflow-hidden flex flex-col">

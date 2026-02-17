@@ -19,6 +19,7 @@ const PageGenerator = lazy(() => import('./pages/PageGenerator'));
 const ServicesManager = lazy(() => import('./pages/ServicesManager'));
 const IndustriesManager = lazy(() => import('./pages/IndustriesManager'));
 const UseCasesManager = lazy(() => import('./pages/UseCasesManager'));
+const SolutionsManager = lazy(() => import('./pages/SolutionsManager'));
 const BlogManager = lazy(() => import('./pages/BlogManager'));
 const BlogCategoryManager = lazy(() => import('./pages/BlogCategoryManager'));
 const BlogTagManager = lazy(() => import('./pages/BlogTagManager'));
@@ -82,6 +83,7 @@ function App() {
                 <Route path="taxonomy/services" element={<ServicesManager />} />
                 <Route path="taxonomy/industries" element={<IndustriesManager />} />
                 <Route path="taxonomy/use-cases" element={<UseCasesManager />} />
+                <Route path="taxonomy/tools" element={<SolutionsManager />} />
             </Route>
 
             {/* Blog */}

@@ -6,15 +6,26 @@ export interface User {
     permissions?: string[];
 }
 
+export interface ServiceFeature {
+    id?: number;
+    title: string;
+    description?: string;
+    icon?: string;
+    sort_order?: number;
+}
+
 export interface Service {
     id: number;
     name: string;
     slug: string;
     template_slug?: string;
-    category_id?: number;
+    service_category_id?: number;
+    short_description?: string;
+    full_description?: string;
+    icon?: string;
     description?: string;
     is_active: boolean;
-    features?: string[];
+    features?: ServiceFeature[];
 }
 
 export interface Industry {

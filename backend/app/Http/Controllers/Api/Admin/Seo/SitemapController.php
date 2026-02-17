@@ -16,10 +16,13 @@ class SitemapController extends Controller
         $count = SitemapCache::count();
         $lastRebuilt = SitemapCache::orderBy('updated_at', 'desc')->value('updated_at');
 
+        $frontendBase = rtrim(env('FRONTEND_URL', env('PUBLIC_SITE_URL', config('app.url'))), '/');
+        $sitemapUrl = $frontendBase . '/sitemap.xml';
+
         return response()->json([
             'page_count' => $count,
             'last_rebuilt' => $lastRebuilt,
-            'url' => url('/sitemap.xml')
+            'url' => $sitemapUrl,
         ]);
     }
 

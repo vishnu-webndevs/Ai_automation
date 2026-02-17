@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, ArrowUp, ArrowDown } from 'lucide-react';
 import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
-import type { Service } from '../types';
+import type { Service, ServiceFeature } from '../types';
 import Modal from '../components/ui/Modal';
 import Dropdown from '../components/ui/Dropdown';
 
 type TemplateSummary = { id: number; name: string; slug: string };
 
-// Extend Service type locally if not updated globally yet
 interface ServiceWithLock extends Service {
     locked_status?: {
         is_locked: boolean;
@@ -25,6 +24,7 @@ const ServicesManager = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentService, setCurrentService] = useState<Partial<ServiceWithLock>>({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [features, setFeatures] = useState<ServiceFeature[]>([]);
     
     // Pagination & Sort
     const [page, setPage] = useState(1);
@@ -76,13 +76,83 @@ const ServicesManager = () => {
             .catch(err => console.error('Failed to load templates', err));
     }, []);
 
+    const loadService = useCallback(async (id: number) => {
+        try {
+            const res = await api.get(`/services/${id}`);
+            const data = res.data as ServiceWithLock;
+            setCurrentService(data);
+            const list: ServiceFeature[] = Array.isArray((data as any).features)
+                ? ((data as any).features as ServiceFeature[])
+                      .slice()
+                      .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+                : [];
+            setFeatures(
+                list.map((f, index) => ({
+                    id: f.id,
+                    title: f.title || `Section ${index + 1}`,
+                    description: f.description || '',
+                    icon: f.icon || '',
+                    sort_order: index,
+                }))
+            );
+            setIsModalOpen(true);
+        } catch (error) {
+            console.error('Failed to load service', error);
+        }
+    }, []);
+
+    const addFeature = () => {
+        setFeatures((prev) => [
+            ...prev,
+            {
+                title: '',
+                description: '',
+                icon: '',
+                sort_order: prev.length,
+            },
+        ]);
+    };
+
+    const updateFeature = (index: number, field: keyof ServiceFeature, value: string) => {
+        setFeatures((prev) => {
+            const next = [...prev];
+            next[index] = { ...next[index], [field]: value };
+            return next;
+        });
+    };
+
+    const removeFeature = (index: number) => {
+        setFeatures((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const moveFeature = (index: number, direction: 'up' | 'down') => {
+        setFeatures((prev) => {
+            if (direction === 'up' && index === 0) return prev;
+            if (direction === 'down' && index === prev.length - 1) return prev;
+            const next = [...prev];
+            const targetIndex = direction === 'up' ? index - 1 : index + 1;
+            [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+            return next;
+        });
+    };
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const payload: any = {
+                ...currentService,
+                features: features.map((f, index) => ({
+                    title: f.title || `Section ${index + 1}`,
+                    description: f.description || '',
+                    icon: f.icon || '',
+                    sort_order: index,
+                })),
+            };
+
             if (currentService.id) {
-                await api.put(`/services/${currentService.id}`, currentService);
+                await api.put(`/services/${currentService.id}`, payload);
             } else {
-                await api.post('/services', currentService);
+                await api.post('/services', payload);
             }
             setIsModalOpen(false);
             fetchData();
@@ -137,7 +207,7 @@ const ServicesManager = () => {
                     <p className="text-gray-500">Manage your service offerings and taxonomy</p>
                 </div>
                 <button 
-                    onClick={() => { setCurrentService({ is_active: true }); setIsModalOpen(true); }}
+                    onClick={() => { setCurrentService({ is_active: true }); setFeatures([]); setIsModalOpen(true); }}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                     <Plus size={20} />
@@ -275,7 +345,7 @@ const ServicesManager = () => {
                                                     {service.locked_status?.is_locked ? <Unlock size={18} /> : <Lock size={18} />}
                                                 </button>
                                                 <button 
-                                                    onClick={() => { setCurrentService(service); setIsModalOpen(true); }}
+                                                    onClick={() => loadService(service.id)}
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     disabled={service.locked_status?.is_locked}
                                                 >
@@ -342,7 +412,7 @@ const ServicesManager = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={currentService.id ? 'Edit Service' : 'Add New Service'}
             >
-                <form onSubmit={handleSave} className="space-y-4">
+                <form onSubmit={handleSave} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
                         <input
@@ -383,6 +453,83 @@ const ServicesManager = () => {
                             value={currentService.description || ''}
                             onChange={(e) => setCurrentService({ ...currentService, description: e.target.value })}
                         />
+                    </div>
+                    <div className="border-t border-gray-200 pt-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-sm font-medium text-gray-700">Service Sections</label>
+                            <button
+                                type="button"
+                                onClick={addFeature}
+                                className="inline-flex items-center gap-1 text-xs px-2 py-1 border border-blue-500 text-blue-600 rounded-md hover:bg-blue-50"
+                            >
+                                <Plus size={14} />
+                                <span>Add Section</span>
+                            </button>
+                        </div>
+                        {features.length === 0 ? (
+                            <div className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg px-3 py-4 bg-gray-50">
+                                No sections yet. Click "Add Section" to define highlights for this service.
+                            </div>
+                        ) : (
+                            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                                {features.map((feature, index) => (
+                                    <div key={index} className="border border-gray-200 rounded-lg bg-gray-50 p-3">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="text-xs font-semibold text-gray-600">
+                                                Section {index + 1}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => moveFeature(index, 'up')}
+                                                    disabled={index === 0}
+                                                    className="p-1 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+                                                >
+                                                    <ArrowUp size={14} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => moveFeature(index, 'down')}
+                                                    disabled={index === features.length - 1}
+                                                    className="p-1 rounded text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+                                                >
+                                                    <ArrowDown size={14} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeFeature(index)}
+                                                    className="p-1 rounded text-red-500 hover:bg-red-50"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <input
+                                                type="text"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                                placeholder="Section title"
+                                                value={feature.title || ''}
+                                                onChange={(e) => updateFeature(index, 'title', e.target.value)}
+                                            />
+                                            <textarea
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                                placeholder="Short description for this section"
+                                                value={feature.description || ''}
+                                                onChange={(e) => updateFeature(index, 'description', e.target.value)}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                                placeholder="Icon name (optional, e.g. Zap, Shield)"
+                                                value={feature.icon || ''}
+                                                onChange={(e) => updateFeature(index, 'icon', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
                         <input

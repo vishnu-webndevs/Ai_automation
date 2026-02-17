@@ -633,7 +633,7 @@ const MenuManager = () => {
         </Card>
       )}
 
-      <Card className="mb-6">
+      <Card className="mb-6 overflow-visible">
         <CardHeader>
           <h2 className="text-lg font-bold text-gray-800">Add Menu Item</h2>
         </CardHeader>
@@ -728,7 +728,22 @@ const MenuManager = () => {
               {newLinkType === 'page' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative">
-                    <label className="block text-sm font-medium mb-1">Search Page (Published)</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-sm font-medium">Search Page (Published)</label>
+                      {(newPageId || newPageSearch) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewPageId(null);
+                            setNewPageSearch('');
+                            setPageOptions([]);
+                          }}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
                     <Input
                       value={newPageSearch}
                       onChange={(e) => setNewPageSearch(e.target.value)}
@@ -755,7 +770,6 @@ const MenuManager = () => {
                         ))}
                       </div>
                     )}
-                    {newPageId && <div className="text-xs text-green-600 font-medium mt-1">✓ Page selected (ID: {newPageId})</div>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Label (Link Text)</label>

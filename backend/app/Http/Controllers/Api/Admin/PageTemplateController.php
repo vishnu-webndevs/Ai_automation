@@ -9,6 +9,7 @@ use App\Models\PageSection;
 use App\Models\ContentBlock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class PageTemplateController extends Controller
 {
@@ -62,6 +63,8 @@ class PageTemplateController extends Controller
                 }
             }
         });
+
+        Cache::forget("public_page:{$page->slug}");
 
         return response()->json(['message' => 'Template applied successfully', 'page' => $page->load('sections.blocks')]);
     }

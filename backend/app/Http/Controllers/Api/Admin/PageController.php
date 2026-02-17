@@ -79,7 +79,7 @@ class PageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string',
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:draft,published,scheduled,archived',
             'slug' => 'nullable|string|unique:pages,slug',
             'template' => 'nullable|string',
             // Relations
@@ -119,7 +119,7 @@ class PageController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'type' => 'sometimes|string',
-            'status' => 'sometimes|in:draft,published',
+            'status' => 'sometimes|in:draft,published,scheduled,archived',
             'slug' => 'sometimes|nullable|string|unique:pages,slug,' . $id,
             'template' => 'sometimes|nullable|string',
             

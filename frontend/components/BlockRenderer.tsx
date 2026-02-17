@@ -63,8 +63,21 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
             />;
         
         case 'features':
-        case 'features_grid':
-            return <Features {...content} />;
+        case 'features_grid': {
+            const heading = content.heading || content.title;
+            const subheading = content.subheading || '';
+            const items = content.features || content.items || [];
+            const layout = content.layout === 'right' ? 'right' : 'left';
+
+            return (
+                <Features
+                    heading={heading}
+                    subheading={subheading}
+                    items={items}
+                    layout={layout}
+                />
+            );
+        }
 
         case 'bento_grid':
             return <BentoGrid {...content} />;
@@ -183,6 +196,28 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
                         ))}
                     </div>
                 </div>
+            );
+        
+        case 'cta_bottom':
+            return (
+                <section className="py-16 sm:py-24">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                            {content.title || 'Ready to get started?'}
+                        </h2>
+                        {content.subtitle && (
+                            <p className="text-lg text-slate-300 mb-8">
+                                {content.subtitle}
+                            </p>
+                        )}
+                        <Link
+                            to={content.url || '/contact'}
+                            className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-full transition-colors duration-200 shadow-lg shadow-purple-500/25"
+                        >
+                            {content.button_text || 'Talk to our team'}
+                        </Link>
+                    </div>
+                </section>
             );
             
         default:

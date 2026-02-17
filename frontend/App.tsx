@@ -1,11 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './layouts/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Import Pages
 import Home from './pages/Home';
-import About from './pages/About';
 import PricingPage from './pages/PricingPage';
 import Customers from './pages/Customers';
 import Changelog from './pages/Changelog';
@@ -27,6 +26,8 @@ import BlogCategoryList from './templates/BlogCategoryList';
 import BlogCategoryDetail from './templates/BlogCategoryDetail';
 import SolutionList from './templates/SolutionList';
 import SolutionDetail from './templates/SolutionDetail';
+import ToolsList from './templates/ToolsList';
+import ToolDetail from './templates/ToolDetail';
 import IntegrationList from './templates/IntegrationList';
 import IntegrationDetail from './templates/IntegrationDetail';
 import PlatformList from './templates/PlatformList';
@@ -54,6 +55,8 @@ const App: React.FC = () => {
           
           <Route path="solutions" element={<SolutionList />} />
           <Route path="solutions/:slug" element={<SolutionDetail />} />
+          <Route path="tools" element={<ToolsList />} />
+          <Route path="tools/:slug" element={<ToolDetail />} />
           <Route path="integrations" element={<IntegrationList />} />
           <Route path="integrations/:slug" element={<IntegrationDetail />} />
           <Route path="platform" element={<PlatformList />} />
@@ -67,8 +70,9 @@ const App: React.FC = () => {
           <Route path="customers" element={<Customers />} />
           <Route path="pricing" element={<PricingPage />} />
 
-          {/* Main Home Route */}
+          {/* Main Home Route - Static Home Page */}
           <Route index element={<Home />} />
+          <Route path="home" element={<Navigate to="/" replace />} />
 
           {/* Main catch-all route for Dynamic Pages */}
           <Route path="*" element={<DynamicPage />} />

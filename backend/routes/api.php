@@ -20,10 +20,10 @@ use App\Http\Controllers\Api\Public\SolutionController as PublicSolutionControll
 use App\Http\Controllers\Api\Public\IntegrationController as PublicIntegrationController;
 use App\Http\Controllers\Api\Public\BlogCategoryController as PublicBlogCategoryController;
 use App\Http\Controllers\Api\Admin\Taxonomy\ServiceController;
-
 use App\Http\Controllers\Api\Admin\Taxonomy\ServiceCategoryController;
 use App\Http\Controllers\Api\Admin\Taxonomy\IndustryController;
 use App\Http\Controllers\Api\Admin\Taxonomy\UseCaseController;
+use App\Http\Controllers\Api\Admin\Taxonomy\SolutionController as AdminSolutionController;
 use App\Http\Controllers\Api\Admin\Blog\BlogCategoryController;
 use App\Http\Controllers\Api\Admin\Blog\BlogTagController;
 use App\Http\Controllers\Api\Admin\Seo\RedirectController;
@@ -126,14 +126,15 @@ Route::prefix('admin')->group(function () {
             Route::patch('services/{id}/toggle-active', [ServiceController::class, 'toggleActive']);
             Route::patch('industries/{id}/toggle-active', [IndustryController::class, 'toggleActive']);
             Route::patch('use-cases/{id}/toggle-active', [UseCaseController::class, 'toggleActive']);
+            Route::patch('solutions/{id}/toggle-active', [AdminSolutionController::class, 'toggleActive']);
             
             Route::apiResource('services', ServiceController::class);
             Route::apiResource('service-categories', ServiceCategoryController::class);
             Route::apiResource('industries', IndustryController::class);
             Route::apiResource('use-cases', UseCaseController::class);
+            Route::apiResource('solutions', AdminSolutionController::class);
             
             // Read-only access for Menu Manager
-            Route::get('/solutions', [PublicSolutionController::class, 'index']);
             Route::get('/integrations', [PublicIntegrationController::class, 'index']);
         });
 

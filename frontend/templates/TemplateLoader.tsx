@@ -6,6 +6,8 @@ import BlogModern from './blog-modern';
 import BlogClassic from './blog-classic';
 import LandingStartup from './landing-startup';
 import BlankCanvas from './blank-canvas';
+import TotanPreview from './totan-preview';
+import ContactDark from './contact-dark';
 
 type TemplateComponent = React.FC<{ page: Page }>;
 
@@ -14,6 +16,8 @@ const templates: Record<string, TemplateComponent> = {
     'blog-classic': BlogClassic,
     'landing-startup': LandingStartup,
     'blank-canvas': BlankCanvas,
+    'totan-preview': TotanPreview,
+    'contact-dark': ContactDark,
 };
 
 export const getTemplateComponent = (slug?: string): TemplateComponent | null => {
