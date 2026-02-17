@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink } from 'lucide-react';
 import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
 
 type TemplateSummary = { id: number; name: string; slug: string };
@@ -476,4 +476,3 @@ const XIcon = () => (
 );
 
 export default SolutionsManager;
-
