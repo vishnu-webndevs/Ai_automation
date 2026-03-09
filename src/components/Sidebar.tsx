@@ -78,6 +78,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         { title: 'Industries', path: '/web-admin/taxonomy/industries', icon: Briefcase },
         { title: 'Use Cases', path: '/web-admin/taxonomy/use-cases', icon: Target },
         { title: 'Tools', path: '/web-admin/taxonomy/tools', icon: Briefcase },
+        { title: 'Integrations', path: '/web-admin/taxonomy/integrations', icon: Briefcase },
       ]
     },
     {

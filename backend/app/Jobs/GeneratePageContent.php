@@ -7,11 +7,13 @@ use App\Models\ContentBlock;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\SeoMeta;
+use App\Models\PageTemplate;
 use App\Services\AI\AIManager;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -45,6 +47,25 @@ class GeneratePageContent implements ShouldQueue
 
         try {
             $validated = $this->parameters;
+
+            $primaryKeyword = $validated['primary_keyword']
+                ?? $page->seo?->meta_keywords
+                ?? $page->title;
+
+            $industry = $validated['target_industry'] ?? null;
+            if (!$industry) {
+                if ($page->industries()->exists()) {
+                    $industry = $page->industries->first()->name;
+                } else {
+                    $industry = 'General';
+                }
+            }
+
+            $structureDescription = $this->buildPageStructureDescription($page);
+            $validated['page_structure'] = $structureDescription;
+            $validated['primary_keyword'] = $primaryKeyword;
+            $validated['target_industry'] = $industry;
+
             $aiService = $aiManager->createService($validated['model']);
 
             $generatedContent = $aiService->generatePageContent($validated);
@@ -124,10 +145,12 @@ class GeneratePageContent implements ShouldQueue
             AiGenerationLog::create([
                 'page_id' => $page->id,
                 'model_used' => $validated['model'],
-                'prompt_used' => "Keyword: {$validated['primary_keyword']}, Industry: {$validated['target_industry']}",
+                'prompt_used' => "Keyword: {$primaryKeyword}, Industry: {$industry}",
                 'tokens_used' => 0,
                 'response_status' => 'success',
             ]);
+
+            Cache::forget("public_page:{$page->slug}");
 
         } catch (ValidationException $e) {
             AiGenerationLog::create([
@@ -148,6 +171,57 @@ class GeneratePageContent implements ShouldQueue
                 'response_status' => 'failed',
             ]);
         }
+    }
+
+    private function buildPageStructureDescription(Page $page): string
+    {
+        $parts = [];
+
+        if ($page->template_slug) {
+            $parts[] = "Template slug: {$page->template_slug}.";
+
+            $template = PageTemplate::where('slug', $page->template_slug)->first();
+
+            if ($template && isset($template->config_json['sections']) && is_array($template->config_json['sections'])) {
+                $sectionTypes = [];
+
+                foreach ($template->config_json['sections'] as $sectionConfig) {
+                    if (!empty($sectionConfig['type'])) {
+                        $sectionTypes[] = $sectionConfig['type'];
+                    }
+                }
+
+                if (!empty($sectionTypes)) {
+                    $parts[] = 'Use these sections in order and keep the section_key values exactly the same: ' . implode(', ', $sectionTypes) . '.';
+                }
+            }
+        }
+
+        $existingSections = $page->sections()->with('blocks')->get();
+
+        if ($existingSections->count() > 0) {
+            $sectionSummaries = [];
+
+            foreach ($existingSections as $section) {
+                $blockTypes = $section->blocks->pluck('block_type')->unique()->values()->all();
+                $summary = "section_key={$section->section_key}";
+
+                if (!empty($blockTypes)) {
+                    $summary .= ' (block types: ' . implode(', ', $blockTypes) . ')';
+                }
+
+                $sectionSummaries[] = $summary;
+            }
+
+            $parts[] = 'Existing page layout currently uses these sections (in order): ' . implode(' | ', $sectionSummaries) . '.';
+            $parts[] = 'When generating JSON, follow this structure and reuse the same section_key values.';
+        }
+
+        if (empty($parts)) {
+            $parts[] = 'No specific template is set. Use a standard landing page flow: hero, features, benefits, social proof, FAQ, call-to-action.';
+        }
+
+        return implode(' ', $parts);
     }
 
     private function validateAiResponse(array $data): void

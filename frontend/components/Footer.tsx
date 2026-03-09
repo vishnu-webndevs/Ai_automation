@@ -6,7 +6,10 @@ import { menuService } from '../services/api';
 
 const Footer: React.FC = () => {
   const location = useLocation();
-  const hideCta = location.pathname === '/contact-us';
+  const hideCta =
+    location.pathname === '/contact-us' ||
+    location.pathname === '/' ||
+    location.pathname === '/home';
   const { data: menuData } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
 
   return (

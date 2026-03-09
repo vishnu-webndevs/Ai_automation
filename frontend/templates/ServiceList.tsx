@@ -4,9 +4,16 @@ import { Link } from 'react-router-dom';
 import { serviceService } from '../services/api';
 
 const ServiceList: React.FC = () => {
-    const { data: services, isLoading } = useSWR('services', serviceService.getAll);
+    const { data: services, error, isLoading } = useSWR('services', serviceService.getAll);
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading services...</div>;
+
+    if (error)
+        return (
+            <div className="bg-slate-950 min-h-screen flex items-center justify-center">
+                <p className="text-slate-400">Unable to load services right now. Please try again later.</p>
+            </div>
+        );
 
     return (
         <div className="bg-slate-950 min-h-screen">
@@ -123,6 +130,11 @@ const ServiceList: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {services && services.length === 0 && (
+                            <p className="col-span-full text-sm text-slate-500">
+                                No services are available yet. Add services in the admin panel to see them here.
+                            </p>
+                        )}
                         {services?.map((service) => (
                             <Link
                                 to={`/services/${service.slug}`}

@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { Page, Menu, Service, Industry, UseCase, Solution, Integration, BlogCategory } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.totan.ai/api';
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+        ? 'http://localhost:8000/api'
+        : 'https://api.totan.ai/api');
 
 export const api = axios.create({
     baseURL: API_URL,

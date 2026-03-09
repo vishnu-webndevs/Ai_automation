@@ -15,12 +15,12 @@ export interface FeaturesProps {
 }
 
 const Features: React.FC<FeaturesProps> = ({
-  heading = "Simplify your security with authentication services",
-  subheading = "Define access roles for the end-users, and extend your authorization capabilities to implement dynamic access control.",
+  heading = "Automate your workflows with AI, not more tabs",
+  subheading = "Build reliable AI automations that connect tools, reduce manual work, and keep humans in control.",
   items = [
-    { title: 'Simplify your security', description: '' },
-    { title: 'Customer identity', description: '' },
-    { title: 'Adaptable authentication', description: '' }
+    { title: 'Automate repetitive work', description: '' },
+    { title: 'AI in your existing stack', description: '' },
+    { title: 'Human in the loop by default', description: '' }
   ],
   layout = 'left'
 }) => {
@@ -34,7 +34,7 @@ const Features: React.FC<FeaturesProps> = ({
         {/* Feature 1: Simplify */}
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className={layout === 'right' ? 'md:order-2' : ''}>
-            <div className="text-purple-400 font-medium mb-2">The security first platform</div>
+            <div className="text-purple-400 font-medium mb-2">The AI automation platform</div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{heading}</h2>
             <p className="text-slate-400 text-lg mb-8">{subheading}</p>
             

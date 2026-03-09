@@ -29,6 +29,9 @@ class PageController extends Controller
                 ->firstOrFail();
         });
 
-        return response()->json($page);
+        $data = $page->toArray();
+        $data['seo_meta'] = $data['seo'] ?? null;
+
+        return response()->json($data);
     }
 }

@@ -27,8 +27,8 @@ class HomePageSeeder extends Seeder
         SeoMeta::firstOrCreate(
             ['page_id' => $page->id],
             [
-                'meta_title' => 'API Security Framework - Secure Your Digital Assets',
-                'meta_description' => 'Comprehensive API security solutions for modern enterprises. Protect your data with AI-driven threat detection and automated compliance.',
+                'meta_title' => 'Totan.ai – AI Automation for Real-World Workflows',
+                'meta_description' => 'Design, run, and monitor AI-powered automations across your tools without extra engineering.',
             ]
         );
 
@@ -43,9 +43,9 @@ class HomePageSeeder extends Seeder
             [
                 'order' => 1,
                 'content_json' => [
-                    'heading' => 'Secure Your API Infrastructure',
-                    'subheading' => 'Advanced protection for the modern web',
-                    'cta_text' => 'Get Started',
+                    'heading' => 'Automate work with AI, not manual tasks',
+                    'subheading' => 'Totan.ai turns your existing tools and processes into smart, end-to-end automations.',
+                    'cta_text' => 'Get Started Free',
                     'cta_link' => '/signup',
                 ]
             ]
@@ -62,19 +62,19 @@ class HomePageSeeder extends Seeder
             [
                 'order' => 1,
                 'content_json' => [
-                    'title' => 'Why Choose Us',
+                    'title' => 'Why teams automate with Totan.ai',
                     'features' => [
                         [
-                            'title' => 'Real-time Protection',
-                            'description' => 'Detect and block threats instantly with AI-powered analysis.'
+                            'title' => 'Automate repetitive work',
+                            'description' => 'Replace manual copy-paste, updates, and approvals with reliable AI workflows.'
                         ],
                         [
-                            'title' => 'Compliance Automated',
-                            'description' => 'Automatically adhere to GDPR, HIPAA, and SOC2 standards.'
+                            'title' => 'Connect your tools',
+                            'description' => 'Plug into the CRMs, support tools, docs, and data sources you already use.'
                         ],
                         [
-                            'title' => 'Scalable Architecture',
-                            'description' => 'Built to handle billions of requests with zero latency impact.'
+                            'title' => 'Stay in control',
+                            'description' => 'Review, approve, and monitor every automation with clear guardrails and audit trails.'
                         ]
                     ]
                 ]

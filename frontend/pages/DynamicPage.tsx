@@ -9,20 +9,19 @@ import { getTemplateComponent } from '../templates/TemplateLoader';
 
 const DynamicPage: React.FC = () => {
     const params = useParams();
-    // Capture the catch-all route parameter (usually '*')
-    const slug = params['*'] || 'home';
+    const slugParam = params['*'] || 'home';
+    const slug = slugParam || 'home';
 
     const { data: apiPage, error, isLoading } = useSWR(
-        slug ? `/pages/${slug}` : null,
+        slug && slug !== 'home' ? `/pages/${slug}` : null,
         () => pageService.getBySlug(slug),
         {
-            shouldRetryOnError: false // Don't retry if API is down, fail fast to fallback
+            shouldRetryOnError: false
         }
     );
 
-    // Use API data if available, otherwise check static fallback
     const page = useMemo(() => {
-        let resolved = apiPage || STATIC_PAGES[slug] || null;
+        let resolved = slug === 'home' ? STATIC_PAGES['home'] || null : apiPage || STATIC_PAGES[slug] || null;
 
         if (resolved && !resolved.template_slug && slug === 'contact-us') {
             resolved = { ...resolved, template_slug: 'contact-dark' };

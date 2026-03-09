@@ -10,11 +10,23 @@ class BlogController extends Controller
 {
     public function index()
     {
-        return Page::where('type', 'blog')
+        $paginator = Page::where('type', 'blog')
             ->where('status', 'published')
             ->with(['blogCategories', 'blogTags', 'seo'])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
+
+        $data = $paginator->toArray();
+
+        if (!empty($data['data']) && is_array($data['data'])) {
+            foreach ($data['data'] as &$page) {
+                if (is_array($page)) {
+                    $page['seo_meta'] = $page['seo'] ?? null;
+                }
+            }
+        }
+
+        return response()->json($data);
     }
     
     // Show is handled by PageController, but we can add it here if needed for specific logic.

@@ -1,10 +1,9 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './layouts/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Import Pages
-import Home from './pages/Home';
 import PricingPage from './pages/PricingPage';
 import Customers from './pages/Customers';
 import Changelog from './pages/Changelog';
@@ -32,9 +31,32 @@ import IntegrationList from './templates/IntegrationList';
 import IntegrationDetail from './templates/IntegrationDetail';
 import PlatformList from './templates/PlatformList';
 
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown>>;
+  }
+}
+
+const GTMListener: React.FC = () => {
+  const location = useLocation();
+  useEffect(() => {
+    const page_path = `${location.pathname}${location.search}${location.hash}`;
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer ?? [];
+      window.dataLayer.push({
+        event: 'page_view',
+        page_path,
+        page_title: document.title,
+      });
+    }
+  }, [location]);
+  return null;
+};
+
 const App: React.FC = () => {
   return (
     <Router>
+      <GTMListener />
       <Routes>
         <Route path="/" element={<Layout />}>
           
@@ -70,9 +92,9 @@ const App: React.FC = () => {
           <Route path="customers" element={<Customers />} />
           <Route path="pricing" element={<PricingPage />} />
 
-          {/* Main Home Route - Static Home Page */}
-          <Route index element={<Home />} />
-          <Route path="home" element={<Navigate to="/" replace />} />
+          {/* Main Home Route - Dynamic Page (slug: home) */}
+          <Route index element={<DynamicPage />} />
+          <Route path="home" element={<DynamicPage />} />
 
           {/* Main catch-all route for Dynamic Pages */}
           <Route path="*" element={<DynamicPage />} />

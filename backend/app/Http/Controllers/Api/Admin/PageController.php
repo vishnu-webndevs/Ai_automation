@@ -15,12 +15,14 @@ use App\Models\BlogTag;
 use App\Models\Cta;
 use App\Models\Industry;
 use App\Models\MediaAsset;
+use App\Models\PageTemplate;
 use App\Jobs\GeneratePageContent;
 use App\Services\AI\AIManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -150,7 +152,7 @@ class PageController extends Controller
             $this->syncRelationships($page, $request);
 
             if ($request->has('seo')) {
-                $page->seoMeta()->updateOrCreate([], $request->input('seo'));
+                $page->seo()->updateOrCreate([], $request->input('seo'));
             }
 
             if ($request->has('sections')) {
@@ -398,8 +400,8 @@ class PageController extends Controller
     {
         $validated = $request->validate([
             'page_id' => 'required|exists:pages,id',
-            'primary_keyword' => 'required|string',
-            'target_industry' => 'required|string',
+            'primary_keyword' => 'sometimes|nullable|string',
+            'target_industry' => 'sometimes|nullable|string',
             'tone' => 'required|string',
             'content_length' => 'required|string',
             'model' => 'required|in:lorum,openai,gemini',
@@ -421,9 +423,29 @@ class PageController extends Controller
                 ], 409);
             }
 
+            $primaryKeyword = $validated['primary_keyword']
+                ?? $page->seo?->meta_keywords
+                ?? $page->title;
+
+            $industry = $validated['target_industry'] ?? null;
+            if (!$industry) {
+                if ($page->industries()->exists()) {
+                    $industry = $page->industries->first()->name;
+                } else {
+                    $industry = 'General';
+                }
+            }
+
+            $structureDescription = $this->buildPageStructureDescription($page);
+            $context = array_merge($validated, [
+                'primary_keyword' => $primaryKeyword,
+                'target_industry' => $industry,
+                'page_structure' => $structureDescription,
+            ]);
+
             $aiService = $this->aiManager->createService($validated['model']);
 
-            $generatedContent = $aiService->generatePageContent($validated);
+            $generatedContent = $aiService->generatePageContent($context);
             $generatedContent = $this->normalizeAiResponse($generatedContent);
             $this->validateAiResponse($generatedContent);
 
@@ -500,10 +522,12 @@ class PageController extends Controller
             AiGenerationLog::create([
                 'page_id' => $page->id,
                 'model_used' => $validated['model'],
-                'prompt_used' => "Keyword: {$validated['primary_keyword']}, Industry: {$validated['target_industry']}",
+                'prompt_used' => "Keyword: {$primaryKeyword}, Industry: {$industry}",
                 'tokens_used' => 0,
                 'response_status' => 'success',
             ]);
+
+            Cache::forget("public_page:{$page->slug}");
 
             $page->load(['sections.blocks', 'seo']);
 
@@ -537,6 +561,79 @@ class PageController extends Controller
 
             return response()->json(['message' => 'AI Generation Failed', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    private function buildPageStructureDescription(Page $page): string
+    {
+        $parts = [];
+
+        $title = trim((string) $page->title);
+        $slug = trim((string) $page->slug);
+
+        if ($title !== '') {
+            $parts[] = "Page title: {$title}.";
+        }
+
+        if ($slug !== '') {
+            $parts[] = "Page slug: {$slug}.";
+        }
+
+        if ($page->type) {
+            $parts[] = "Page type: {$page->type}.";
+        }
+
+        $lowerTitle = mb_strtolower($title);
+        $lowerSlug = mb_strtolower($slug);
+
+        if (str_contains($lowerTitle, 'contact') || str_contains($lowerSlug, 'contact')) {
+            $parts[] = 'This is a Contact page where visitors reach the team, send inquiries, or request demos. Focus copy on getting in touch, support, and next steps rather than generic product marketing.';
+        }
+
+        if ($page->template_slug) {
+            $parts[] = "Template slug: {$page->template_slug}.";
+
+            $template = PageTemplate::where('slug', $page->template_slug)->first();
+
+            if ($template && isset($template->config_json['sections']) && is_array($template->config_json['sections'])) {
+                $sectionTypes = [];
+
+                foreach ($template->config_json['sections'] as $sectionConfig) {
+                    if (!empty($sectionConfig['type'])) {
+                        $sectionTypes[] = $sectionConfig['type'];
+                    }
+                }
+
+                if (!empty($sectionTypes)) {
+                    $parts[] = 'Use these sections in order and keep the section_key values exactly the same: ' . implode(', ', $sectionTypes) . '.';
+                }
+            }
+        }
+
+        $existingSections = $page->sections()->with('blocks')->get();
+
+        if ($existingSections->count() > 0) {
+            $sectionSummaries = [];
+
+            foreach ($existingSections as $section) {
+                $blockTypes = $section->blocks->pluck('block_type')->unique()->values()->all();
+                $summary = "section_key={$section->section_key}";
+
+                if (!empty($blockTypes)) {
+                    $summary .= ' (block types: ' . implode(', ', $blockTypes) . ')';
+                }
+
+                $sectionSummaries[] = $summary;
+            }
+
+            $parts[] = 'Existing page layout currently uses these sections (in order): ' . implode(' | ', $sectionSummaries) . '.';
+            $parts[] = 'When generating JSON, follow this structure and reuse the same section_key values.';
+        }
+
+        if (empty($parts)) {
+            $parts[] = 'No specific template is set. Use a standard landing page flow: hero, features, benefits, social proof, FAQ, call-to-action.';
+        }
+
+        return implode(' ', $parts);
     }
     
     public function show($id)

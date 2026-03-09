@@ -35,9 +35,11 @@ const SolutionsManager = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [sort, setSort] = useState('updated_at');
     const [dir, setDir] = useState<'asc' | 'desc'>('desc');
+    const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const response = await api.get('/solutions', {
                 params: {
@@ -58,6 +60,7 @@ const SolutionsManager = () => {
             }
         } catch (error) {
             console.error('Failed to fetch solutions', error);
+            setError('Unable to load tools. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -110,6 +113,7 @@ const SolutionsManager = () => {
             fetchData();
         } catch (error) {
             console.error('Failed to save solution', error);
+            setError('Saving tool failed. Please check the form and try again.');
         }
     };
 
@@ -120,6 +124,7 @@ const SolutionsManager = () => {
                 fetchData();
             } catch (error) {
                 console.error('Failed to delete solution', error);
+                setError('Deleting tool failed. Please try again.');
             }
         }
     };
@@ -130,6 +135,7 @@ const SolutionsManager = () => {
             fetchData();
         } catch (error) {
             console.error('Failed to toggle status', error);
+            setError('Updating status failed. Please try again.');
         }
     };
 
@@ -169,6 +175,12 @@ const SolutionsManager = () => {
                     <span>Add Tool</span>
                 </button>
             </div>
+
+            {error && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+                    {error}
+                </div>
+            )}
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-4 border-b border-gray-100 bg-gray-50/50">

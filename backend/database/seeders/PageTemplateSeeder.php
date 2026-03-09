@@ -130,11 +130,11 @@ class PageTemplateSeeder extends Seeder
                             'type' => 'hero',
                             'order' => 1,
                             'content' => [
-                                'heading' => 'API Security Framework',
-                                'subheading' => 'Comprehensive protection for your APIs and microservices.',
-                                'cta_text' => 'Book a Demo',
+                                'heading' => 'AI Automation for Modern Teams',
+                                'subheading' => 'Orchestrate AI, data, and tools in one place with Totan.ai.',
+                                'cta_text' => 'Book a Live Demo',
                                 'cta_link' => '/contact',
-                                'badge' => 'Enterprise Ready'
+                                'badge' => 'Built for operations, marketing, and product teams'
                             ]
                         ],
                         [
@@ -144,16 +144,16 @@ class PageTemplateSeeder extends Seeder
                                 'title' => 'Why Teams Choose Totan.ai',
                                 'features' => [
                                     [
-                                        'title' => 'Real-time Protection',
-                                        'description' => 'Detect and block threats instantly with AI-powered analysis.'
+                                        'title' => 'Automate repetitive tasks',
+                                        'description' => 'Let AI handle updates, summaries, and routing so people focus on decisions.'
                                     ],
                                     [
-                                        'title' => 'Compliance Automated',
-                                        'description' => 'Stay compliant with GDPR, HIPAA, SOC2 without manual effort.'
+                                        'title' => 'Human-in-the-loop',
+                                        'description' => 'Keep humans in control with approvals, checks, and guardrails around every flow.'
                                     ],
                                     [
-                                        'title' => 'Scalable Architecture',
-                                        'description' => 'Scale to billions of requests with minimal latency overhead.'
+                                        'title' => 'Scales with your stack',
+                                        'description' => 'Start with one workflow and grow to hundreds without rewriting tools.'
                                     ]
                                 ]
                             ]
@@ -176,7 +176,7 @@ class PageTemplateSeeder extends Seeder
                             'type' => 'cta_bottom',
                             'order' => 4,
                             'content' => [
-                                'title' => 'Ready to secure your APIs?',
+                                'title' => 'Ready to automate your workflows?',
                                 'button_text' => 'Talk to our team'
                             ]
                         ]

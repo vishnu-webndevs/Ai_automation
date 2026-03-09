@@ -32,3 +32,6 @@ dist-ssr
 *.env
 analyze_uikit.js
 fetch_uikit.js
+ 
+# Ignore the ai-automation-site workspace entirely
+ai-automation-site/

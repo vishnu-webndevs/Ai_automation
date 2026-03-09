@@ -12,7 +12,7 @@ class ServiceController extends Controller
     {
         return Service::with('category')
             ->where('is_active', true)
-            ->orderBy('sort_order')
+            ->orderBy('name')
             ->get();
     }
 

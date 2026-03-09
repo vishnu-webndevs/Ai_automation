@@ -98,7 +98,7 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-3 mt-8 lg:mt-16">
                         <div className="relative">
                             <div className="absolute -inset-1 rounded-3xl bg-emerald-500/10 blur-2xl" />
                             <div className="relative rounded-3xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 shadow-xl space-y-6">

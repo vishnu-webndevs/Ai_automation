@@ -18,11 +18,11 @@ export interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ 
-  badge = "API Studio is now in beta",
-  heading = "The API Security Framework",
-  subheading = "Our landing page template works on all devices, so you only have to set it up once, and get beautiful results forever.",
+  badge = "Totan.ai – AI automation studio",
+  heading = "AI automation for real workflows",
+  subheading = "Design and run AI-powered workflows that connect your tools, data, and teams without extra engineering.",
   primary_cta = { text: "Get Started", url: "/signup" },
-  secondary_cta = { text: "Read the docs", url: "/docs" },
+  secondary_cta = { text: "Book a demo", url: "/pricing" },
   image,
   layout = 'center',
   meta

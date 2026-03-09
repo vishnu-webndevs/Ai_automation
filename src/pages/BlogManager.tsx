@@ -22,7 +22,13 @@ const BlogManager = () => {
                 api.get('/blog-categories')
             ]);
             setBlogs(blogsRes.data.data || []);
-            setCategories(catsRes.data.data || []);
+
+            const catsPayload = catsRes.data;
+            const catsData = Array.isArray(catsPayload)
+                ? catsPayload
+                : catsPayload.data || [];
+
+            setCategories(catsData);
         } catch (error) {
             console.error('Failed to fetch blogs', error);
         } finally {
@@ -34,13 +40,28 @@ const BlogManager = () => {
         fetchData();
     }, []);
 
+    const buildPayload = (blog: Partial<Blog>) => {
+        const payload: any = {
+            title: blog.title,
+            slug: blog.slug,
+            status: blog.status,
+            type: 'blog',
+        };
+
+        if (blog.category_id) {
+            payload.blog_categories = [blog.category_id];
+        }
+
+        return payload;
+    };
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (currentBlog.id) {
-                await api.put(`/blogs/${currentBlog.id}`, currentBlog);
+                await api.put(`/blogs/${currentBlog.id}`, buildPayload(currentBlog));
             } else {
-                await api.post('/blogs', currentBlog);
+                await api.post('/blogs', buildPayload(currentBlog));
             }
             setIsModalOpen(false);
             fetchData();

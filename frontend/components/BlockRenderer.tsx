@@ -104,6 +104,28 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
         case 'newsletter':
             return <Newsletter {...content} />;
 
+        case 'cta':
+            return (
+                <section className="py-16 sm:py-24">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                            {content.heading || 'Ready to get started?'}
+                        </h2>
+                        {content.subheading && (
+                            <p className="text-lg text-slate-300 mb-8">
+                                {content.subheading}
+                            </p>
+                        )}
+                        <Link
+                            to={content.buttonUrl || '/signup'}
+                            className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-full transition-colors duration-200 shadow-lg shadow-purple-500/25"
+                        >
+                            {content.buttonText || 'Get Started for Free'}
+                        </Link>
+                    </div>
+                </section>
+            );
+
         case 'text':
             return (
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">

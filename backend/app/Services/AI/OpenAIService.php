@@ -20,6 +20,7 @@ class OpenAIService implements AIServiceInterface
         $prompt = $this->buildPrompt($context);
 
         try {
+            /** @var \Illuminate\Http\Client\Response $response */
             $response = Http::withToken($this->apiKey)
                 ->timeout(60)
                 ->post('https://api.openai.com/v1/chat/completions', [
@@ -48,11 +49,15 @@ class OpenAIService implements AIServiceInterface
 
     protected function buildPrompt(array $context): string
     {
+        $structure = $context['page_structure'] ?? null;
+        $structureText = $structure ? "\n\nPage Structure:\n{$structure}\n\nFollow this structure when deciding section_key values and overall flow." : "\n\nIf no specific structure is provided, use a standard SaaS landing page flow (hero, features, benefits, social proof, FAQ, call-to-action).";
+
         return "Generate a full SEO-optimized landing page for the following context:
         Primary Keyword: {$context['primary_keyword']}
         Target Industry: {$context['target_industry']}
         Tone: {$context['tone']}
         Content Length: {$context['content_length']}
+        {$structureText}
 
         The output must be a valid JSON object with this exact structure (all keys must exist):
         {
