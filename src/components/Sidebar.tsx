@@ -75,6 +75,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       permission: 'manage_taxonomy',
       submenu: [
         { title: 'Services', path: '/web-admin/taxonomy/services', icon: Briefcase },
+        { title: 'Service Categories', path: '/web-admin/taxonomy/service-categories', icon: Tags },
         { title: 'Industries', path: '/web-admin/taxonomy/industries', icon: Briefcase },
         { title: 'Use Cases', path: '/web-admin/taxonomy/use-cases', icon: Target },
         { title: 'Tools', path: '/web-admin/taxonomy/tools', icon: Briefcase },
@@ -119,6 +120,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         { title: 'Media Library', path: '/web-admin/media', icon: Image },
         { title: 'Menus', path: '/web-admin/menus', icon: MenuIcon },
         { title: 'CTAs', path: '/web-admin/ctas', icon: MousePointer },
+        { title: 'AI Prompts', path: '/web-admin/ai-prompts', icon: Sparkles, permission: 'manage_settings' },
         { title: 'Authentication', path: '/authentication', icon: Lock },
       ]
     },

@@ -15,6 +15,7 @@ import DynamicPage from './pages/DynamicPage';
 // Import Templates
 import ServiceList from './templates/ServiceList';
 import ServiceDetail from './templates/ServiceDetail';
+import ServiceCategoryDetail from './templates/ServiceCategoryDetail';
 import IndustryList from './templates/IndustryList';
 import IndustryDetail from './templates/IndustryDetail';
 import UseCaseList from './templates/UseCaseList';
@@ -62,6 +63,7 @@ const App: React.FC = () => {
           
           {/* Explicit Content Routes */}
           <Route path="services" element={<ServiceList />} />
+          <Route path="services/category/:slug" element={<ServiceCategoryDetail />} />
           <Route path="services/:slug" element={<ServiceDetail />} />
           
           <Route path="industries" element={<IndustryList />} />

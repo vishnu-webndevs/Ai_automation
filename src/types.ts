@@ -20,12 +20,23 @@ export interface Service {
     slug: string;
     template_slug?: string;
     service_category_id?: number;
+    category_ids?: number[];
     short_description?: string;
     full_description?: string;
     icon?: string;
     description?: string;
     is_active: boolean;
     features?: ServiceFeature[];
+    categories?: ServiceCategory[];
+}
+
+export interface ServiceCategory {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    is_active: boolean;
+    services_count?: number;
 }
 
 export interface Industry {
@@ -164,4 +175,31 @@ export interface MediaRow {
     alt_text: string;
     usages_count?: number;
     created_at: string;
+}
+
+export interface AiPromptVersion {
+    id: number;
+    ai_prompt_id: number;
+    version_number: number;
+    prompt_text: string;
+    variables_json?: string[] | null;
+    content_hash?: string | null;
+    created_by_admin_id?: number | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AiPrompt {
+    id: number;
+    key: string;
+    name: string;
+    description?: string | null;
+    is_active: boolean;
+    variables_json?: string[] | null;
+    current_version_id?: number | null;
+    current_version?: AiPromptVersion | null;
+    currentVersion?: AiPromptVersion | null;
+    versions?: AiPromptVersion[];
+    created_at: string;
+    updated_at: string;
 }

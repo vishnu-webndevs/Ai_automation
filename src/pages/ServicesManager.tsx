@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, ArrowUp, ArrowDown } from 'lucide-react';
 import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
-import type { Service, ServiceFeature } from '../types';
+import type { Service, ServiceCategory, ServiceFeature } from '../types';
 import Modal from '../components/ui/Modal';
 import Dropdown from '../components/ui/Dropdown';
 
@@ -20,11 +20,13 @@ interface ServiceWithLock extends Service {
 const ServicesManager = () => {
     const [services, setServices] = useState<ServiceWithLock[]>([]);
     const [templates, setTemplates] = useState<TemplateSummary[]>([]);
+    const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentService, setCurrentService] = useState<Partial<ServiceWithLock>>({});
     const [searchTerm, setSearchTerm] = useState('');
     const [features, setFeatures] = useState<ServiceFeature[]>([]);
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
     
     // Pagination & Sort
     const [page, setPage] = useState(1);
@@ -76,11 +78,24 @@ const ServicesManager = () => {
             .catch(err => console.error('Failed to load templates', err));
     }, []);
 
+    useEffect(() => {
+        api.get('/service-categories', { params: { all: 1 } })
+            .then((res) => {
+                const rows = Array.isArray(res.data) ? (res.data as ServiceCategory[]) : (res.data?.data || []);
+                setServiceCategories(rows);
+            })
+            .catch((err) => console.error('Failed to load service categories', err));
+    }, []);
+
     const loadService = useCallback(async (id: number) => {
         try {
             const res = await api.get(`/services/${id}`);
             const data = res.data as ServiceWithLock;
             setCurrentService(data);
+            const fromRel = Array.isArray((data as any).categories) ? (data as any).categories.map((c: any) => c?.id).filter(Boolean) : [];
+            const fromPrimary = (data as any).service_category_id ? [(data as any).service_category_id] : [];
+            const combined = Array.from(new Set([...(fromRel as number[]), ...(fromPrimary as number[])]));
+            setSelectedCategoryIds(combined);
             const list: ServiceFeature[] = Array.isArray((data as any).features)
                 ? ((data as any).features as ServiceFeature[])
                       .slice()
@@ -139,8 +154,20 @@ const ServicesManager = () => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const primaryCategoryId =
+                (currentService as any).service_category_id ||
+                selectedCategoryIds[0] ||
+                (serviceCategories[0]?.id ?? undefined);
+
+            const categoryIds = Array.from(
+                new Set([...(selectedCategoryIds || []), ...(primaryCategoryId ? [primaryCategoryId] : [])])
+            ).filter(Boolean) as number[];
+
             const payload: any = {
                 ...currentService,
+                service_category_id: primaryCategoryId,
+                category_ids: categoryIds,
+                short_description: (currentService as any).description || (currentService as any).short_description,
                 features: features.map((f, index) => ({
                     title: f.title || `Section ${index + 1}`,
                     description: f.description || '',
@@ -207,7 +234,13 @@ const ServicesManager = () => {
                     <p className="text-gray-500">Manage your service offerings and taxonomy</p>
                 </div>
                 <button 
-                    onClick={() => { setCurrentService({ is_active: true }); setFeatures([]); setIsModalOpen(true); }}
+                    onClick={() => {
+                        const defaultCategoryId = serviceCategories[0]?.id;
+                        setCurrentService({ is_active: true, service_category_id: defaultCategoryId });
+                        setSelectedCategoryIds(defaultCategoryId ? [defaultCategoryId] : []);
+                        setFeatures([]);
+                        setIsModalOpen(true);
+                    }}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                     <Plus size={20} />
@@ -413,6 +446,72 @@ const ServicesManager = () => {
                 title={currentService.id ? 'Edit Service' : 'Add New Service'}
             >
                 <form onSubmit={handleSave} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Primary Category</label>
+                        <select
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            value={(currentService as any).service_category_id || ''}
+                            onChange={(e) => {
+                                const id = Number(e.target.value);
+                                setCurrentService({ ...currentService, service_category_id: id });
+                                setSelectedCategoryIds((prev) => {
+                                    const next = new Set(prev);
+                                    next.add(id);
+                                    return Array.from(next);
+                                });
+                            }}
+                        >
+                            <option value="" disabled>
+                                Select a category
+                            </option>
+                            {serviceCategories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="mt-2 text-sm text-gray-500">
+                            Select additional categories below if this service fits multiple groups.
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Categories</label>
+                        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 max-h-40 overflow-y-auto space-y-2">
+                            {serviceCategories.length === 0 ? (
+                                <div className="text-sm text-gray-500">No categories yet. Create one first.</div>
+                            ) : (
+                                serviceCategories.map((c) => {
+                                    const primaryId = (currentService as any).service_category_id;
+                                    const checked = selectedCategoryIds.includes(c.id) || primaryId === c.id;
+                                    const disabled = primaryId === c.id;
+                                    return (
+                                        <label key={c.id} className="flex items-center gap-2 text-sm text-gray-700">
+                                            <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                disabled={disabled}
+                                                onChange={(e) => {
+                                                    const nextChecked = e.target.checked;
+                                                    setSelectedCategoryIds((prev) => {
+                                                        const set = new Set(prev);
+                                                        if (nextChecked) set.add(c.id);
+                                                        else set.delete(c.id);
+                                                        if (primaryId) set.add(primaryId);
+                                                        return Array.from(set);
+                                                    });
+                                                }}
+                                            />
+                                            <span>{c.name}</span>
+                                            {disabled && <span className="text-xs text-gray-500">(Primary)</span>}
+                                        </label>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Service Name</label>
                         <input

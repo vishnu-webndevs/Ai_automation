@@ -17,6 +17,7 @@ const PageManager = lazy(() => import('./pages/PageManager'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const PageGenerator = lazy(() => import('./pages/PageGenerator'));
 const ServicesManager = lazy(() => import('./pages/ServicesManager'));
+const ServiceCategoriesManager = lazy(() => import('./pages/ServiceCategoriesManager'));
 const IndustriesManager = lazy(() => import('./pages/IndustriesManager'));
 const UseCasesManager = lazy(() => import('./pages/UseCasesManager'));
 const SolutionsManager = lazy(() => import('./pages/SolutionsManager'));
@@ -36,6 +37,7 @@ const HopeUIKit = lazy(() => import('./pages/HopeUIKit'));
 const StyleGuide = lazy(() => import('./pages/StyleGuide'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
+const AiPromptManager = lazy(() => import('./pages/AiPromptManager'));
 
 // Verticals
 const FintechDashboard = lazy(() => import('./pages/verticals/FintechDashboard'));
@@ -82,6 +84,7 @@ function App() {
             {/* Taxonomy */}
             <Route element={<ProtectedRoute permission="manage_taxonomy" />}>
                 <Route path="taxonomy/services" element={<ServicesManager />} />
+                <Route path="taxonomy/service-categories" element={<ServiceCategoriesManager />} />
                 <Route path="taxonomy/industries" element={<IndustriesManager />} />
                 <Route path="taxonomy/use-cases" element={<UseCasesManager />} />
                 <Route path="taxonomy/tools" element={<SolutionsManager />} />
@@ -114,6 +117,10 @@ function App() {
 
             <Route element={<ProtectedRoute permission="manage_media" />}>
                 <Route path="media" element={<MediaLibrary />} />
+            </Route>
+
+            <Route element={<ProtectedRoute permission="manage_settings" />}>
+                <Route path="ai-prompts" element={<AiPromptManager />} />
             </Route>
         </Route>
       </Routes>

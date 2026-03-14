@@ -158,6 +158,30 @@ export const generatePageContent = async (data: any) => {
     return api.post('/ai/generate-page', data);
 };
 
+export const listAiPrompts = async (params?: { q?: string; is_active?: boolean; per_page?: number; page?: number }) => {
+    return api.get('/ai-prompts', { params });
+};
+
+export const getAiPrompt = async (id: number) => {
+    return api.get(`/ai-prompts/${id}`);
+};
+
+export const createAiPrompt = async (data: { key: string; name: string; description?: string | null; is_active?: boolean; prompt_text: string }) => {
+    return api.post('/ai-prompts', data);
+};
+
+export const updateAiPrompt = async (id: number, data: { name?: string; description?: string | null; is_active?: boolean; prompt_text?: string }) => {
+    return api.patch(`/ai-prompts/${id}`, data);
+};
+
+export const deleteAiPrompt = async (id: number) => {
+    return api.delete(`/ai-prompts/${id}`);
+};
+
+export const activateAiPromptVersion = async (id: number, versionId: number) => {
+    return api.post(`/ai-prompts/${id}/activate/${versionId}`);
+};
+
 export const createPage = async (data: any) => {
     return api.post('/pages', data);
 };

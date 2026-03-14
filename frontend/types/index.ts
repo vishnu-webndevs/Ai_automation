@@ -40,6 +40,7 @@ export interface Service {
     is_active: boolean;
     sort_order: number;
     category?: ServiceCategory;
+    categories?: ServiceCategory[];
     features?: any[];
 }
 
@@ -49,6 +50,8 @@ export interface ServiceCategory {
     slug: string;
     description: string;
     icon?: string;
+    services?: Service[];
+    services_count?: number;
 }
 
 export interface Industry {

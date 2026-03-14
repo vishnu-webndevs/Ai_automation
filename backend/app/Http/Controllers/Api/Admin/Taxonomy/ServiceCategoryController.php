@@ -96,4 +96,18 @@ class ServiceCategoryController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function toggleActive($id)
+    {
+        $category = ServiceCategory::findOrFail($id);
+
+        if ($category->locked_at) {
+            return response()->json(['error' => 'Resource is locked. Please unlock it first.'], 403);
+        }
+
+        $category->is_active = !$category->is_active;
+        $category->save();
+
+        return response()->json($category);
+    }
 }

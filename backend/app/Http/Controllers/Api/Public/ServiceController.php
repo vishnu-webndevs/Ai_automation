@@ -10,7 +10,7 @@ class ServiceController extends Controller
 {
     public function index()
     {
-        return Service::with('category')
+        return Service::with(['category', 'categories'])
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -18,7 +18,7 @@ class ServiceController extends Controller
 
     public function show($slug)
     {
-        return Service::with(['category', 'features'])
+        return Service::with(['category', 'categories', 'features'])
             ->where('slug', $slug)
             ->where('is_active', true)
             ->firstOrFail();

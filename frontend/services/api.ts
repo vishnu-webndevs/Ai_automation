@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Page, Menu, Service, Industry, UseCase, Solution, Integration, BlogCategory } from '../types';
+import { Page, Menu, Service, Industry, UseCase, Solution, Integration, BlogCategory, ServiceCategory } from '../types';
 
 const API_URL =
     import.meta.env.VITE_API_URL ||
@@ -37,6 +37,17 @@ export const serviceService = {
     },
     getBySlug: async (slug: string): Promise<Service> => {
         const response = await api.get<Service>(`/services/${slug}`);
+        return response.data;
+    },
+};
+
+export const serviceCategoryService = {
+    getAll: async (): Promise<ServiceCategory[]> => {
+        const response = await api.get<ServiceCategory[]>('/service-categories');
+        return response.data;
+    },
+    getBySlug: async (slug: string): Promise<ServiceCategory> => {
+        const response = await api.get<ServiceCategory>(`/service-categories/${slug}`);
         return response.data;
     },
 };

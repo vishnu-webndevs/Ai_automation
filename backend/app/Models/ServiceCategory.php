@@ -13,6 +13,11 @@ class ServiceCategory extends Model
 
     public function services()
     {
-        return $this->hasMany(Service::class);
+        return $this->belongsToMany(Service::class, 'service_category_service')->withTimestamps();
+    }
+
+    public function primaryServices()
+    {
+        return $this->hasMany(Service::class, 'service_category_id');
     }
 }

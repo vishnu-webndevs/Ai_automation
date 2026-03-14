@@ -42,7 +42,7 @@ class TaxonomyTest extends TestCase
             ->getJson('/api/admin/industries');
 
         $response->assertStatus(200)
-            ->assertJsonCount(2);
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_can_create_industry()
@@ -90,7 +90,7 @@ class TaxonomyTest extends TestCase
             ->getJson('/api/admin/services');
 
         $response->assertStatus(200)
-            ->assertJsonCount(1);
+            ->assertJsonCount(1, 'data');
     }
 
     public function test_can_create_service()
@@ -114,7 +114,7 @@ class TaxonomyTest extends TestCase
             ->getJson('/api/admin/use-cases');
 
         $response->assertStatus(200)
-            ->assertJsonCount(1);
+            ->assertJsonCount(1, 'data');
     }
 
     public function test_can_create_use_case()

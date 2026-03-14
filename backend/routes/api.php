@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\Public\SitemapController;
 use App\Http\Controllers\Api\Public\AuthController as PublicAuthController;
 use App\Http\Controllers\Api\Public\ServiceController as PublicServiceController;
+use App\Http\Controllers\Api\Public\ServiceCategoryController as PublicServiceCategoryController;
 use App\Http\Controllers\Api\Public\IndustryController as PublicIndustryController;
 use App\Http\Controllers\Api\Public\UseCaseController as PublicUseCaseController;
 use App\Http\Controllers\Api\Public\BlogController as PublicBlogController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\Api\Admin\Seo\SitemapController as AdminSitemapControll
 use App\Http\Controllers\Api\Admin\Seo\InternalLinkController;
 use App\Http\Controllers\Api\Admin\Content\VersionController;
 use App\Http\Controllers\Api\Admin\Content\CtaController;
+use App\Http\Controllers\Api\Admin\Content\AiPromptController;
 use App\Http\Controllers\Api\Admin\System\AuditLogController;
 use App\Http\Controllers\Api\Admin\SearchController;
 
@@ -51,6 +53,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 // Public Taxonomy Routes
 Route::get('/services', [PublicServiceController::class, 'index']);
 Route::get('/services/{slug}', [PublicServiceController::class, 'show']);
+Route::get('/service-categories', [PublicServiceCategoryController::class, 'index']);
+Route::get('/service-categories/{slug}', [PublicServiceCategoryController::class, 'show']);
 Route::get('/solutions', [PublicSolutionController::class, 'index']);
 Route::get('/solutions/{slug}', [PublicSolutionController::class, 'show']);
 Route::get('/integrations', [PublicIntegrationController::class, 'index']);
@@ -93,6 +97,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/pages/{id}/duplicate', [PageController::class, 'duplicate']);
         Route::post('/ai/generate-page', [PageController::class, 'generateContent'])->middleware('throttle:ai-generation');
         Route::post('/ai/generate-page-bulk', [PageController::class, 'bulkGenerate'])->middleware('throttle:ai-generation');
+        Route::post('/ai/generate-service', [ServiceController::class, 'generateContent'])->middleware('throttle:ai-generation');
+        Route::post('/ai/generate-service-bulk', [ServiceController::class, 'bulkGenerateContent'])->middleware('throttle:ai-generation');
 
         // Page Templates
         Route::get('/page-templates', [PageTemplateController::class, 'index']);
@@ -125,6 +131,7 @@ Route::prefix('admin')->group(function () {
         Route::middleware(['admin.permission:manage_taxonomy'])->group(function () {
             // Toggle Active Routes
             Route::patch('services/{id}/toggle-active', [ServiceController::class, 'toggleActive']);
+            Route::patch('service-categories/{id}/toggle-active', [ServiceCategoryController::class, 'toggleActive']);
             Route::patch('industries/{id}/toggle-active', [IndustryController::class, 'toggleActive']);
             Route::patch('use-cases/{id}/toggle-active', [UseCaseController::class, 'toggleActive']);
             Route::patch('solutions/{id}/toggle-active', [AdminSolutionController::class, 'toggleActive']);
@@ -170,6 +177,12 @@ Route::prefix('admin')->group(function () {
         // Audit Logging
         Route::middleware(['admin.permission:manage_settings'])->group(function () {
             Route::get('audit-logs', [AuditLogController::class, 'index']);
+            Route::get('ai-prompts', [AiPromptController::class, 'index']);
+            Route::post('ai-prompts', [AiPromptController::class, 'store']);
+            Route::get('ai-prompts/{id}', [AiPromptController::class, 'show']);
+            Route::patch('ai-prompts/{id}', [AiPromptController::class, 'update']);
+            Route::delete('ai-prompts/{id}', [AiPromptController::class, 'destroy']);
+            Route::post('ai-prompts/{id}/activate/{versionId}', [AiPromptController::class, 'activateVersion']);
         });
     });
 });

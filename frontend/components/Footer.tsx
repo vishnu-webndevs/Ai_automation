@@ -9,7 +9,8 @@ const Footer: React.FC = () => {
   const hideCta =
     location.pathname === '/contact-us' ||
     location.pathname === '/' ||
-    location.pathname === '/home';
+    location.pathname === '/home' ||
+    location.pathname.startsWith('/services/');
   const { data: menuData } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
 
   return (

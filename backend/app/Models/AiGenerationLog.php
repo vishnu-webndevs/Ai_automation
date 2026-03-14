@@ -10,11 +10,16 @@ class AiGenerationLog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'page_id', 'model_used', 'prompt_used', 'tokens_used', 'response_status'
+        'page_id', 'service_id', 'model_used', 'prompt_used', 'tokens_used', 'response_status'
     ];
 
     public function page()
     {
         return $this->belongsTo(Page::class);
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }

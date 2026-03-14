@@ -17,6 +17,7 @@ class Service extends Model
         'template_slug',
         'short_description',
         'full_description',
+        'content_json',
         'icon',
         'is_active',
         'locked_at',
@@ -25,7 +26,8 @@ class Service extends Model
 
     protected $casts = [
         'locked_at' => 'datetime',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'content_json' => 'array',
     ];
 
     protected $appends = ['locked_status'];
@@ -33,6 +35,11 @@ class Service extends Model
     public function category()
     {
         return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'service_category_service')->withTimestamps();
     }
 
     public function features()
