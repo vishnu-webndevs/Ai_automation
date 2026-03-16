@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { History, AlertTriangle, CheckCircle, Edit, FileText, Eye, EyeOff, Copy, LayoutTemplate, Wand, Lock, Unlock } from 'lucide-react';
+import { History, AlertTriangle, CheckCircle, Edit, FileText, Eye, EyeOff, Copy, Wand, Lock, Unlock, Trash2 } from 'lucide-react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Card, CardBody, CardHeader } from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
-import { TemplateLibraryModal } from '../components/templates/TemplateLibraryModal';
 import {
   createPage,
   bulkUpdatePageStatus,
   duplicatePage,
+  deletePage,
   listPages,
   togglePublish,
   updatePage,
@@ -88,10 +88,6 @@ const PageManager = () => {
   const [checkingConflicts, setCheckingConflicts] = useState(false);
   const [conflictChecked, setConflictChecked] = useState(false);
 
-  // Template Modal
-  const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [templatePageId, setTemplatePageId] = useState<number | null>(null);
-
   // Manual Create Modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -99,9 +95,19 @@ const PageManager = () => {
   const [newType, setNewType] = useState('page');
   const [creating, setCreating] = useState(false);
 
-  const openTemplateModal = (id: number) => {
-    setTemplatePageId(id);
-    setTemplateModalOpen(true);
+  const onDelete = async (id: number) => {
+    const ok = confirm('Delete this page? This cannot be undone.');
+    if (!ok) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await deletePage(id);
+      await fetchRows();
+    } catch (e: any) {
+      setError(e?.response?.data?.message || 'Failed to delete page');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const publicBaseUrl = useMemo(() => {
@@ -637,20 +643,20 @@ const PageManager = () => {
                                 <Copy size={18} />
                               </button>
                               <button 
-                                onClick={() => openTemplateModal(row.id)} 
-                                disabled={loading}
-                                className="p-1 text-gray-500 hover:text-indigo-600 rounded hover:bg-gray-100 disabled:opacity-50"
-                                title="Template"
-                              >
-                                <LayoutTemplate size={18} />
-                              </button>
-                              <button 
                                 onClick={() => openRegenerate(row.id)} 
                                 disabled={loading}
                                 className="p-1 text-gray-500 hover:text-pink-600 rounded hover:bg-gray-100 disabled:opacity-50"
                                 title="Regenerate AI"
                               >
                                 <Wand size={18} />
+                              </button>
+                              <button
+                                onClick={() => onDelete(row.id)}
+                                disabled={loading || (row.locked_status?.is_locked ?? false)}
+                                className="p-1 text-gray-500 hover:text-red-600 rounded hover:bg-gray-100 disabled:opacity-50"
+                                title="Delete"
+                              >
+                                <Trash2 size={18} />
                               </button>
                               <button 
                                 onClick={() => openDetails(row, 'history')}
@@ -907,19 +913,6 @@ const PageManager = () => {
         </div>
       </Modal>
 
-      <TemplateLibraryModal
-        isOpen={templateModalOpen}
-        onClose={() => setTemplateModalOpen(false)}
-        pageId={templatePageId!}
-        onTemplateApplied={() => {
-            setTemplateModalOpen(false);
-            if (templatePageId) {
-                navigate(`/web-admin/pages/editor?pageId=${templatePageId}`);
-            } else {
-                fetchRows();
-            }
-        }}
-      />
     </div>
   );
 };

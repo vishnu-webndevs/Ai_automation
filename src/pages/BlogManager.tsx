@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Edit, Trash2, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import type { Blog, BlogCategory } from '../types';
 import Modal from '../components/ui/Modal';
-import ImagePicker from '../components/media/ImagePicker';
 
 const BlogManager = () => {
+    const navigate = useNavigate();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [loading, setLoading] = useState(true);
@@ -13,6 +14,11 @@ const BlogManager = () => {
     const [currentBlog, setCurrentBlog] = useState<Partial<Blog>>({});
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState<string>('all');
+    const [aiModel, setAiModel] = useState<'lorum' | 'openai' | 'gemini'>('openai');
+    const [aiTone, setAiTone] = useState('Professional');
+    const [aiContentLength, setAiContentLength] = useState<'Short' | 'Medium' | 'Long'>('Long');
+    const [confirmOverwriteAi, setConfirmOverwriteAi] = useState(false);
+    const [generatingAi, setGeneratingAi] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -86,13 +92,57 @@ const BlogManager = () => {
             alert('Please enter a title first');
             return;
         }
+        setGeneratingAi(true);
         try {
-            alert('AI Generation started... This would connect to the backend AI service.');
-            // Implementation would be: await api.post('/blogs/generate', { title: currentBlog.title });
-        } catch (error) {
-            console.error('AI Generation failed', error);
+            let pageId = (currentBlog as any).id as number | undefined;
+            if (!pageId) {
+                const res = await api.post('/blogs', buildPayload({ ...currentBlog, status: currentBlog.status || 'draft' }));
+                pageId = res.data?.id;
+                if (pageId) {
+                    setCurrentBlog(res.data);
+                }
+            }
+
+            if (!pageId) {
+                alert('Failed to create blog post first.');
+                return;
+            }
+
+            const selectedCategoryName = categories.find((c) => c.id === (currentBlog as any).category_id)?.name;
+            const pageStructure =
+                'Write a long-form blog article. Use these block types only: heading, paragraph, list. Use multiple headings and paragraphs. For list blocks, content must be an array of strings. End with a short FAQ section (faqs array) and internal_links relevant to Totan.ai. Avoid hero blocks and avoid button blocks except optional final CTA.';
+
+            await api.post('/ai/generate-page', {
+                page_id: pageId,
+                primary_keyword: currentBlog.title,
+                target_industry: selectedCategoryName || 'General',
+                tone: aiTone,
+                content_length: aiContentLength,
+                model: aiModel,
+                preserve_title: true,
+                page_structure: pageStructure,
+                confirm_overwrite: confirmOverwriteAi,
+            });
+
+            await fetchData();
+            alert('AI content generated and saved.');
+            navigate(`/web-admin/pages/editor?pageId=${pageId}`);
+        } catch (e: any) {
+            const code = e?.response?.data?.code;
+            if (e?.response?.status === 409 && code === 'CONFIRM_OVERWRITE_REQUIRED') {
+                setConfirmOverwriteAi(true);
+                alert('This blog already has content. Enable overwrite and run again.');
+            } else {
+                alert(e?.response?.data?.message || 'AI generation failed');
+            }
+        } finally {
+            setGeneratingAi(false);
         }
     };
+
+    const canGenerate = useMemo(() => {
+        return !!currentBlog.title && !generatingAi;
+    }, [currentBlog.title, generatingAi]);
 
     const filteredBlogs = blogs.filter(blog => {
         const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -235,11 +285,12 @@ const BlogManager = () => {
                                 <button
                                     type="button"
                                     onClick={handleGenerate}
+                                    disabled={!canGenerate}
                                     className="px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors flex items-center gap-2"
                                     title="Generate with AI"
                                 >
                                     <Sparkles size={18} />
-                                    <span className="hidden sm:inline">Generate</span>
+                                    <span className="hidden sm:inline">{generatingAi ? 'Generating...' : 'Generate'}</span>
                                 </button>
                             </div>
                         </div>
@@ -294,33 +345,54 @@ const BlogManager = () => {
                             </div>
                         )}
 
-                        <div className="md:col-span-2">
-                            <ImagePicker
-                                label="Featured Image"
-                                value={currentBlog.featured_image || ''}
-                                onChange={(val) => setCurrentBlog({ ...currentBlog, featured_image: val })}
-                                placeholder="Select featured image..."
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                            <textarea
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 min-h-[200px]"
-                                value={currentBlog.content || ''}
-                                onChange={(e) => setCurrentBlog({ ...currentBlog, content: e.target.value })}
-                                placeholder="Write your post content here..."
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt</label>
-                            <textarea
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 min-h-[80px]"
-                                value={currentBlog.excerpt || ''}
-                                onChange={(e) => setCurrentBlog({ ...currentBlog, excerpt: e.target.value })}
-                                placeholder="Short summary for SEO and previews"
-                            />
+                        <div className="md:col-span-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                            <div className="text-sm font-semibold text-gray-900">AI generation settings</div>
+                            <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiModel}
+                                        onChange={(e) => setAiModel(e.target.value as any)}
+                                    >
+                                        <option value="openai">OpenAI</option>
+                                        <option value="gemini">Gemini</option>
+                                        <option value="lorum">Lorum</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tone</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiTone}
+                                        onChange={(e) => setAiTone(e.target.value)}
+                                    >
+                                        <option value="Professional">Professional</option>
+                                        <option value="Casual">Casual</option>
+                                        <option value="Technical">Technical</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Length</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiContentLength}
+                                        onChange={(e) => setAiContentLength(e.target.value as any)}
+                                    >
+                                        <option value="Short">Short</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Long">Long</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+                                <input
+                                    type="checkbox"
+                                    checked={confirmOverwriteAi}
+                                    onChange={(e) => setConfirmOverwriteAi(e.target.checked)}
+                                />
+                                Overwrite existing blog content
+                            </label>
                         </div>
 
                         <div className="md:col-span-2 flex items-center gap-2">

@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { Helmet } from 'react-helmet-async';
-import { serviceService } from '../services/api';
+import { api, serviceService } from '../services/api';
 
 type ServicePageFAQ = {
     question: string;
@@ -77,6 +77,11 @@ const ServiceDetail: React.FC = () => {
     const [searchParams] = useSearchParams();
     const { data: service, isLoading, error } = useSWR(slug ? `service-${slug}` : null, () => serviceService.getBySlug(slug!));
     const { data: allServices } = useSWR('services-all', () => serviceService.getAll());
+    const [quickEmail, setQuickEmail] = useState('');
+    const [quickMessage, setQuickMessage] = useState('');
+    const [quickSubmitting, setQuickSubmitting] = useState(false);
+    const [quickSent, setQuickSent] = useState(false);
+    const [quickError, setQuickError] = useState<string | null>(null);
 
     const resolvedContext = useMemo<ServicePageContext>(() => {
         const industry = compact(searchParams.get('industry')) || 'your industry';
@@ -131,6 +136,33 @@ const ServiceDetail: React.FC = () => {
         ]
     );
 
+    const submitQuickBrief = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
+            setQuickError(null);
+            setQuickSent(false);
+            setQuickSubmitting(true);
+            try {
+                await api.post('/contact', {
+                    email: quickEmail,
+                    message: quickMessage,
+                    subject: `${serviceName} inquiry`,
+                    source: 'service_quick_brief',
+                    source_url: typeof window !== 'undefined' ? window.location.href : undefined,
+                });
+                setQuickSent(true);
+                setQuickEmail('');
+                setQuickMessage('');
+            } catch (err: any) {
+                const message = err?.response?.data?.message || 'Failed to submit. Please try again.';
+                setQuickError(String(message));
+            } finally {
+                setQuickSubmitting(false);
+            }
+        },
+        [quickEmail, quickMessage, serviceName]
+    );
+
     const t = useCallback(
         (value: unknown) => interpolate(typeof value === 'string' ? value : '', templateVars),
         [templateVars]
@@ -166,12 +198,7 @@ const ServiceDetail: React.FC = () => {
 
         if (candidates.length > 0) return candidates;
 
-        return [
-            { title: 'AI Automation', href: '/services', text: 'Explore automation-first services designed for measurable impact.' },
-            { title: 'AI Agents', href: '/services', text: 'Deploy task-driven agents to streamline research and operations.' },
-            { title: 'Workflow Automation', href: '/services', text: 'Reduce manual approvals and handoffs across teams.' },
-            { title: 'API Integrations', href: '/services', text: 'Connect systems reliably with secure, maintainable integrations.' },
-        ];
+        return [];
     }, [allServices, service, serviceContent, t]);
 
     const featureCards = useMemo(
@@ -182,18 +209,10 @@ const ServiceDetail: React.FC = () => {
                           title: t(compact(feature.title || feature.name) || `Feature ${idx + 1}`),
                           description:
                               t(compact(feature.description) || 'Configured to match your workflows, data access rules, and operational guardrails.'),
-                          icon: t(compact(feature.icon) || '⚙️'),
                       })),
                       8
                   )
-                : [
-                      { title: t('Workflow mapping'), description: t('Turn business steps into a clear automation blueprint with owners and success metrics.'), icon: t('🧭') },
-                      { title: t('AI-assisted decisions'), description: t('Route work using rules and AI signals, with human approval where needed.'), icon: t('🧠') },
-                      { title: t('Integrations'), description: t('Connect CRMs, ERPs, ticketing tools, and data sources without disrupting teams.'), icon: t('🔗') },
-                      { title: t('Monitoring & alerts'), description: t('Track outcomes, failures, and exceptions with fast iteration loops.'), icon: t('📈') },
-                      { title: t('Security by design'), description: t('Apply least-privilege access patterns and auditable workflows.'), icon: t('🛡️') },
-                      { title: t('Scalable delivery'), description: t('Move from quick wins to enterprise rollouts with repeatable components.'), icon: t('🏗️') },
-                  ],
+                : [],
         [features, serviceContent, t]
     );
 
@@ -210,12 +229,7 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                { title: 'Manual workflows slow operations', description: `Teams lose time on repetitive steps and handoffs in ${resolvedContext.industry}.` },
-                { title: 'High operational costs', description: 'Routine tasks consume hours that could be redirected to higher-value work.' },
-                { title: 'Inconsistent quality and data', description: 'Human error and fragmented tools create rework, delays, and unreliable reporting.' },
-                { title: 'Limited scalability', description: 'Growth increases workload faster than headcount, creating bottlenecks across teams.' },
-            ];
+            return [];
         },
         [resolvedContext.industry, serviceContent, t]
     );
@@ -233,12 +247,7 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                { title: `Automate ${resolvedContext.automationType}`, text: 'Design workflows that reduce friction and keep humans in the loop when required.' },
-                { title: 'Integrate with your existing stack', text: 'Connect systems and data sources using APIs and secure connectors from day one.' },
-                { title: 'Make outcomes measurable', text: 'Define KPIs upfront and optimize continuously based on real operational signals.' },
-                { title: 'Deploy safely', text: 'Roll out in phases with testing, monitoring, and guardrails aligned to your policies.' },
-            ];
+            return [];
         },
         [resolvedContext.automationType, serviceContent, t]
     );
@@ -256,14 +265,7 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                { title: t('Increased productivity'), text: t('Reduce time spent on repetitive tasks and approvals.') },
-                { title: t('Reduced operational costs'), text: t('Lower manual effort and rework with consistent workflows.') },
-                { title: t('Faster cycle times'), text: t('Move work from request to completion with fewer handoffs.') },
-                { title: t('Improved data accuracy'), text: t('Standardize inputs, validations, and system updates.') },
-                { title: t('Better customer experience'), text: t('Improve response times and consistency across channels.') },
-                { title: t('Scalable operations'), text: t('Expand capacity without linear headcount growth.') },
-            ];
+            return [];
         },
         [serviceContent, t]
     );
@@ -282,28 +284,7 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                {
-                    title: t('Automated intake and routing'),
-                    industry: resolvedContext.industry,
-                    text: t('Capture requests, validate fields, enrich data, and route to the right owner or system automatically.'),
-                },
-                {
-                    title: t('Data sync and reconciliation'),
-                    industry: resolvedContext.industry,
-                    text: t('Keep CRMs, spreadsheets, and internal tools aligned with automated checks and exception handling.'),
-                },
-                {
-                    title: t('AI-assisted customer support'),
-                    industry: resolvedContext.industry,
-                    text: t('Deflect common questions, draft replies, and escalate complex cases with clear confidence signals.'),
-                },
-                {
-                    title: t('Ops reporting and alerts'),
-                    industry: resolvedContext.industry,
-                    text: t('Generate summaries, detect anomalies, and notify teams when SLAs are at risk.'),
-                },
-            ];
+            return [];
         },
         [resolvedContext.industry, serviceContent, t]
     );
@@ -321,14 +302,7 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                { title: t('Business requirement analysis'), text: t(`Identify workflows, constraints, and success metrics for ${resolvedContext.targetProblem}.`) },
-                { title: t('Workflow design'), text: t('Map steps, owners, inputs/outputs, and approvals into a clear implementation plan.') },
-                { title: t('Automation development'), text: t(`Build automations using ${resolvedContext.toolStack.slice(0, 3).join(', ')} and proven patterns.`) },
-                { title: t('Integration'), text: t('Connect systems via APIs and secure connectors with clear logging and retries.') },
-                { title: t('Testing and deployment'), text: t('Validate accuracy, performance, and edge cases before rollout.') },
-                { title: t('Continuous optimization'), text: t('Improve performance and coverage based on real-world feedback and monitoring.') },
-            ];
+            return [];
         },
         [resolvedContext.targetProblem, resolvedContext.toolStack, serviceContent, t]
     );
@@ -354,29 +328,44 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                { title: t('Healthcare'), text: t('Automate admin workflows while supporting auditability and controlled data access patterns.') },
-                { title: t('Finance'), text: t('Streamline operations with policy-aligned approvals and reliable reporting outputs.') },
-                { title: t('SaaS'), text: t('Improve onboarding, support, and billing operations with integrated automations.') },
-                { title: t('E-commerce'), text: t('Automate orders, inventory updates, customer messaging, and exception handling.') },
-                { title: t('Logistics'), text: t('Reduce delays by automating tracking updates, dispatch coordination, and status reporting.') },
-                { title: t('Education'), text: t('Simplify enrollment, communication workflows, and internal administration processes.') },
-            ];
+            return [];
         },
         [serviceContent, t]
     );
 
-    const comparisonRows = useMemo(
-        () => [
-            { topic: 'Speed', left: 'Manual handoffs and slow approvals', right: 'Automated routing with clear escalation paths' },
-            { topic: 'Cost', left: 'Higher labor per task', right: 'Lower effort per unit of work with repeatable workflows' },
-            { topic: 'Accuracy', left: 'Error-prone data entry', right: 'Validated inputs and standardized updates' },
-            { topic: 'Scalability', left: 'Headcount grows with workload', right: 'Capacity scales through automation' },
-            { topic: 'Reporting', left: 'Fragmented visibility', right: 'Centralized metrics and monitoring signals' },
-            { topic: 'Reliability', left: 'Inconsistent execution', right: 'Defined guardrails and predictable outcomes' },
-        ],
-        []
-    );
+    const comparison = useMemo(() => {
+        const structured = ensureArray<any>(serviceContent?.comparison?.rows, []);
+        if (structured.length > 0) {
+            const leftLabel = t(compact(serviceContent?.comparison?.left_label) || 'Manual Processes');
+            const rightLabel = t(compact(serviceContent?.comparison?.right_label) || serviceName);
+            const rows = take(
+                structured.map((row: any, idx: number) => ({
+                    topic: t(compact(row.topic) || `Area ${idx + 1}`),
+                    left: t(compact(row.left) || ''),
+                    right: t(compact(row.right) || ''),
+                })),
+                10
+            );
+            return { leftLabel, rightLabel, rows };
+        }
+
+        return { leftLabel: '', rightLabel: '', rows: [] };
+    }, [serviceContent, serviceName, t]);
+
+    const roiCards = useMemo(() => {
+        const structured = ensureArray<any>(serviceContent?.roi?.highlights, []);
+        if (structured.length > 0) {
+            return take(
+                structured.map((item: any, idx: number) => ({
+                    title: t(compact(item.title) || `ROI ${idx + 1}`),
+                    value: t(compact(item.value) || ''),
+                    note: t(compact(item.note) || ''),
+                })),
+                8
+            );
+        }
+        return [];
+    }, [serviceContent, t]);
 
     const faqItems = useMemo<ServicePageFAQ[]>(
         () => {
@@ -392,40 +381,14 @@ const ServiceDetail: React.FC = () => {
                 );
             }
 
-            return [
-                {
-                    question: `What is ${serviceName}?`,
-                    shortAnswer: `${serviceName} helps teams automate workflows and improve operational efficiency.`,
-                    expandedAnswer: `${serviceName} is a service designed to reduce manual work, improve consistency, and connect your existing tools. It is typically used to streamline ${resolvedContext.automationType}, reduce delays, and make outcomes measurable across teams.`,
-                },
-                {
-                    question: `Who is ${serviceName} best for?`,
-                    shortAnswer: `Teams in ${resolvedContext.industry} that need scalable, measurable automation.`,
-                    expandedAnswer: `${serviceName} fits teams that rely on repeatable processes and want to improve speed, cost, and accuracy. It works for different business sizes because workflows can be rolled out in phases and adapted to policies and systems.`,
-                },
-                {
-                    question: `How does ${serviceName} integrate with our existing tools?`,
-                    shortAnswer: 'We connect systems using APIs and secure connectors.',
-                    expandedAnswer: 'Integrations are implemented around your current stack, often via REST APIs, webhooks, or automation platforms. We prioritize least-privilege access, clear monitoring, and predictable failure handling to keep operations stable.',
-                },
-                {
-                    question: 'How long does implementation usually take?',
-                    shortAnswer: 'It depends on scope, integrations, and approvals.',
-                    expandedAnswer: 'Most teams start with a small number of high-impact workflows and expand. Timelines vary by complexity, number of systems, and governance needs. A phased rollout reduces risk and delivers value earlier.',
-                },
-                {
-                    question: `Is ${serviceName} secure and compliant?`,
-                    shortAnswer: 'Security is addressed through access controls and auditability.',
-                    expandedAnswer: 'We apply least-privilege access patterns, isolate sensitive data flows, and keep audit trails where required. Controls and processes are aligned to your internal security and compliance requirements.',
-                },
-                {
-                    question: `What results can we expect from ${serviceName}?`,
-                    shortAnswer: 'Time savings, fewer errors, and faster workflows.',
-                    expandedAnswer: 'Outcomes are measured using your KPIs. Common improvements include reduced processing time, lower rework rates, higher consistency, and better visibility into operational performance.',
-                },
-            ];
+            return [];
         },
         [resolvedContext.automationType, resolvedContext.industry, serviceContent, serviceName, t]
+    );
+
+    const emptySectionText = useMemo(
+        () => t('Content not generated yet. Generate AI content from admin panel.'),
+        [t]
     );
 
     const faqSchema = useMemo(() => buildFaqSchema(faqItems), [faqItems]);
@@ -599,21 +562,37 @@ const ServiceDetail: React.FC = () => {
                                         <div className="text-sm text-slate-400">Share your goal and stack</div>
                                     </div>
                                 </div>
-                                <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                                {quickSent && (
+                                    <div className="mb-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-base text-emerald-100">
+                                        Thanks — we received your message.
+                                    </div>
+                                )}
+                                {quickError && (
+                                    <div className="mb-3 rounded-2xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-base text-red-100">
+                                        {quickError}
+                                    </div>
+                                )}
+                                <form className="space-y-3" onSubmit={submitQuickBrief}>
                                     <input
-                                        type="text"
+                                        type="email"
+                                        required
                                         placeholder="Work email"
+                                        value={quickEmail}
+                                        onChange={(e) => setQuickEmail(e.target.value)}
                                         className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500"
                                     />
                                     <textarea
                                         placeholder={`What are you trying to improve? (e.g., ${resolvedContext.targetProblem})`}
+                                        value={quickMessage}
+                                        onChange={(e) => setQuickMessage(e.target.value)}
                                         className="w-full rounded-xl bg-slate-900/70 border border-slate-700 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 min-h-[90px]"
                                     />
                                     <button
                                         type="submit"
-                                        className="w-full inline-flex items-center justify-center rounded-xl bg-white text-slate-950 text-sm font-semibold py-2.5 hover:bg-slate-200 transition-colors"
+                                        disabled={quickSubmitting || quickEmail.trim().length === 0}
+                                        className="w-full inline-flex items-center justify-center rounded-xl bg-white text-slate-950 text-sm font-semibold py-2.5 hover:bg-slate-200 transition-colors disabled:opacity-50"
                                     >
-                                        Talk to an Expert
+                                        {quickSubmitting ? 'Sending...' : 'Talk to an Expert'}
                                     </button>
                                 </form>
                                 <div className="mt-3 text-sm text-slate-400">
@@ -645,12 +624,9 @@ const ServiceDetail: React.FC = () => {
                     <div className="grid lg:grid-cols-12 gap-8 items-start">
                         <div className="lg:col-span-7">
                             <p className="text-base text-slate-200 leading-relaxed">
-                                {t(
-                                    compact(serviceContent?.intro?.body) ||
-                                        `${serviceName} helps teams in ${resolvedContext.industry} improve how work moves through systems and people. It focuses on ${resolvedContext.automationType} that targets ${resolvedContext.targetProblem}, so operations become faster, more consistent, and easier to scale. The approach fits ${resolvedContext.businessType ? resolvedContext.businessType : 'growing'} businesses because workflows can start small and expand safely with measurable outcomes.`
-                                )}
+                                {compact(serviceContent?.intro?.body) ? t(compact(serviceContent?.intro?.body)) : emptySectionText}
                             </p>
-                            {longDescriptionHtml && (
+                            {!compact(serviceContent?.intro?.body) && longDescriptionHtml && (
                                 <div className="mt-6 rounded-3xl bg-slate-900/40 border border-slate-800 p-6">
                                     <div className="prose prose-invert prose-sm sm:prose-base max-w-none">
                                         <div dangerouslySetInnerHTML={{ __html: longDescriptionHtml }} />
@@ -664,19 +640,19 @@ const ServiceDetail: React.FC = () => {
                                     Key outcomes
                                 </div>
                                 <ul className="space-y-3 text-base text-slate-200">
-                                    {(ensureArray<string>(serviceContent?.intro?.key_outcomes, []).length > 0
-                                        ? take(ensureArray<string>(serviceContent?.intro?.key_outcomes, []), 6).map((item) => t(String(item)))
-                                        : [
-                                              t('Reduce manual steps and handoffs across teams'),
-                                              t('Improve accuracy with validations and standardized updates'),
-                                              t('Scale delivery with repeatable automation components'),
-                                          ]
-                                    ).map((item) => (
-                                        <li key={item} className="flex gap-3">
-                                            <span className="text-purple-200">•</span>
-                                            <span>{item}</span>
-                                        </li>
-                                    ))}
+                                    {ensureArray<string>(serviceContent?.intro?.key_outcomes, []).length === 0 ? (
+                                        <li className="text-slate-300">{emptySectionText}</li>
+                                    ) : (
+                                        take(ensureArray<string>(serviceContent?.intro?.key_outcomes, []), 6)
+                                            .map((item) => t(String(item)))
+                                            .filter(Boolean)
+                                            .map((item) => (
+                                                <li key={item} className="flex gap-3">
+                                                    <span className="text-purple-200">•</span>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))
+                                    )}
                                 </ul>
                             </div>
                         </div>
@@ -684,35 +660,47 @@ const ServiceDetail: React.FC = () => {
                 </SectionShell>
 
                 <SectionShell id="problems" eyebrow="Pain Points" title={`Problems ${serviceName} helps solve`}>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {problemCards.map((problem) => (
-                            <article key={problem.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <h3 className="text-base font-semibold text-white mb-2">
-                                    {problem.title}
-                                </h3>
-                                <p className="text-base text-slate-300 leading-relaxed">
-                                    {problem.description}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
+                    {problemCards.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {problemCards.map((problem) => (
+                                <article key={problem.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                    <h3 className="text-base font-semibold text-white mb-2">
+                                        {problem.title}
+                                    </h3>
+                                    <p className="text-base text-slate-300 leading-relaxed">
+                                        {problem.description}
+                                    </p>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="solution" eyebrow="Solution" title={`How ${serviceName} addresses these challenges`}>
                     <div className="grid lg:grid-cols-12 gap-8 items-start">
                         <div className="lg:col-span-7">
-                            <ul className="space-y-4">
-                                {solutionBullets.map((item) => (
-                                    <li key={item.title} className="rounded-3xl bg-slate-950/60 border border-slate-800 p-5">
-                                        <h3 className="text-base font-semibold text-white mb-1.5">
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-base text-slate-300 leading-relaxed">
-                                            {item.text}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
+                            {solutionBullets.length === 0 ? (
+                                <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                                    {emptySectionText}
+                                </div>
+                            ) : (
+                                <ul className="space-y-4">
+                                    {solutionBullets.map((item) => (
+                                        <li key={item.title} className="rounded-3xl bg-slate-950/60 border border-slate-800 p-5">
+                                            <h3 className="text-base font-semibold text-white mb-1.5">
+                                                {item.title}
+                                            </h3>
+                                            <p className="text-base text-slate-300 leading-relaxed">
+                                                {item.text}
+                                            </p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         <div className="lg:col-span-5">
                             <div className="rounded-3xl bg-gradient-to-b from-emerald-500/12 via-slate-950/70 to-slate-950 border border-emerald-400/25 p-6">
@@ -720,7 +708,7 @@ const ServiceDetail: React.FC = () => {
                                     Outcome focus
                                 </div>
                                 <p className="text-base text-slate-200 leading-relaxed">
-                                    Replace fragmented steps with a clear workflow that improves speed, reliability, and visibility without disrupting your current tools.
+                                    {compact(serviceContent?.hero?.subheadline) ? t(compact(serviceContent?.hero?.subheadline)) : emptySectionText}
                                 </p>
                                 <a
                                     href="/contact-us"
@@ -734,76 +722,93 @@ const ServiceDetail: React.FC = () => {
                 </SectionShell>
 
                 <SectionShell id="features" eyebrow="Capabilities" title="Key features">
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {featureCards.map((feature) => (
-                            <article key={feature.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <div className="flex items-start gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-xl">
-                                        <span>{feature.icon}</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-base font-semibold text-white mb-1">
-                                            {feature.title}
-                                        </h3>
-                                        <p className="text-base text-slate-300 leading-relaxed">
-                                            {feature.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                    {featureCards.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {featureCards.map((feature) => (
+                                <article key={feature.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                    <h3 className="text-base font-semibold text-white mb-1">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-base text-slate-300 leading-relaxed">
+                                        {feature.description}
+                                    </p>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="benefits" eyebrow="Benefits" title="Business outcomes">
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {benefits.map((benefit) => (
-                            <article key={benefit.title} className="rounded-3xl bg-gradient-to-b from-purple-500/10 to-slate-950/70 border border-purple-500/20 p-5">
-                                <h3 className="text-base font-semibold text-white mb-1.5">
-                                    {benefit.title}
-                                </h3>
-                                <p className="text-base text-slate-300 leading-relaxed">
-                                    {benefit.text}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
+                    {benefits.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {benefits.map((benefit) => (
+                                <article key={benefit.title} className="rounded-3xl bg-gradient-to-b from-purple-500/10 to-slate-950/70 border border-purple-500/20 p-5">
+                                    <h3 className="text-base font-semibold text-white mb-1.5">
+                                        {benefit.title}
+                                    </h3>
+                                    <p className="text-base text-slate-300 leading-relaxed">
+                                        {benefit.text}
+                                    </p>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="use-cases" eyebrow="Use Cases" title={`Real-world use cases for ${resolvedContext.industry}`}>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {useCases.map((useCase) => (
-                            <article key={useCase.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <h3 className="text-base font-semibold text-white mb-2">
-                                    {useCase.title}
-                                </h3>
-                                <div className="text-sm text-slate-300 mb-3">
-                                    Industry: {useCase.industry}
-                                </div>
-                                <p className="text-base text-slate-300 leading-relaxed">
-                                    {useCase.text}
-                                </p>
-                            </article>
-                        ))}
-                    </div>
+                    {useCases.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {useCases.map((useCase) => (
+                                <article key={useCase.title} className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                    <h3 className="text-base font-semibold text-white mb-2">
+                                        {useCase.title}
+                                    </h3>
+                                    <div className="text-sm text-slate-300 mb-3">
+                                        Industry: {useCase.industry}
+                                    </div>
+                                    <p className="text-base text-slate-300 leading-relaxed">
+                                        {useCase.text}
+                                    </p>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="process" eyebrow="Process" title="How it works">
-                    <ol className="grid lg:grid-cols-3 gap-5">
-                        {processSteps.map((step, idx) => (
-                            <li key={step.title} className="rounded-3xl bg-slate-950/60 border border-slate-800 p-5">
-                                <div className="text-sm font-semibold text-purple-200 mb-2">
-                                    Step {idx + 1}
-                                </div>
-                                <h3 className="text-base font-semibold text-white mb-1.5">
-                                    {step.title}
-                                </h3>
-                                <p className="text-base text-slate-300 leading-relaxed">
-                                    {step.text}
-                                </p>
-                            </li>
-                        ))}
-                    </ol>
+                    {processSteps.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <ol className="grid lg:grid-cols-3 gap-5">
+                            {processSteps.map((step, idx) => (
+                                <li key={step.title} className="rounded-3xl bg-slate-950/60 border border-slate-800 p-5">
+                                    <div className="text-sm font-semibold text-purple-200 mb-2">
+                                        Step {idx + 1}
+                                    </div>
+                                    <h3 className="text-base font-semibold text-white mb-1.5">
+                                        {step.title}
+                                    </h3>
+                                    <p className="text-base text-slate-300 leading-relaxed">
+                                        {step.text}
+                                    </p>
+                                </li>
+                            ))}
+                        </ol>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="tech" eyebrow="Technology" title="Technology stack">
@@ -820,59 +825,72 @@ const ServiceDetail: React.FC = () => {
                 </SectionShell>
 
                 <SectionShell id="industries" eyebrow="Industries" title={`Industry applications of ${serviceName}`}>
-                    <div className="space-y-3">
-                        {industryApplications.map((item) => (
-                            <details key={item.title} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <summary className="cursor-pointer list-none">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <h3 className="text-base font-semibold text-white">
-                                            {item.title}
-                                        </h3>
-                                        <span className="text-slate-400 group-open:text-slate-200 text-sm">
-                                            Expand
-                                        </span>
-                                    </div>
-                                </summary>
-                                <p className="mt-3 text-base text-slate-300 leading-relaxed">
-                                    {item.text}
-                                </p>
-                            </details>
-                        ))}
-                    </div>
+                    {industryApplications.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {industryApplications.map((item) => (
+                                <details key={item.title} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                    <summary className="cursor-pointer list-none">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <h3 className="text-base font-semibold text-white">
+                                                {item.title}
+                                            </h3>
+                                            <span className="text-slate-400 group-open:text-slate-200 text-sm">
+                                                Expand
+                                            </span>
+                                        </div>
+                                    </summary>
+                                    <p className="mt-3 text-base text-slate-300 leading-relaxed">
+                                        {item.text}
+                                    </p>
+                                </details>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="comparison" eyebrow="Comparison" title={`Manual processes vs ${serviceName}`}>
-                    <div className="overflow-hidden rounded-3xl border border-slate-800">
-                        <div className="grid grid-cols-3 bg-slate-900/60">
-                            <div className="p-4 text-sm font-semibold text-slate-300">Area</div>
-                            <div className="p-4 text-sm font-semibold text-slate-300">Manual processes</div>
-                            <div className="p-4 text-sm font-semibold text-slate-300">{serviceName}</div>
+                    {comparison.rows.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
                         </div>
-                        {comparisonRows.map((row) => (
-                            <div key={row.topic} className="grid grid-cols-3 border-t border-slate-800 bg-slate-950/40">
-                                <div className="p-4 text-sm text-white font-semibold">{row.topic}</div>
-                                <div className="p-4 text-sm text-slate-300">{row.left}</div>
-                                <div className="p-4 text-sm text-slate-300">{row.right}</div>
+                    ) : (
+                        <div className="overflow-hidden rounded-3xl border border-slate-800">
+                            <div className="grid grid-cols-3 bg-slate-900/60">
+                                <div className="p-4 text-sm font-semibold text-slate-300">Area</div>
+                                <div className="p-4 text-sm font-semibold text-slate-300">{comparison.leftLabel}</div>
+                                <div className="p-4 text-sm font-semibold text-slate-300">{comparison.rightLabel}</div>
                             </div>
-                        ))}
-                    </div>
+                            {comparison.rows.map((row) => (
+                                <div key={row.topic} className="grid grid-cols-3 border-t border-slate-800 bg-slate-950/40">
+                                    <div className="p-4 text-sm text-white font-semibold">{row.topic}</div>
+                                    <div className="p-4 text-sm text-slate-300">{row.left}</div>
+                                    <div className="p-4 text-sm text-slate-300">{row.right}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="roi" eyebrow="Impact" title="ROI and business impact">
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                        {[
-                            { title: 'Time saved', value: 'Tracked per workflow', note: 'Measure hours saved using your baseline' },
-                            { title: 'Cost reduction', value: 'Measured by throughput', note: 'Compare effort per task before and after' },
-                            { title: 'Scalability', value: 'Increase capacity', note: 'Handle more volume without linear headcount' },
-                            { title: 'Operational visibility', value: 'Clear metrics', note: 'Monitor exceptions and SLAs continuously' },
-                        ].map((card) => (
-                            <article key={card.title} className="rounded-3xl bg-gradient-to-b from-emerald-500/10 to-slate-950/70 border border-emerald-400/20 p-5">
-                                <div className="text-sm font-semibold text-emerald-200 mb-2">{card.title}</div>
-                                <div className="text-base font-bold text-white mb-1">{card.value}</div>
-                                <div className="text-base text-slate-300 leading-relaxed">{card.note}</div>
-                            </article>
-                        ))}
-                    </div>
+                    {roiCards.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {roiCards.map((card) => (
+                                <article key={card.title} className="rounded-3xl bg-gradient-to-b from-emerald-500/10 to-slate-950/70 border border-emerald-400/20 p-5">
+                                    <div className="text-sm font-semibold text-emerald-200 mb-2">{card.title}</div>
+                                    <div className="text-base font-bold text-white mb-1">{card.value}</div>
+                                    <div className="text-base text-slate-300 leading-relaxed">{card.note}</div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="related" eyebrow="Internal Links" title="Related services">
@@ -895,71 +913,63 @@ const ServiceDetail: React.FC = () => {
                 </SectionShell>
 
                 <SectionShell id="faq" eyebrow="FAQ" title="Frequently asked questions">
-                    <div className="space-y-3">
-                        {faqItems.map((faq) => (
-                            <details key={faq.question} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <summary className="cursor-pointer list-none">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <h3 className="text-base font-semibold text-white mb-1">
-                                                {faq.question}
-                                            </h3>
-                                            <p className="text-base text-slate-300">
-                                                {faq.shortAnswer}
-                                            </p>
+                    {faqItems.length === 0 ? (
+                        <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                            {emptySectionText}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {faqItems.map((faq) => (
+                                <details key={faq.question} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                    <summary className="cursor-pointer list-none">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div>
+                                                <h3 className="text-base font-semibold text-white mb-1">
+                                                    {faq.question}
+                                                </h3>
+                                                <p className="text-base text-slate-300">
+                                                    {faq.shortAnswer}
+                                                </p>
+                                            </div>
+                                            <span className="text-sm text-slate-400 group-open:text-slate-200">
+                                                Expand
+                                            </span>
                                         </div>
-                                        <span className="text-sm text-slate-400 group-open:text-slate-200">
-                                            Expand
-                                        </span>
-                                    </div>
-                                </summary>
-                                <p className="mt-3 text-base text-slate-300 leading-relaxed">
-                                    {faq.expandedAnswer}
-                                </p>
-                            </details>
-                        ))}
-                    </div>
+                                    </summary>
+                                    <p className="mt-3 text-base text-slate-300 leading-relaxed">
+                                        {faq.expandedAnswer}
+                                    </p>
+                                </details>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
 
                 <SectionShell id="seo" eyebrow="SEO" title={`More about ${serviceName}`}>
                     <div className="space-y-3">
-                        {(ensureArray<any>(serviceContent?.seo_expanders, []).length > 0
-                            ? take(ensureArray<any>(serviceContent?.seo_expanders, []), 6).map((item: any, idx: number) => ({
-                                  title: t(compact(item.title) || `SEO topic ${idx + 1}`),
-                                  body: t(compact(item.body || item.text) || 'Additional SEO-focused detail for long-tail queries.'),
-                              }))
-                            : [
-                                  {
-                                      title: t(`Best ${serviceName} for small businesses`),
-                                      body: t(
-                                          `${serviceName} can be delivered in phases so smaller teams can start with a single workflow and expand as they grow. The key is prioritizing the highest-impact processes and choosing integrations that reduce manual effort immediately.`
-                                      ),
-                                  },
-                                  {
-                                      title: t(`${serviceName} automation tools`),
-                                      body: t(
-                                          'Common tool categories include LLMs, workflow orchestration, integration platforms, and analytics. Your ideal stack depends on data sources, governance requirements, and how teams collaborate today.'
-                                      ),
-                                  },
-                                  {
-                                      title: t(`How ${serviceName} improves productivity`),
-                                      body: t(
-                                          'Productivity improves when workflows are consistent, approvals are streamlined, and systems stay synchronized. By removing repeat work and adding clear visibility, teams spend more time on decisions rather than administration.'
-                                      ),
-                                  },
-                              ]
-                        ).map((block) => (
-                            <details key={block.title} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
-                                <summary className="cursor-pointer list-none">
-                                    <h3 className="text-base font-semibold text-white">
-                                        {block.title}
-                                    </h3>
-                                </summary>
-                                <p className="mt-3 text-base text-slate-300 leading-relaxed">
-                                    {block.body}
-                                </p>
-                            </details>
-                        ))}
+                        {ensureArray<any>(serviceContent?.seo_expanders, []).length === 0 ? (
+                            <div className="rounded-3xl bg-slate-900/45 border border-slate-800 p-5 text-slate-300">
+                                {emptySectionText}
+                            </div>
+                        ) : (
+                            take(ensureArray<any>(serviceContent?.seo_expanders, []), 6)
+                                .map((item: any, idx: number) => ({
+                                    title: t(compact(item.title) || `SEO topic ${idx + 1}`),
+                                    body: t(compact(item.body || item.text) || 'Additional SEO-focused detail for long-tail queries.'),
+                                }))
+                                .map((block) => (
+                                    <details key={block.title} className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-5">
+                                        <summary className="cursor-pointer list-none">
+                                            <h3 className="text-base font-semibold text-white">
+                                                {block.title}
+                                            </h3>
+                                        </summary>
+                                        <p className="mt-3 text-base text-slate-300 leading-relaxed">
+                                            {block.body}
+                                        </p>
+                                    </details>
+                                ))
+                        )}
                     </div>
                 </SectionShell>
 
@@ -972,10 +982,7 @@ const ServiceDetail: React.FC = () => {
                         <div className="grid lg:grid-cols-12 gap-8 items-start">
                             <div className="lg:col-span-7">
                                 <p className="text-base text-slate-200 leading-relaxed">
-                                    Totan.ai supports global delivery for {serviceName}. This page can be adapted for location-specific requirements while keeping messaging clear for international B2B audiences.
-                                </p>
-                                <p className="mt-4 text-base text-slate-200 leading-relaxed">
-                                    If you operate in {resolvedContext.country || 'your region'}, we can align implementation details with your internal policies, stakeholders, and system landscape.
+                                    {compact(serviceContent?.location?.body) ? t(compact(serviceContent?.location?.body)) : emptySectionText}
                                 </p>
                             </div>
                             <div className="lg:col-span-5">

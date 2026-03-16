@@ -13,6 +13,7 @@ class OpenAIService implements AIServiceInterface
     public function __construct()
     {
         $this->apiKey = config('services.openai.key') ?? env('OPENAI_API_KEY');
+        $this->model = config('services.openai.model') ?? env('OPENAI_MODEL', $this->model);
     }
 
     public function generatePageContent(array $context): array
@@ -200,7 +201,10 @@ Content constraints:
             {
               \"section_key\": \"hero | features | benefits | cta | about\",
               \"content_blocks\": [
-                { \"type\": \"heading | paragraph | list | button\", \"content\": \"Text content\" }
+                { \"type\": \"heading\", \"content\": \"string\" },
+                { \"type\": \"paragraph\", \"content\": \"string\" },
+                { \"type\": \"list\", \"content\": [\"string\", \"string\"] },
+                { \"type\": \"button\", \"content\": { \"label\": \"string\", \"url\": \"/path\" } }
               ]
             }
           ],

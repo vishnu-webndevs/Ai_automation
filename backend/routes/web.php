@@ -19,5 +19,7 @@ Route::get('/robots.txt', function () {
     return response("User-agent: *\nAllow: /\nSitemap: {$sitemapUrl}\n", 200)->header('Content-Type', 'text/plain; charset=UTF-8');
 });
 
+Route::get('/sitemap.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'index']);
+
 Route::get('/{slug}', [PageRenderController::class, 'show'])
-    ->where('slug', '^(?!api|up|robots\.txt).*$');
+    ->where('slug', '^(?!api|up|robots\.txt|sitemap\.xml).*$');

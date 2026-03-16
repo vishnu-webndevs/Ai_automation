@@ -87,6 +87,14 @@ export const duplicatePage = async (id: number) => {
     return api.post(`/pages/${id}/duplicate`);
 };
 
+export const deletePage = async (id: number) => {
+    return api.delete(`/pages/${id}`);
+};
+
+export const getDashboardStats = async () => {
+    return api.get('/dashboard/stats');
+};
+
 export const toggleLock = async (resource: string, id: number) => {
     return api.post(`/lock/${resource}/${id}`);
 };

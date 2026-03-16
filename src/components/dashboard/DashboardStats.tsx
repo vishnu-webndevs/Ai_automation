@@ -10,6 +10,16 @@ interface StatCardProps {
     color: string;
 }
 
+export type DashboardStatsPayload = {
+    pages_total: number;
+    pages_delta_percent: number;
+    ai_total: number;
+    ai_delta_percent: number;
+    health_percent: number;
+    health_delta_percent: number;
+    users_total: number;
+};
+
 const StatCard = ({ title, value, change, isPositive, icon: Icon, color }: StatCardProps) => (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-strokedark dark:bg-boxdark">
         <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-slate-50 dark:bg-meta-4">
@@ -34,38 +44,60 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon, color }: StatC
     </div>
 );
 
-const DashboardStats = () => {
+const formatCompact = (n: number) => {
+    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+    return n.toLocaleString();
+};
+
+const formatDelta = (n: number) => {
+    const abs = Math.abs(n);
+    const value = abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(1);
+    return `${value}%`;
+};
+
+const DashboardStats = ({ stats, loading }: { stats?: DashboardStatsPayload; loading?: boolean }) => {
+    const pages = stats?.pages_total ?? 0;
+    const ai = stats?.ai_total ?? 0;
+    const health = stats?.health_percent ?? 100;
+    const users = stats?.users_total ?? 0;
+
+    const pagesDelta = stats?.pages_delta_percent ?? 0;
+    const aiDelta = stats?.ai_delta_percent ?? 0;
+    const healthDelta = stats?.health_delta_percent ?? 0;
+    const usersDelta = 0;
+
     return (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
             <StatCard 
                 title="Total Pages" 
-                value="2,453" 
-                change="12%" 
-                isPositive={true} 
+                value={loading ? '—' : pages.toLocaleString()} 
+                change={loading ? '—' : formatDelta(pagesDelta)} 
+                isPositive={pagesDelta >= 0} 
                 icon={FileText} 
                 color="text-indigo-600" 
             />
             <StatCard 
                 title="AI Generated" 
-                value="856" 
-                change="5.4%" 
-                isPositive={true} 
+                value={loading ? '—' : ai.toLocaleString()} 
+                change={loading ? '—' : formatDelta(aiDelta)} 
+                isPositive={aiDelta >= 0} 
                 icon={Sparkles} 
                 color="text-purple-600" 
             />
             <StatCard 
                 title="System Health" 
-                value="98.9%" 
-                change="0.1%" 
-                isPositive={false} 
+                value={loading ? '—' : `${health.toFixed(1)}%`} 
+                change={loading ? '—' : formatDelta(healthDelta)} 
+                isPositive={healthDelta >= 0} 
                 icon={Activity} 
                 color="text-green-600" 
             />
             <StatCard 
                 title="Active Users" 
-                value="3.5K" 
-                change="18%" 
-                isPositive={true} 
+                value={loading ? '—' : formatCompact(users)} 
+                change={loading ? '—' : formatDelta(usersDelta)} 
+                isPositive={usersDelta >= 0} 
                 icon={Users} 
                 color="text-blue-600" 
             />

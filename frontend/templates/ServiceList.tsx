@@ -1,10 +1,24 @@
 import React from 'react';
 import useSWR from 'swr';
 import { Link } from 'react-router-dom';
-import { serviceService } from '../services/api';
+import { serviceCategoryService, serviceService } from '../services/api';
 
 const ServiceList: React.FC = () => {
     const { data: services, error, isLoading } = useSWR('services', serviceService.getAll);
+    const { data: categories } = useSWR('service-categories', serviceCategoryService.getAll);
+
+    const totalServices = services?.length || 0;
+    const totalCategories = categories?.length || 0;
+    const topCategories =
+        categories
+            ?.slice()
+            .sort((a: any, b: any) => ((b?.services_count || 0) as number) - ((a?.services_count || 0) as number))
+            .slice(0, 6) || [];
+    const mostPopularCategory = topCategories[0];
+    const lastUpdatedService = services
+        ?.slice()
+        .sort((a: any, b: any) => String(b?.updated_at || '').localeCompare(String(a?.updated_at || '')))
+        .find(Boolean);
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading services...</div>;
 
@@ -36,7 +50,7 @@ const ServiceList: React.FC = () => {
                             </p>
                             <div className="flex flex-wrap gap-3">
                                 <Link
-                                    to="/contact"
+                                    to="/contact-us"
                                     className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-white text-slate-900 text-sm font-semibold hover:bg-slate-200 transition-colors"
                                 >
                                     Book a strategy call
@@ -48,20 +62,22 @@ const ServiceList: React.FC = () => {
                                     See live use cases
                                 </Link>
                             </div>
-                            <div className="mt-6 flex flex-wrap gap-4 text-xs text-slate-400">
-                                <div className="flex items-center gap-2">
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-300 text-xs">
-                                        24/7
-                                    </span>
-                                    <span>Production monitoring included</span>
+                            {topCategories.length > 0 && (
+                                <div className="mt-6 flex flex-wrap gap-2">
+                                    {topCategories.map((c: any) => (
+                                        <Link
+                                            key={c.id}
+                                            to={`/services/category/${c.slug}`}
+                                            className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-sm text-slate-200 hover:bg-white/10 transition-colors"
+                                        >
+                                            <span>{c.name}</span>
+                                            {typeof c.services_count === 'number' && (
+                                                <span className="text-slate-400">({c.services_count})</span>
+                                            )}
+                                        </Link>
+                                    ))}
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/10 text-purple-300 text-xs">
-                                        SOC
-                                    </span>
-                                    <span>Security & governance first</span>
-                                </div>
-                            </div>
+                            )}
                         </div>
 
                         <div className="lg:pl-8">
@@ -69,40 +85,37 @@ const ServiceList: React.FC = () => {
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-1">
-                                            Example stack
+                                            Snapshot
                                         </p>
                                         <p className="text-sm font-medium text-slate-100">
-                                            Call centre + CRM + knowledge base
+                                            {totalServices} services · {totalCategories} categories
                                         </p>
                                     </div>
-                                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                                        Live AI agents
-                                    </span>
+                                    {mostPopularCategory && (
+                                        <span className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-200">
+                                            Top category: {mostPopularCategory.name}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                     <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4">
-                                        <p className="text-slate-400 mb-1">Channels</p>
-                                        <p className="text-slate-100 font-medium">
-                                            Voice, chat, WhatsApp
-                                        </p>
+                                        <p className="text-slate-400 mb-1">Services</p>
+                                        <p className="text-slate-100 font-medium">{totalServices}</p>
                                     </div>
                                     <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4">
-                                        <p className="text-slate-400 mb-1">Systems</p>
-                                        <p className="text-slate-100 font-medium">
-                                            Telephony, CRM, ticketing
-                                        </p>
+                                        <p className="text-slate-400 mb-1">Categories</p>
+                                        <p className="text-slate-100 font-medium">{totalCategories}</p>
                                     </div>
                                     <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4">
-                                        <p className="text-slate-400 mb-1">Guardrails</p>
+                                        <p className="text-slate-400 mb-1">Latest update</p>
                                         <p className="text-slate-100 font-medium">
-                                            Identity, consent, escalation
+                                            {lastUpdatedService?.name || '—'}
                                         </p>
                                     </div>
                                     <div className="rounded-xl bg-slate-900/80 border border-slate-800 p-4">
                                         <p className="text-slate-400 mb-1">Outcomes</p>
                                         <p className="text-slate-100 font-medium">
-                                            Faster resolution, lower cost
+                                            Speed, accuracy, visibility
                                         </p>
                                     </div>
                                 </div>
@@ -185,7 +198,7 @@ const ServiceList: React.FC = () => {
                                 How an AI service goes live
                             </h2>
                             <p className="text-sm text-slate-400">
-                                We use the same playbook for every service roll‑out so you know exactly where we are and what is changing.
+                                Each service is packaged and repeatable. We start with one workflow, then expand.
                             </p>
                         </div>
                         <div className="md:col-span-2 space-y-6">

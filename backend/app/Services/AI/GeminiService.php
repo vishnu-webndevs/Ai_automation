@@ -13,6 +13,7 @@ class GeminiService implements AIServiceInterface
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key') ?? env('GEMINI_API_KEY');
+        $this->model = config('services.gemini.model') ?? env('GEMINI_MODEL', $this->model);
     }
 
     public function generatePageContent(array $context): array

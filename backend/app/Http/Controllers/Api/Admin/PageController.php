@@ -406,6 +406,8 @@ class PageController extends Controller
             'content_length' => 'required|string',
             'model' => 'required|in:lorum,openai,gemini',
             'confirm_overwrite' => 'sometimes|boolean',
+            'preserve_title' => 'sometimes|boolean',
+            'page_structure' => 'sometimes|nullable|string|max:5000',
         ]);
 
         $page = Page::findOrFail($validated['page_id']);
@@ -436,7 +438,7 @@ class PageController extends Controller
                 }
             }
 
-            $structureDescription = $this->buildPageStructureDescription($page);
+            $structureDescription = $validated['page_structure'] ?? $this->buildPageStructureDescription($page);
             $context = array_merge($validated, [
                 'primary_keyword' => $primaryKeyword,
                 'target_industry' => $industry,
@@ -455,7 +457,8 @@ class PageController extends Controller
                     $page->seo->delete();
                 }
 
-                if (!empty($generatedContent['title'])) {
+                $preserveTitle = (bool)($validated['preserve_title'] ?? true);
+                if (!$preserveTitle && !empty($generatedContent['title'])) {
                     $page->update(['title' => $generatedContent['title']]);
                 }
 

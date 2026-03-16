@@ -226,6 +226,7 @@ class ServiceController extends Controller
             'target_problem' => 'sometimes|nullable|string',
             'tool_stack' => 'sometimes|array',
             'tool_stack.*' => 'string',
+            'run_now' => 'sometimes|boolean',
         ]);
 
         $service = Service::with(['category', 'features'])->findOrFail((int)$validated['service_id']);
@@ -239,10 +240,28 @@ class ServiceController extends Controller
             ], 409);
         }
 
-        GenerateServiceContent::dispatch($service->id, array_merge($validated, [
+        $payload = array_merge($validated, [
+            'service_id' => $service->id,
             'uniqueness_seed' => $service->slug,
-        ]));
+        ]);
 
+        $runNow = (bool)($validated['run_now'] ?? true);
+        if ($runNow) {
+            GenerateServiceContent::dispatchSync($service->id, $payload);
+            Cache::forget('public_services:list');
+
+            $service->refresh()->load(['features', 'category', 'categories']);
+            if (empty($service->content_json)) {
+                return response()->json(['message' => 'Service generation failed'], 500);
+            }
+
+            return response()->json([
+                'message' => 'Generated',
+                'service' => $service,
+            ]);
+        }
+
+        GenerateServiceContent::dispatch($service->id, $payload);
         return response()->json(['message' => 'Queued service for generation', 'service_id' => $service->id]);
     }
 

@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, ArrowUp, ArrowDown } from 'lucide-react';
-import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
+import { api, toggleLock, FRONTEND_URL } from '../api';
 import type { Service, ServiceCategory, ServiceFeature } from '../types';
 import Modal from '../components/ui/Modal';
-import Dropdown from '../components/ui/Dropdown';
-
-type TemplateSummary = { id: number; name: string; slug: string };
 
 interface ServiceWithLock extends Service {
     locked_status?: {
@@ -19,7 +16,6 @@ interface ServiceWithLock extends Service {
 
 const ServicesManager = () => {
     const [services, setServices] = useState<ServiceWithLock[]>([]);
-    const [templates, setTemplates] = useState<TemplateSummary[]>([]);
     const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +23,11 @@ const ServicesManager = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [features, setFeatures] = useState<ServiceFeature[]>([]);
     const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+    const [aiModel, setAiModel] = useState<'lorum' | 'openai' | 'gemini'>('lorum');
+    const [aiTone, setAiTone] = useState('Professional');
+    const [aiContentLength, setAiContentLength] = useState<'Short' | 'Medium' | 'Long'>('Long');
+    const [confirmOverwriteAi, setConfirmOverwriteAi] = useState(false);
+    const [generatingAi, setGeneratingAi] = useState(false);
     
     // Pagination & Sort
     const [page, setPage] = useState(1);
@@ -69,16 +70,6 @@ const ServicesManager = () => {
     }, [fetchData]);
 
     useEffect(() => {
-        listPageTemplates()
-            .then(res => {
-                const raw = Array.isArray(res.data) ? res.data : [];
-                const rows: TemplateSummary[] = (raw as unknown as TemplateSummary[]);
-                setTemplates(rows);
-            })
-            .catch(err => console.error('Failed to load templates', err));
-    }, []);
-
-    useEffect(() => {
         api.get('/service-categories', { params: { all: 1 } })
             .then((res) => {
                 const rows = Array.isArray(res.data) ? (res.data as ServiceCategory[]) : (res.data?.data || []);
@@ -115,6 +106,51 @@ const ServicesManager = () => {
             console.error('Failed to load service', error);
         }
     }, []);
+
+    const generateAi = async () => {
+        if (!(currentService as any)?.id) return;
+        setGeneratingAi(true);
+        try {
+            const res = await api.post('/ai/generate-service', {
+                service_id: (currentService as any).id,
+                model: aiModel,
+                tone: aiTone,
+                content_length: aiContentLength,
+                confirm_overwrite: confirmOverwriteAi,
+                run_now: true,
+            });
+            const updated = res.data?.service;
+            if (updated) {
+                setCurrentService(updated);
+                const list: ServiceFeature[] = Array.isArray((updated as any).features)
+                    ? ((updated as any).features as ServiceFeature[])
+                          .slice()
+                          .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+                    : [];
+                setFeatures(
+                    list.map((f, index) => ({
+                        id: f.id,
+                        title: f.title || `Section ${index + 1}`,
+                        description: f.description || '',
+                        icon: f.icon || '',
+                        sort_order: index,
+                    }))
+                );
+            }
+            await fetchData();
+            alert('AI content generated and saved.');
+        } catch (e: any) {
+            const code = e?.response?.data?.code;
+            if (e?.response?.status === 409 && code === 'CONFIRM_OVERWRITE_REQUIRED') {
+                setConfirmOverwriteAi(true);
+                alert('This service already has content. Enable overwrite and run again.');
+            } else {
+                alert(e?.response?.data?.message || 'Failed to queue AI generation');
+            }
+        } finally {
+            setGeneratingAi(false);
+        }
+    };
 
     const addFeature = () => {
         setFeatures((prev) => [
@@ -268,7 +304,6 @@ const ServicesManager = () => {
                             <tr>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('name')}>Name</th>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('slug')}>Slug</th>
-                                <th className="px-6 py-4">Template</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 cursor-pointer hover:bg-gray-100" onClick={() => toggleSort('updated_at')}>Last Updated</th>
                                 <th className="px-6 py-4 text-center">Lock</th>
@@ -278,11 +313,11 @@ const ServicesManager = () => {
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">Loading services...</td>
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading services...</td>
                                 </tr>
                             ) : services.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500">No services found.</td>
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No services found.</td>
                                 </tr>
                             ) : (
                                 services.map((service) => (
@@ -296,11 +331,6 @@ const ServicesManager = () => {
                                         <td className="px-6 py-4">
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
                                                 {service.slug}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm text-gray-600">
-                                                {service.template_slug || 'Default'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -332,37 +362,6 @@ const ServicesManager = () => {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Dropdown
-                                                    label="Template"
-                                                    items={[
-                                                        {
-                                                            label: 'Default (clear)',
-                                                            onClick: async () => {
-                                                                if (service.locked_status?.is_locked) return;
-                                                                try {
-                                                                    await api.patch(`/services/${service.id}`, { template_slug: '' });
-                                                                    fetchData();
-                                                                } catch (e) {
-                                                                    console.error('Failed to clear template', e);
-                                                                }
-                                                            }
-                                                        },
-                                                        { divider: true, label: 'divider' },
-                                                        ...templates.map((t) => ({
-                                                            label: t.name,
-                                                            onClick: async () => {
-                                                                if (service.locked_status?.is_locked) return;
-                                                                try {
-                                                                    await api.patch(`/services/${service.id}`, { template_slug: t.slug });
-                                                                    fetchData();
-                                                                } catch (e) {
-                                                                    console.error('Failed to set template', e);
-                                                                }
-                                                            }
-                                                        }))
-                                                    ]}
-                                                    variant="light"
-                                                />
                                                 <button 
                                                     onClick={() => window.open(`${FRONTEND_URL}/services/${service.slug}`, '_blank')}
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -533,19 +532,6 @@ const ServicesManager = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Page Template</label>
-                        <select
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                            value={currentService.template_slug || ''}
-                            onChange={(e) => setCurrentService({ ...currentService, template_slug: e.target.value })}
-                        >
-                            <option value="">Default Template</option>
-                             {templates.map((t) => (
-                                <option key={t.id} value={t.slug}>{t.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                         <textarea
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 min-h-[100px]"
@@ -655,6 +641,73 @@ const ServicesManager = () => {
                             {currentService.id ? 'Save Changes' : 'Create Service'}
                         </button>
                     </div>
+
+                    {currentService.id && (
+                        <div className="pt-6 border-t border-gray-200">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <div className="text-sm font-semibold text-gray-900">AI content generation</div>
+                                    <div className="text-sm text-gray-500">Generates full service content_json for frontend rendering.</div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={generateAi}
+                                    disabled={generatingAi}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                                >
+                                    {generatingAi ? 'Queuing...' : 'Generate AI Content'}
+                                </button>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiModel}
+                                        onChange={(e) => setAiModel(e.target.value as any)}
+                                    >
+                                        <option value="lorum">Lorum</option>
+                                        <option value="openai">OpenAI</option>
+                                        <option value="gemini">Gemini</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tone</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiTone}
+                                        onChange={(e) => setAiTone(e.target.value)}
+                                    >
+                                        <option value="Professional">Professional</option>
+                                        <option value="Casual">Casual</option>
+                                        <option value="Technical">Technical</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Length</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                                        value={aiContentLength}
+                                        onChange={(e) => setAiContentLength(e.target.value as any)}
+                                    >
+                                        <option value="Short">Short</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Long">Long</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <label className="mt-4 flex items-center gap-2 text-sm text-gray-700">
+                                <input
+                                    type="checkbox"
+                                    checked={confirmOverwriteAi}
+                                    onChange={(e) => setConfirmOverwriteAi(e.target.checked)}
+                                />
+                                Overwrite existing service content
+                            </label>
+                        </div>
+                    )}
                 </form>
             </Modal>
         </div>

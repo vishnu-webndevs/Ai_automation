@@ -11,6 +11,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import StyleGuide from './pages/StyleGuide';
 import DynamicPage from './pages/DynamicPage';
+import ContactPage from './pages/ContactPage';
 
 // Import Templates
 import ServiceList from './templates/ServiceList';
@@ -86,6 +87,7 @@ const App: React.FC = () => {
           <Route path="platform" element={<PlatformList />} />
 
           {/* Static Pages */}
+          <Route path="contact-us" element={<ContactPage />} />
           <Route path="login" element={<SignIn />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="signup" element={<SignUp />} />

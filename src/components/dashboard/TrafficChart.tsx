@@ -1,17 +1,22 @@
 // import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const data = [
-  { name: 'Mon', visitors: 4000, pageviews: 2400 },
-  { name: 'Tue', visitors: 3000, pageviews: 1398 },
-  { name: 'Wed', visitors: 2000, pageviews: 9800 },
-  { name: 'Thu', visitors: 2780, pageviews: 3908 },
-  { name: 'Fri', visitors: 1890, pageviews: 4800 },
-  { name: 'Sat', visitors: 2390, pageviews: 3800 },
-  { name: 'Sun', visitors: 3490, pageviews: 4300 },
-];
+export type DashboardChartPoint = {
+  date: string;
+  label: string;
+  pages: number;
+  ai: number;
+};
 
-const TrafficChart = () => {
+export type DashboardChartPayload = {
+  range: { from: string; to: string };
+  data: DashboardChartPoint[];
+};
+
+const TrafficChart = ({ chart, loading }: { chart?: DashboardChartPayload; loading?: boolean }) => {
+  const data = chart?.data?.map((p) => ({ name: p.label, pages: p.pages, ai: p.ai })) ?? [];
+  const rangeLabel = chart?.range ? `${chart.range.from} - ${chart.range.to}` : '';
+
   return (
     <div className="col-span-12 rounded-xl border border-slate-200 bg-white px-5 pt-7.5 pb-5 shadow-sm dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
       <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
@@ -21,8 +26,8 @@ const TrafficChart = () => {
               <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-indigo-600"></span>
             </span>
             <div className="w-full">
-              <p className="font-semibold text-indigo-600">Total Visitors</p>
-              <p className="text-sm font-medium text-slate-500">12.04.2024 - 12.05.2024</p>
+              <p className="font-semibold text-indigo-600">Pages Created</p>
+              <p className="text-sm font-medium text-slate-500">{loading ? '—' : rangeLabel}</p>
             </div>
           </div>
           <div className="flex min-w-47.5">
@@ -30,8 +35,8 @@ const TrafficChart = () => {
               <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-purple-500"></span>
             </span>
             <div className="w-full">
-              <p className="font-semibold text-purple-500">Page Views</p>
-              <p className="text-sm font-medium text-slate-500">12.04.2024 - 12.05.2024</p>
+              <p className="font-semibold text-purple-500">AI Generations</p>
+              <p className="text-sm font-medium text-slate-500">{loading ? '—' : rangeLabel}</p>
             </div>
           </div>
         </div>
@@ -79,8 +84,8 @@ const TrafficChart = () => {
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
                 }}
             />
-            <Area type="monotone" dataKey="visitors" stroke="#4F46E5" strokeWidth={2} fillOpacity={1} fill="url(#colorVisitors)" />
-            <Area type="monotone" dataKey="pageviews" stroke="#A855F7" strokeWidth={2} fillOpacity={1} fill="url(#colorPageviews)" />
+            <Area type="monotone" dataKey="pages" stroke="#4F46E5" strokeWidth={2} fillOpacity={1} fill="url(#colorVisitors)" />
+            <Area type="monotone" dataKey="ai" stroke="#A855F7" strokeWidth={2} fillOpacity={1} fill="url(#colorPageviews)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

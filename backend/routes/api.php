@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\MenuController as AdminMenuController;
 use App\Http\Controllers\Api\Admin\PageController;
 use App\Http\Controllers\Api\Admin\PageTemplateController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Public\MenuController as PublicMenuController;
 use App\Http\Controllers\Api\Public\PageController as PublicPageController;
 use App\Http\Controllers\Api\Public\SitemapController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Api\Public\BlogController as PublicBlogController;
 use App\Http\Controllers\Api\Public\SolutionController as PublicSolutionController;
 use App\Http\Controllers\Api\Public\IntegrationController as PublicIntegrationController;
 use App\Http\Controllers\Api\Public\BlogCategoryController as PublicBlogCategoryController;
+use App\Http\Controllers\Api\Public\ContactController as PublicContactController;
 use App\Http\Controllers\Api\Admin\Taxonomy\ServiceController;
 use App\Http\Controllers\Api\Admin\Taxonomy\ServiceCategoryController;
 use App\Http\Controllers\Api\Admin\Taxonomy\IndustryController;
@@ -66,6 +68,7 @@ Route::get('/use-cases/{slug}', [PublicUseCaseController::class, 'show']);
 Route::get('/blogs', [PublicBlogController::class, 'index']); // Blog Listing
 Route::get('/blog-categories', [PublicBlogCategoryController::class, 'index']);
 Route::get('/blog-categories/{slug}', [PublicBlogCategoryController::class, 'show']);
+Route::post('/contact', [PublicContactController::class, 'store'])->middleware('throttle:20,1');
 
 
 Route::post('/auth/register', [PublicAuthController::class, 'register']);
@@ -78,6 +81,8 @@ Route::prefix('admin')->group(function () {
     Route::middleware('auth:sanctum')->get('/auth/me', function (Request $request) {
         return $request->user();
     });
+
+    Route::middleware('auth:sanctum')->get('/dashboard/stats', [DashboardController::class, 'stats']);
 
     Route::middleware('auth:sanctum')->get('/global-search', [SearchController::class, 'globalSearch']);
     

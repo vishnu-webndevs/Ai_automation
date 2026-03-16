@@ -40,17 +40,6 @@ const BlogDetail: React.FC = () => {
 
     const sortedSections: PageSection[] = [...(page.sections || [])].sort((a, b) => a.order - b.order);
 
-    const articleBlockTypes = new Set([
-        'text',
-        'heading',
-        'paragraph',
-        'list',
-        'button',
-        'faq_list',
-        'internal_links',
-        'cta_bottom',
-    ]);
-
     const contentSections: PageSection[] = sortedSections
         .map((section) => {
             const blocks = (section.blocks || [])
@@ -60,7 +49,7 @@ const BlogDetail: React.FC = () => {
                     const type = (block.block_type || block.type || '').toLowerCase();
                     if (!type) return false;
                     if (type.includes('hero')) return false;
-                    return articleBlockTypes.has(type);
+                    return true;
                 });
             return { ...section, blocks };
         })
@@ -111,13 +100,17 @@ const BlogDetail: React.FC = () => {
                         )}
 
                         <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 md:p-8">
-                            {contentSections.map((section) => (
-                                <section key={section.id} className="mb-10 last:mb-0">
-                                    {section.blocks?.map((block) => (
-                                        <BlockRenderer key={block.id} block={block} page={page} />
-                                    ))}
-                                </section>
-                            ))}
+                            {contentSections.length === 0 ? (
+                                <div className="text-slate-300">Content not generated yet. Generate AI content from admin panel.</div>
+                            ) : (
+                                contentSections.map((section) => (
+                                    <section key={section.id} className="mb-10 last:mb-0">
+                                        {section.blocks?.map((block) => (
+                                            <BlockRenderer key={block.id} block={block} page={page} />
+                                        ))}
+                                    </section>
+                                ))
+                            )}
                         </div>
                     </article>
 
@@ -181,53 +174,7 @@ const BlogDetail: React.FC = () => {
                                 )}
                             </div>
                         </div>
-
-                        <div className="rounded-3xl bg-gradient-to-b from-purple-700/40 via-slate-950 to-slate-950 border border-purple-500/60 p-6 flex flex-col justify-between min-h-[220px]">
-                            <div>
-                                <p className="text-[10px] font-semibold tracking-[0.25em] uppercase text-purple-200 mb-2">
-                                    Newsletter
-                                </p>
-                                <h3 className="text-md font-bold text-white mb-2">
-                                    Stay ahead of AI rollouts
-                                </h3>
-                                <p className="text-xs text-slate-200">
-                                    A short, practical email when we ship something new to production.
-                                </p>
-                            </div>
-                            <button className="mt-4 inline-flex items-center justify-center rounded-full bg-white text-slate-950 text-xs font-semibold px-5 py-2 hover:bg-slate-200 transition-colors">
-                                Join the list
-                            </button>
-                        </div>
                     </aside>
-                </div>
-            </section>
-
-            <section className="pb-20 pt-4 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-6xl mx-auto rounded-[2.5rem] bg-gradient-to-br from-purple-900 via-slate-950 to-emerald-900 border border-slate-800 overflow-hidden">
-                    <div className="grid md:grid-cols-2 gap-0">
-                        <div className="p-8 md:p-10 flex flex-col justify-center">
-                            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-purple-200 mb-2">
-                                Start a project
-                            </p>
-                            <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                                Let’s make something great together
-                            </h2>
-                            <p className="text-sm text-slate-200 mb-6">
-                                If this article matches a problem you are facing, we can help you design, launch and monitor the AI services behind it.
-                            </p>
-                            <button className="inline-flex items-center justify-center rounded-full bg-white text-slate-950 text-sm font-semibold px-6 py-2.5 hover:bg-slate-200 transition-colors">
-                                Talk to our team
-                            </button>
-                        </div>
-                        <div className="relative bg-gradient-to-tl from-black via-purple-900/40 to-emerald-900/40">
-                            <div className="absolute -bottom-16 right-0 left-0 mx-auto w-64 h-64 rounded-full bg-purple-500/40 blur-[80px]" />
-                            <div className="relative h-full flex items-center justify-center py-10">
-                                <div className="w-40 h-40 rounded-full border border-purple-300/50 bg-black/40 flex items-center justify-center text-5xl">
-                                    <span>📰</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
         </div>

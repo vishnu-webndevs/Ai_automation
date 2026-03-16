@@ -17,10 +17,11 @@ const PageGenerator = () => {
         tone: 'Professional',
         content_length: 'Long',
         model: 'lorum',
-        type: 'service',
+        type: 'page',
         status: 'draft'
     });
     const [generatedData, setGeneratedData] = useState<any>(null);
+    const [pageStructure, setPageStructure] = useState('');
 
     const publicBaseUrl = useMemo(() => {
         const url = (import.meta as any).env?.VITE_PUBLIC_SITE_URL;
@@ -79,6 +80,8 @@ const PageGenerator = () => {
                 tone: formData.tone,
                 content_length: formData.content_length,
                 model: formData.model,
+                preserve_title: true,
+                page_structure: pageStructure || undefined,
                 confirm_overwrite: confirmOverwrite
             });
 
@@ -123,6 +126,30 @@ const PageGenerator = () => {
                                     value={formData.title} 
                                     onChange={handleChange} 
                                     placeholder="e.g. AI Customer Service" 
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Page Type</label>
+                                <select
+                                    name="type"
+                                    value={formData.type}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                >
+                                    <option value="page">Page</option>
+                                    <option value="service">Service</option>
+                                    <option value="blog">Blog</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Page Structure</label>
+                                <textarea
+                                    className="w-full p-2 border rounded min-h-[100px]"
+                                    value={pageStructure}
+                                    onChange={(e) => setPageStructure(e.target.value)}
+                                    placeholder="Optional: Describe sections order, e.g. Hero > Features > Benefits > Testimonials > FAQ > CTA"
                                 />
                             </div>
 
