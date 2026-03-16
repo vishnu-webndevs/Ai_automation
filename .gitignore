@@ -36,3 +36,4 @@ fetch_uikit.js
 # Ignore the ai-automation-site workspace entirely
 ai-automation-site/
 backend/database/seeders/
+backend/tests/
