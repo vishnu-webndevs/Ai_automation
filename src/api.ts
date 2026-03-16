@@ -91,6 +91,14 @@ export const deletePage = async (id: number) => {
     return api.delete(`/pages/${id}`);
 };
 
+export const getAiSettings = async () => {
+    return api.get('/ai-settings');
+};
+
+export const updateOpenAiSettings = async (payload: { api_key?: string; model?: string; clear_key?: boolean }) => {
+    return api.put('/ai-settings/openai', payload);
+};
+
 export const getDashboardStats = async () => {
     return api.get('/dashboard/stats');
 };

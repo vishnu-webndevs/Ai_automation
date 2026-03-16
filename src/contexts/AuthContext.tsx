@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         
         // robust admin check
         const role = user.role?.toLowerCase() || '';
-        if (role === 'super_admin' || role === 'admin' || user.email === 'admin@totan.ai') {
+        if (role === 'super_admin' || role === 'admin') {
             return true;
         }
         

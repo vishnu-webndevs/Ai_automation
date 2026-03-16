@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactSubmission;
+use App\Models\AppSetting;
+use App\Mail\ContactSubmissionMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -27,7 +30,16 @@ class ContactController extends Controller
             'user_agent' => substr((string) $request->userAgent(), 0, 255),
         ]);
 
+        $to = AppSetting::getValue('contact_to_email') ?? env('CONTACT_TO_EMAIL') ?? config('mail.from.address');
+        if ($to) {
+            try {
+                Mail::to($to)->send(new ContactSubmissionMail($validated));
+            } catch (\Throwable $e) {
+                // Do not fail the request if mail transport fails
+                // Optionally log: \Log::warning('Contact mail failed', ['error' => $e->getMessage()]);
+            }
+        }
+
         return response()->json(['message' => 'Submitted'], 201);
     }
 }
-

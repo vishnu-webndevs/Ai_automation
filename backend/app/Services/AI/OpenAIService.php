@@ -2,6 +2,7 @@
 
 namespace App\Services\AI;
 
+use App\Models\AppSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -12,8 +13,8 @@ class OpenAIService implements AIServiceInterface
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.key') ?? env('OPENAI_API_KEY');
-        $this->model = config('services.openai.model') ?? env('OPENAI_MODEL', $this->model);
+        $this->apiKey = AppSetting::getValue('openai_api_key') ?? config('services.openai.key') ?? env('OPENAI_API_KEY');
+        $this->model = AppSetting::getValue('openai_model') ?? config('services.openai.model') ?? env('OPENAI_MODEL', $this->model);
     }
 
     public function generatePageContent(array $context): array

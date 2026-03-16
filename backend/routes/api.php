@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\Admin\Content\CtaController;
 use App\Http\Controllers\Api\Admin\Content\AiPromptController;
 use App\Http\Controllers\Api\Admin\System\AuditLogController;
 use App\Http\Controllers\Api\Admin\SearchController;
+use App\Http\Controllers\Api\Admin\AiSettingsController;
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok', 'service' => 'backend-api', 'timestamp' => now()]);
@@ -188,6 +189,9 @@ Route::prefix('admin')->group(function () {
             Route::patch('ai-prompts/{id}', [AiPromptController::class, 'update']);
             Route::delete('ai-prompts/{id}', [AiPromptController::class, 'destroy']);
             Route::post('ai-prompts/{id}/activate/{versionId}', [AiPromptController::class, 'activateVersion']);
+
+            Route::get('ai-settings', [AiSettingsController::class, 'show']);
+            Route::put('ai-settings/openai', [AiSettingsController::class, 'updateOpenAi']);
         });
     });
 });

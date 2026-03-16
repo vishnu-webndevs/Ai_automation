@@ -121,6 +121,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         { title: 'Menus', path: '/web-admin/menus', icon: MenuIcon },
         { title: 'CTAs', path: '/web-admin/ctas', icon: MousePointer },
         { title: 'AI Prompts', path: '/web-admin/ai-prompts', icon: Sparkles, permission: 'manage_settings' },
+        { title: 'AI Settings', path: '/web-admin/ai-settings', icon: Sparkles, permission: 'manage_settings' },
         { title: 'Authentication', path: '/authentication', icon: Lock },
       ]
     },

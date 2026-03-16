@@ -38,6 +38,7 @@ const StyleGuide = lazy(() => import('./pages/StyleGuide'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
 const AiPromptManager = lazy(() => import('./pages/AiPromptManager'));
+const AiSettings = lazy(() => import('./pages/AiSettings'));
 
 // Verticals
 const FintechDashboard = lazy(() => import('./pages/verticals/FintechDashboard'));
@@ -121,6 +122,7 @@ function App() {
 
             <Route element={<ProtectedRoute permission="manage_settings" />}>
                 <Route path="ai-prompts" element={<AiPromptManager />} />
+                <Route path="ai-settings" element={<AiSettings />} />
             </Route>
         </Route>
       </Routes>
