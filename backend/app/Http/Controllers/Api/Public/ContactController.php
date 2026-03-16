@@ -7,6 +7,7 @@ use App\Models\ContactSubmission;
 use App\Models\AppSetting;
 use App\Mail\ContactSubmissionMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
@@ -15,7 +16,7 @@ class ContactController extends Controller
     {
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
-            'email' => 'required|email:rfc,dns|max:255',
+            'email' => 'required|email|max:255',
             'company' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:50',
             'subject' => 'nullable|string|max:255',
@@ -24,7 +25,7 @@ class ContactController extends Controller
             'source_url' => 'nullable|string|max:2048',
         ]);
 
-        ContactSubmission::create([
+        $submission = ContactSubmission::create([
             ...$validated,
             'ip_address' => $request->ip(),
             'user_agent' => substr((string) $request->userAgent(), 0, 255),
@@ -35,8 +36,11 @@ class ContactController extends Controller
             try {
                 Mail::to($to)->send(new ContactSubmissionMail($validated));
             } catch (\Throwable $e) {
-                // Do not fail the request if mail transport fails
-                // Optionally log: \Log::warning('Contact mail failed', ['error' => $e->getMessage()]);
+                Log::warning('Contact mail failed', [
+                    'to' => $to,
+                    'submission_id' => $submission->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Page } from '../types';
+import { api } from '../services/api';
 
 interface TemplateProps {
     page: Page;
@@ -52,6 +53,58 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                           'Ship a working setup instead of another internal document full of ideas.',
                   },
               ];
+
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [company, setCompany] = useState('');
+    const [teamSize, setTeamSize] = useState('');
+    const [startTimeline, setStartTimeline] = useState('');
+    const [budgetRange, setBudgetRange] = useState('');
+    const [message, setMessage] = useState('');
+
+    const [submitting, setSubmitting] = useState(false);
+    const [sent, setSent] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const canSubmit = useMemo(() => email.trim().length > 3 && !submitting, [email, submitting]);
+
+    const submit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setSent(false);
+        setSubmitting(true);
+
+        const extra: string[] = [];
+        if (teamSize) extra.push(`Team size: ${teamSize}`);
+        if (startTimeline) extra.push(`Start: ${startTimeline}`);
+        if (budgetRange) extra.push(`Budget: ${budgetRange}`);
+        const compiledMessage = [message.trim(), extra.length ? `\n\n${extra.join('\n')}` : ''].join('').trim();
+
+        try {
+            await api.post('/contact', {
+                name: name.trim() || undefined,
+                email: email.trim(),
+                company: company.trim() || undefined,
+                subject: heading,
+                message: compiledMessage || undefined,
+                source: 'contact_us_page',
+                source_url: typeof window !== 'undefined' ? window.location.href : undefined,
+            });
+            setSent(true);
+            setName('');
+            setEmail('');
+            setCompany('');
+            setTeamSize('');
+            setStartTimeline('');
+            setBudgetRange('');
+            setMessage('');
+        } catch (err: any) {
+            const msg = err?.response?.data?.message || 'Failed to submit. Please try again.';
+            setError(String(msg));
+        } finally {
+            setSubmitting(false);
+        }
+    };
     return (
         <div className="bg-slate-950 min-h-screen text-slate-50">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
@@ -102,6 +155,17 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                         <div className="relative">
                             <div className="absolute -inset-1 rounded-3xl bg-emerald-500/10 blur-2xl" />
                             <div className="relative rounded-3xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8 shadow-xl space-y-6">
+                                {sent && (
+                                    <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm text-emerald-100">
+                                        Thanks — your message was sent.
+                                    </div>
+                                )}
+                                {error && (
+                                    <div className="rounded-2xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-100">
+                                        {error}
+                                    </div>
+                                )}
+                                <form className="space-y-6" onSubmit={submit}>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs font-medium text-slate-300 mb-1">
@@ -111,6 +175,8 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                             type="text"
                                             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
                                             placeholder="Sarah Lee"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
                                         />
                                     </div>
                                     <div>
@@ -119,8 +185,11 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                         </label>
                                         <input
                                             type="email"
+                                            required
                                             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
                                             placeholder="you@company.com"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
                                         />
                                     </div>
                                     <div>
@@ -131,13 +200,19 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                             type="text"
                                             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
                                             placeholder="Acme Inc."
+                                            value={company}
+                                            onChange={(e) => setCompany(e.target.value)}
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium text-slate-300 mb-1">
                                             Team size
                                         </label>
-                                        <select className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60">
+                                        <select
+                                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
+                                            value={teamSize}
+                                            onChange={(e) => setTeamSize(e.target.value)}
+                                        >
                                             <option value="">Select</option>
                                             <option value="1-5">1-5</option>
                                             <option value="6-20">6-20</option>
@@ -155,6 +230,8 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                         rows={4}
                                         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
                                         placeholder="Describe your current workflow, pain points, and any tools you want to connect."
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
                                     />
                                 </div>
 
@@ -163,7 +240,11 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                         <label className="block text-xs font-medium text-slate-300 mb-1">
                                             How soon are you looking to start?
                                         </label>
-                                        <select className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60">
+                                        <select
+                                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
+                                            value={startTimeline}
+                                            onChange={(e) => setStartTimeline(e.target.value)}
+                                        >
                                             <option value="">Select</option>
                                             <option value="immediately">Immediately</option>
                                             <option value="this-quarter">This quarter</option>
@@ -174,7 +255,11 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                         <label className="block text-xs font-medium text-slate-300 mb-1">
                                             Monthly budget range
                                         </label>
-                                        <select className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60">
+                                        <select
+                                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-50 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/60"
+                                            value={budgetRange}
+                                            onChange={(e) => setBudgetRange(e.target.value)}
+                                        >
                                             <option value="">Select</option>
                                             <option value="<500">&lt;$500</option>
                                             <option value="500-2k">$500 – $2k</option>
@@ -185,11 +270,13 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
                                 </div>
 
                                 <button
-                                    type="button"
+                                    type="submit"
+                                    disabled={!canSubmit}
                                     className="inline-flex w-full items-center justify-center rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-medium text-emerald-950 shadow-sm hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 transition-colors"
                                 >
-                                    Submit message
+                                    {submitting ? 'Submitting...' : 'Submit message'}
                                 </button>
+                                </form>
 
                                 <p className="text-xs text-slate-500 text-center">
                                     By submitting, you agree to let us contact you about Totan.ai. No newsletter signups
