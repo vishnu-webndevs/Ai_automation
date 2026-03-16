@@ -3,29 +3,91 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Contact Submission</title>
+    <title>{{ ($data['subject'] ?? null) ? $data['subject'] : 'New inquiry' }}</title>
     <style>
-        body { font-family: Arial, sans-serif; color: #0f172a; }
-        .card { max-width: 640px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
-        .row { margin-bottom: 10px; }
-        .label { font-weight: bold; color: #334155; display: inline-block; width: 140px; }
-        .value { color: #0f172a; }
-        .muted { color: #64748b; font-size: 12px; margin-top: 12px; }
+        body { margin: 0; padding: 0; background: #0b1220; font-family: Arial, sans-serif; color: #0f172a; }
+        .wrap { width: 100%; padding: 28px 14px; }
+        .card { max-width: 680px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+        .header { padding: 18px 20px; background: linear-gradient(135deg, #111827, #0b1220); color: #ffffff; }
+        .brand { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.72); }
+        .title { font-size: 22px; margin: 8px 0 0; line-height: 1.25; }
+        .body { padding: 18px 20px 8px; }
+        .grid { width: 100%; border-collapse: collapse; }
+        .grid td { padding: 10px 0; vertical-align: top; border-bottom: 1px solid #eef2f7; }
+        .label { width: 140px; color: #64748b; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; }
+        .value { color: #0f172a; font-size: 14px; }
+        .message { white-space: pre-wrap; color: #0f172a; font-size: 14px; line-height: 1.5; }
+        .footer { padding: 12px 20px 18px; color: #64748b; font-size: 12px; }
+        .link { color: #2563eb; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>New Contact Submission</h2>
-        <div class="row"><span class="label">Name:</span> <span class="value">{{ $data['name'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Email:</span> <span class="value">{{ $data['email'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Company:</span> <span class="value">{{ $data['company'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Phone:</span> <span class="value">{{ $data['phone'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Subject:</span> <span class="value">{{ $data['subject'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Message:</span></div>
-        <div class="row"><div class="value">{{ $data['message'] ?? '-' }}</div></div>
-        <div class="row"><span class="label">Source:</span> <span class="value">{{ $data['source'] ?? '-' }}</span></div>
-        <div class="row"><span class="label">Source URL:</span> <span class="value">{{ $data['source_url'] ?? '-' }}</span></div>
-        <p class="muted">You received this email because someone submitted the contact form on your website.</p>
+    <div class="wrap">
+        <div class="card">
+            <div class="header">
+                <div class="brand">Totan.ai</div>
+                <div class="title">{{ ($data['subject'] ?? null) ? $data['subject'] : 'New inquiry' }}</div>
+            </div>
+            <div class="body">
+                <table class="grid" role="presentation">
+                    @php
+                        $name = trim((string)($data['name'] ?? ''));
+                        $email = trim((string)($data['email'] ?? ''));
+                        $company = trim((string)($data['company'] ?? ''));
+                        $phone = trim((string)($data['phone'] ?? ''));
+                        $message = trim((string)($data['message'] ?? ''));
+                        $sourceUrl = trim((string)($data['source_url'] ?? ''));
+                    @endphp
+
+                    @if ($name !== '')
+                    <tr>
+                        <td class="label">Name</td>
+                        <td class="value">{{ $name }}</td>
+                    </tr>
+                    @endif
+
+                    @if ($email !== '')
+                    <tr>
+                        <td class="label">Email</td>
+                        <td class="value">{{ $email }}</td>
+                    </tr>
+                    @endif
+
+                    @if ($company !== '')
+                    <tr>
+                        <td class="label">Company</td>
+                        <td class="value">{{ $company }}</td>
+                    </tr>
+                    @endif
+
+                    @if ($phone !== '')
+                    <tr>
+                        <td class="label">Phone</td>
+                        <td class="value">{{ $phone }}</td>
+                    </tr>
+                    @endif
+
+                    @if ($message !== '')
+                    <tr>
+                        <td class="label">Message</td>
+                        <td class="message">{{ $message }}</td>
+                    </tr>
+                    @endif
+
+                    @if ($sourceUrl !== '')
+                    <tr>
+                        <td class="label">Page</td>
+                        <td class="value">
+                            <a class="link" href="{{ $sourceUrl }}">{{ $sourceUrl }}</a>
+                        </td>
+                    </tr>
+                    @endif
+                </table>
+            </div>
+            <div class="footer">
+                This email was generated from a website form submission.
+            </div>
+        </div>
     </div>
 </body>
 </html>
