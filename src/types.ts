@@ -93,7 +93,8 @@ export interface InternalLink {
     source_page_id: number;
     target_page_id: number;
     anchor_text: string;
-    is_manual: boolean;
+    auto_generated?: boolean;
+    is_manual?: boolean;
     created_at: string;
 }
 
@@ -109,7 +110,7 @@ export interface SchemaTemplate {
     id: number;
     name?: string; // Optional, might not exist on backend
     type: string;
-    schema_json: any; // The actual data from backend
+    schema_json: unknown; // The actual data from backend
     template?: string; // For frontend editing
     is_active?: boolean;
     page_id?: number;
@@ -129,8 +130,8 @@ export interface AuditLog {
     action: string;
     entity_type: string;
     entity_id: string;
-    old_values?: any;
-    new_values?: any;
+    old_values?: unknown;
+    new_values?: unknown;
     created_at: string;
     ip_address: string;
 }
@@ -148,7 +149,7 @@ export interface PageVersion {
     id: number;
     page_id: number;
     version_number: number;
-    content: any; // JSON of page content
+    content: unknown; // JSON of page content
     created_at: string;
     created_by: number;
     author_name?: string;

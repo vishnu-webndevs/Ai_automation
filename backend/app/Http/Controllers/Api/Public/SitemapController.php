@@ -12,6 +12,7 @@ use App\Models\ServiceCategory;
 use App\Models\Solution;
 use App\Models\UseCase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class SitemapController extends Controller
 {
@@ -107,11 +108,15 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/integrations/' . ltrim($integration->slug, '/'), optional($integration->updated_at)->toAtomString());
             }
 
-            $blogCategories = BlogCategory::query()
+            $blogCategoriesQuery = BlogCategory::query()
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
-                ->orderBy('updated_at', 'desc')
-                ->get();
+                ->orderBy('updated_at', 'desc');
+
+            if (Schema::hasColumn('blog_categories', 'is_active')) {
+                $blogCategoriesQuery->where('is_active', true);
+            }
+
+            $blogCategories = $blogCategoriesQuery->get();
 
             foreach ($blogCategories as $blogCategory) {
                 $addUrl($baseUrl . '/blog/category/' . ltrim($blogCategory->slug, '/'), optional($blogCategory->updated_at)->toAtomString());
@@ -125,4 +130,3 @@ class SitemapController extends Controller
         return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 }
-

@@ -25,7 +25,7 @@ const Features: React.FC<FeaturesProps> = ({
   layout = 'left'
 }) => {
   return (
-    <section className="py-20 relative">
+    <section className="py-20 relative overflow-hidden">
       {/* Background glow spot */}
       <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-purple-900/20 blur-[120px] rounded-full -z-10 pointer-events-none translate-x-1/2" />
 
