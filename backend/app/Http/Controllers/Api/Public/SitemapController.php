@@ -19,7 +19,7 @@ class SitemapController extends Controller
     public function index()
     {
         $xml = Cache::remember('public_sitemap_xml', 600, function () {
-            $baseUrl = rtrim(env('FRONTEND_URL', env('PUBLIC_SITE_URL', config('app.url'))), '/');
+            $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
 
             $applyIsActiveFilter = function ($query, string $table) {
                 if (Schema::hasColumn($table, 'is_active')) {
