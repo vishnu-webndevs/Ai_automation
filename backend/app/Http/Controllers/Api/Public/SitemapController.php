@@ -21,6 +21,13 @@ class SitemapController extends Controller
         $xml = Cache::remember('public_sitemap_xml', 600, function () {
             $baseUrl = rtrim(env('FRONTEND_URL', env('PUBLIC_SITE_URL', config('app.url'))), '/');
 
+            $applyIsActiveFilter = function ($query, string $table) {
+                if (Schema::hasColumn($table, 'is_active')) {
+                    $query->where('is_active', true);
+                }
+                return $query;
+            };
+
             $pages = Page::query()
                 ->select(['id', 'slug', 'updated_at'])
                 ->where('status', 'published')
@@ -48,9 +55,8 @@ class SitemapController extends Controller
                 $addUrl($loc, $lastmod);
             }
 
-            $services = Service::query()
+            $services = $applyIsActiveFilter(Service::query(), 'services')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -58,9 +64,8 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/services/' . ltrim($service->slug, '/'), optional($service->updated_at)->toAtomString());
             }
 
-            $serviceCategories = ServiceCategory::query()
+            $serviceCategories = $applyIsActiveFilter(ServiceCategory::query(), 'service_categories')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -68,9 +73,8 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/services/category/' . ltrim($category->slug, '/'), optional($category->updated_at)->toAtomString());
             }
 
-            $industries = Industry::query()
+            $industries = $applyIsActiveFilter(Industry::query(), 'industries')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -78,9 +82,8 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/industries/' . ltrim($industry->slug, '/'), optional($industry->updated_at)->toAtomString());
             }
 
-            $useCases = UseCase::query()
+            $useCases = $applyIsActiveFilter(UseCase::query(), 'use_cases')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -88,9 +91,8 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/use-cases/' . ltrim($useCase->slug, '/'), optional($useCase->updated_at)->toAtomString());
             }
 
-            $solutions = Solution::query()
+            $solutions = $applyIsActiveFilter(Solution::query(), 'solutions')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -98,9 +100,8 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/solutions/' . ltrim($solution->slug, '/'), optional($solution->updated_at)->toAtomString());
             }
 
-            $integrations = Integration::query()
+            $integrations = $applyIsActiveFilter(Integration::query(), 'integrations')
                 ->select(['slug', 'updated_at'])
-                ->where('is_active', true)
                 ->orderBy('updated_at', 'desc')
                 ->get();
 
@@ -108,15 +109,10 @@ class SitemapController extends Controller
                 $addUrl($baseUrl . '/integrations/' . ltrim($integration->slug, '/'), optional($integration->updated_at)->toAtomString());
             }
 
-            $blogCategoriesQuery = BlogCategory::query()
+            $blogCategories = $applyIsActiveFilter(BlogCategory::query(), 'blog_categories')
                 ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc');
-
-            if (Schema::hasColumn('blog_categories', 'is_active')) {
-                $blogCategoriesQuery->where('is_active', true);
-            }
-
-            $blogCategories = $blogCategoriesQuery->get();
+                ->orderBy('updated_at', 'desc')
+                ->get();
 
             foreach ($blogCategories as $blogCategory) {
                 $addUrl($baseUrl . '/blog/category/' . ltrim($blogCategory->slug, '/'), optional($blogCategory->updated_at)->toAtomString());
