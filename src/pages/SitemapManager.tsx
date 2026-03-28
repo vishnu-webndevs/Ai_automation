@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, Map, ExternalLink } from 'lucide-react';
 import { api } from '../api';
 import type { SitemapInfo } from '../types';
+import { useFlash } from '../contexts/FlashContext';
 
 const SitemapManager = () => {
+    const flash = useFlash();
     const [sitemapInfo, setSitemapInfo] = useState<SitemapInfo | null>(null);
     const [, setLoading] = useState(true);
     const [rebuilding, setRebuilding] = useState(false);
@@ -29,9 +31,10 @@ const SitemapManager = () => {
         try {
             await api.get('/sitemap/rebuild');
             await fetchData();
-            alert('Sitemap rebuilt successfully!');
+            flash.success('Sitemap rebuilt successfully!');
         } catch (error) {
             console.error('Failed to rebuild sitemap', error);
+            flash.error('Failed to rebuild sitemap');
         } finally {
             setRebuilding(false);
         }

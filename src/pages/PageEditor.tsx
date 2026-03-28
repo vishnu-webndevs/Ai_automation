@@ -6,6 +6,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Save, Plus, Trash2, ArrowUp, ArrowDown, Layout } from 'lucide-react';
 import ImagePicker from '../components/media/ImagePicker';
+import { useFlash } from '../contexts/FlashContext';
 
 // Default content generators for blocks
 const getDefaultContent = (type: string) => {
@@ -66,6 +67,7 @@ const AVAILABLE_BLOCKS = [
 ];
 
 const PageEditor = () => {
+    const flash = useFlash();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const pageId = searchParams.get('pageId');
@@ -119,10 +121,10 @@ const PageEditor = () => {
             await updatePage(Number(pageId), payload);
             // Reload to get real IDs back
             await loadPage(Number(pageId));
-            alert('Page updated successfully!');
+            flash.success('Page updated successfully!');
         } catch (error) {
             console.error('Failed to save page', error);
-            alert('Failed to save changes');
+            flash.error('Failed to save changes');
         } finally {
             setLoading(false);
         }

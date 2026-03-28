@@ -4,8 +4,10 @@ import { createPage, generatePageContent, getPage } from '../api';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import { useFlash } from '../contexts/FlashContext';
 
 const PageGenerator = () => {
+    const flash = useFlash();
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [existingPageId, setExistingPageId] = useState<number | null>(null);
@@ -86,10 +88,10 @@ const PageGenerator = () => {
             });
 
             setGeneratedData(response.data.data);
-            alert('Content Generated Successfully!');
+            flash.success('Content Generated Successfully!');
         } catch (error) {
             console.error('Generation failed:', error);
-            alert('Generation Failed');
+            flash.error('Generation Failed');
         } finally {
             setLoading(false);
         }

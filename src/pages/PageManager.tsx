@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { Card, CardBody, CardHeader } from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
+import { useFlash } from '../contexts/FlashContext';
 import {
   createPage,
   bulkUpdatePageStatus,
@@ -42,6 +43,7 @@ type PageRow = {
 };
 
 const PageManager = () => {
+  const flash = useFlash();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -311,7 +313,7 @@ const PageManager = () => {
         fetchRows(); // Refresh list
     } catch (e) {
         console.error("Failed to restore version", e);
-        alert('Failed to restore version');
+        flash.error('Failed to restore version');
     }
   };
 

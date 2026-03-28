@@ -270,7 +270,7 @@ const ServiceCategoriesManager = () => {
             </div>
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={currentCategory.id ? 'Edit Category' : 'Add New Category'}>
-                <form onSubmit={handleSave} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+                <form onSubmit={handleSave} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                         <input

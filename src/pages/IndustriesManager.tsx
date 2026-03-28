@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Sparkles, Lock, Unlock, ExternalLink } from
 import { api, toggleLock, FRONTEND_URL } from '../api';
 import type { Industry } from '../types';
 import Modal from '../components/ui/Modal';
+import { useFlash } from '../contexts/FlashContext';
 
 // Extend Industry type locally
 interface IndustryWithLock extends Industry {
@@ -16,6 +17,7 @@ interface IndustryWithLock extends Industry {
 }
 
 const IndustriesManager = () => {
+    const flash = useFlash();
     const [industries, setIndustries] = useState<IndustryWithLock[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,9 +121,10 @@ const IndustriesManager = () => {
         if (confirm('Trigger bulk AI content generation for all industries? This may take a while.')) {
             try {
                 await api.post('/industries/bulk-generate');
-                alert('Bulk generation started in background.');
+                flash.success('Bulk generation started in background.');
             } catch (error) {
                 console.error('Failed to start bulk generation', error);
+                flash.error('Failed to start bulk generation');
             }
         }
     };

@@ -20,8 +20,10 @@ import Toast from '../components/ui/Toast';
 import Tooltip from '../components/ui/Tooltip';
 import Carousel from '../components/ui/Carousel';
 import { Checkbox, Radio, Switch, Range } from '../components/ui/Forms';
+import { useFlash } from '../contexts/FlashContext';
 
 const HopeUIKit = () => {
+  const flash = useFlash();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -234,7 +236,7 @@ const HopeUIKit = () => {
                         { label: 'Dashboard', href: '/' },
                         { label: 'Settings', href: '/settings' },
                         { label: 'Separator', divider: true },
-                        { label: 'Logout', onClick: () => alert('Logged out') }
+                        { label: 'Logout', onClick: () => flash.info('Logged out') }
                     ]} 
                 />
             </div>

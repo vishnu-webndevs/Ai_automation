@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import type { Blog, BlogCategory } from '../types';
 import Modal from '../components/ui/Modal';
+import { useFlash } from '../contexts/FlashContext';
 
 const BlogManager = () => {
+    const flash = useFlash();
     const navigate = useNavigate();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [categories, setCategories] = useState<BlogCategory[]>([]);
@@ -89,7 +91,7 @@ const BlogManager = () => {
 
     const handleGenerate = async () => {
         if (!currentBlog.title) {
-            alert('Please enter a title first');
+            flash.warning('Please enter a title first');
             return;
         }
         setGeneratingAi(true);
@@ -104,7 +106,7 @@ const BlogManager = () => {
             }
 
             if (!pageId) {
-                alert('Failed to create blog post first.');
+                flash.error('Failed to create blog post first.');
                 return;
             }
 
@@ -125,15 +127,15 @@ const BlogManager = () => {
             });
 
             await fetchData();
-            alert('AI content generated and saved.');
+            flash.success('AI content generated and saved.');
             navigate(`/web-admin/pages/editor?pageId=${pageId}`);
         } catch (e: any) {
             const code = e?.response?.data?.code;
             if (e?.response?.status === 409 && code === 'CONFIRM_OVERWRITE_REQUIRED') {
                 setConfirmOverwriteAi(true);
-                alert('This blog already has content. Enable overwrite and run again.');
+                flash.warning('This blog already has content. Enable overwrite and run again.');
             } else {
-                alert(e?.response?.data?.message || 'AI generation failed');
+                flash.error(e?.response?.data?.message || 'AI generation failed');
             }
         } finally {
             setGeneratingAi(false);

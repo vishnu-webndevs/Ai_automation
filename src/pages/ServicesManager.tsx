@@ -3,6 +3,7 @@ import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, ArrowUp, ArrowD
 import { api, toggleLock, FRONTEND_URL } from '../api';
 import type { Service, ServiceCategory, ServiceFeature } from '../types';
 import Modal from '../components/ui/Modal';
+import { useFlash } from '../contexts/FlashContext';
 
 interface ServiceWithLock extends Service {
     locked_status?: {
@@ -15,6 +16,7 @@ interface ServiceWithLock extends Service {
 }
 
 const ServicesManager = () => {
+    const flash = useFlash();
     const [services, setServices] = useState<ServiceWithLock[]>([]);
     const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
     const [loading, setLoading] = useState(true);
@@ -138,14 +140,14 @@ const ServicesManager = () => {
                 );
             }
             await fetchData();
-            alert('AI content generated and saved.');
+            flash.success('AI content generated and saved.');
         } catch (e: any) {
             const code = e?.response?.data?.code;
             if (e?.response?.status === 409 && code === 'CONFIRM_OVERWRITE_REQUIRED') {
                 setConfirmOverwriteAi(true);
-                alert('This service already has content. Enable overwrite and run again.');
+                flash.warning('This service already has content. Enable overwrite and run again.');
             } else {
-                alert(e?.response?.data?.message || 'Failed to queue AI generation');
+                flash.error(e?.response?.data?.message || 'Failed to queue AI generation');
             }
         } finally {
             setGeneratingAi(false);
@@ -444,7 +446,7 @@ const ServicesManager = () => {
                 onClose={() => setIsModalOpen(false)}
                 title={currentService.id ? 'Edit Service' : 'Add New Service'}
             >
-                <form onSubmit={handleSave} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+                <form onSubmit={handleSave} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Primary Category</label>
                         <select

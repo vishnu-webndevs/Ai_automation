@@ -3,6 +3,7 @@ import Modal from '../ui/Modal';
 import { TemplateCard } from './TemplateCard';
 import Button from '../ui/Button';
 import { listPageTemplates, applyPageTemplate } from '../../api';
+import { useFlash } from '../../contexts/FlashContext';
 
 interface Template {
   id: number;
@@ -136,6 +137,7 @@ const WireframePreview: React.FC<{ sections: any[] }> = ({ sections }) => {
 };
 
 export const TemplateLibraryModal: React.FC<TemplateLibraryModalProps> = ({ isOpen, onClose, pageId, onTemplateApplied }) => {
+  const flash = useFlash();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
@@ -176,7 +178,7 @@ export const TemplateLibraryModal: React.FC<TemplateLibraryModalProps> = ({ isOp
       setPreviewTemplate(null);
     } catch (error) {
       console.error('Failed to apply template', error);
-      alert('Failed to apply template. Please try again.');
+      flash.error('Failed to apply template. Please try again.');
     } finally {
       setIsApplying(false);
     }
