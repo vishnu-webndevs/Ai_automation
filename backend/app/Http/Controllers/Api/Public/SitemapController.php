@@ -19,108 +19,191 @@ class SitemapController extends Controller
     public function index()
     {
         $xml = Cache::remember('public_sitemap_xml', 600, function () {
-            $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
+            try {
+                $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
 
-            $applyIsActiveFilter = function ($query, string $table) {
-                if (Schema::hasColumn($table, 'is_active')) {
-                    $query->where('is_active', true);
+                $selectColumns = function (string $table, array $columns): array {
+                    $selected = [];
+                    foreach ($columns as $column) {
+                        if (Schema::hasColumn($table, $column)) {
+                            $selected[] = $column;
+                        }
+                    }
+                    return $selected;
+                };
+
+                $applyIsActiveFilter = function ($query, string $table) {
+                    if (Schema::hasTable($table) && Schema::hasColumn($table, 'is_active')) {
+                        $query->where('is_active', true);
+                    }
+                    return $query;
+                };
+
+                $urlsByLoc = [];
+
+                $addUrl = function (string $loc, $lastmod = null) use (&$urlsByLoc) {
+                    $loc = rtrim($loc, '/');
+                    if ($loc === '') return;
+                    if (isset($urlsByLoc[$loc])) return;
+                    $urlsByLoc[$loc] = [
+                        'loc' => $loc,
+                        'lastmod' => $lastmod,
+                    ];
+                };
+
+                if (Schema::hasTable('pages') && Schema::hasColumn('pages', 'slug')) {
+                    $pageColumns = $selectColumns('pages', ['id', 'slug', 'updated_at']);
+                    $pagesQuery = Page::query()->select($pageColumns);
+
+                    if (Schema::hasColumn('pages', 'status')) {
+                        $pagesQuery->where('status', 'published');
+                    }
+
+                    if (Schema::hasTable('seo_meta') && Schema::hasColumn('seo_meta', 'noindex')) {
+                        $pagesQuery->whereDoesntHave('seo', function ($q) {
+                            $q->where('noindex', true);
+                        });
+                    }
+
+                    if (Schema::hasColumn('pages', 'updated_at')) {
+                        $pagesQuery->orderBy('updated_at', 'desc');
+                    }
+
+                    $pages = $pagesQuery->get();
+
+                    foreach ($pages as $page) {
+                        $loc = $baseUrl . '/' . ltrim($page->slug, '/');
+                        $lastmod = Schema::hasColumn('pages', 'updated_at') ? optional($page->updated_at)->toAtomString() : null;
+                        $addUrl($loc, $lastmod);
+                    }
                 }
-                return $query;
-            };
 
-            $pages = Page::query()
-                ->select(['id', 'slug', 'updated_at'])
-                ->where('status', 'published')
-                ->whereDoesntHave('seo', function ($q) {
-                    $q->where('noindex', true);
-                })
-                ->orderBy('updated_at', 'desc')
-                ->get();
+                if (Schema::hasTable('services') && Schema::hasColumn('services', 'slug')) {
+                    $servicesColumns = $selectColumns('services', ['slug', 'updated_at']);
+                    $servicesQuery = $applyIsActiveFilter(Service::query(), 'services')->select($servicesColumns);
+                    if (Schema::hasColumn('services', 'updated_at')) {
+                        $servicesQuery->orderBy('updated_at', 'desc');
+                    }
+                    $services = $servicesQuery->get();
 
-            $urlsByLoc = [];
+                    foreach ($services as $service) {
+                        $addUrl(
+                            $baseUrl . '/services/' . ltrim($service->slug, '/'),
+                            Schema::hasColumn('services', 'updated_at') ? optional($service->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
 
-            $addUrl = function (string $loc, $lastmod = null) use (&$urlsByLoc) {
-                $loc = rtrim($loc, '/');
-                if ($loc === '') return;
-                if (isset($urlsByLoc[$loc])) return;
-                $urlsByLoc[$loc] = [
-                    'loc' => $loc,
-                    'lastmod' => $lastmod,
+                if (Schema::hasTable('service_categories') && Schema::hasColumn('service_categories', 'slug')) {
+                    $serviceCategoryColumns = $selectColumns('service_categories', ['slug', 'updated_at']);
+                    $serviceCategoriesQuery = $applyIsActiveFilter(ServiceCategory::query(), 'service_categories')->select($serviceCategoryColumns);
+                    if (Schema::hasColumn('service_categories', 'updated_at')) {
+                        $serviceCategoriesQuery->orderBy('updated_at', 'desc');
+                    }
+                    $serviceCategories = $serviceCategoriesQuery->get();
+
+                    foreach ($serviceCategories as $category) {
+                        $addUrl(
+                            $baseUrl . '/services/category/' . ltrim($category->slug, '/'),
+                            Schema::hasColumn('service_categories', 'updated_at') ? optional($category->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                if (Schema::hasTable('industries') && Schema::hasColumn('industries', 'slug')) {
+                    $industryColumns = $selectColumns('industries', ['slug', 'updated_at']);
+                    $industriesQuery = $applyIsActiveFilter(Industry::query(), 'industries')->select($industryColumns);
+                    if (Schema::hasColumn('industries', 'updated_at')) {
+                        $industriesQuery->orderBy('updated_at', 'desc');
+                    }
+                    $industries = $industriesQuery->get();
+
+                    foreach ($industries as $industry) {
+                        $addUrl(
+                            $baseUrl . '/industries/' . ltrim($industry->slug, '/'),
+                            Schema::hasColumn('industries', 'updated_at') ? optional($industry->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                if (Schema::hasTable('use_cases') && Schema::hasColumn('use_cases', 'slug')) {
+                    $useCaseColumns = $selectColumns('use_cases', ['slug', 'updated_at']);
+                    $useCasesQuery = $applyIsActiveFilter(UseCase::query(), 'use_cases')->select($useCaseColumns);
+                    if (Schema::hasColumn('use_cases', 'updated_at')) {
+                        $useCasesQuery->orderBy('updated_at', 'desc');
+                    }
+                    $useCases = $useCasesQuery->get();
+
+                    foreach ($useCases as $useCase) {
+                        $addUrl(
+                            $baseUrl . '/use-cases/' . ltrim($useCase->slug, '/'),
+                            Schema::hasColumn('use_cases', 'updated_at') ? optional($useCase->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                if (Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'slug')) {
+                    $solutionColumns = $selectColumns('solutions', ['slug', 'updated_at']);
+                    $solutionsQuery = $applyIsActiveFilter(Solution::query(), 'solutions')->select($solutionColumns);
+                    if (Schema::hasColumn('solutions', 'updated_at')) {
+                        $solutionsQuery->orderBy('updated_at', 'desc');
+                    }
+                    $solutions = $solutionsQuery->get();
+
+                    foreach ($solutions as $solution) {
+                        $addUrl(
+                            $baseUrl . '/solutions/' . ltrim($solution->slug, '/'),
+                            Schema::hasColumn('solutions', 'updated_at') ? optional($solution->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                if (Schema::hasTable('integrations') && Schema::hasColumn('integrations', 'slug')) {
+                    $integrationColumns = $selectColumns('integrations', ['slug', 'updated_at']);
+                    $integrationsQuery = $applyIsActiveFilter(Integration::query(), 'integrations')->select($integrationColumns);
+                    if (Schema::hasColumn('integrations', 'updated_at')) {
+                        $integrationsQuery->orderBy('updated_at', 'desc');
+                    }
+                    $integrations = $integrationsQuery->get();
+
+                    foreach ($integrations as $integration) {
+                        $addUrl(
+                            $baseUrl . '/integrations/' . ltrim($integration->slug, '/'),
+                            Schema::hasColumn('integrations', 'updated_at') ? optional($integration->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                if (Schema::hasTable('blog_categories') && Schema::hasColumn('blog_categories', 'slug')) {
+                    $blogCategoryColumns = $selectColumns('blog_categories', ['slug', 'updated_at']);
+                    $blogCategoriesQuery = $applyIsActiveFilter(BlogCategory::query(), 'blog_categories')->select($blogCategoryColumns);
+                    if (Schema::hasColumn('blog_categories', 'updated_at')) {
+                        $blogCategoriesQuery->orderBy('updated_at', 'desc');
+                    }
+                    $blogCategories = $blogCategoriesQuery->get();
+
+                    foreach ($blogCategories as $blogCategory) {
+                        $addUrl(
+                            $baseUrl . '/blog/category/' . ltrim($blogCategory->slug, '/'),
+                            Schema::hasColumn('blog_categories', 'updated_at') ? optional($blogCategory->updated_at)->toAtomString() : null
+                        );
+                    }
+                }
+
+                return view('public.sitemap', [
+                    'urls' => array_values($urlsByLoc),
+                ])->render();
+            } catch (\Throwable $e) {
+                report($e);
+                $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
+                $urls = [
+                    [
+                        'loc' => $baseUrl,
+                        'lastmod' => now()->toAtomString(),
+                    ],
                 ];
-            };
-
-            foreach ($pages as $page) {
-                $loc = $baseUrl . '/' . ltrim($page->slug, '/');
-                $lastmod = optional($page->updated_at)->toAtomString();
-                $addUrl($loc, $lastmod);
+                return view('public.sitemap', ['urls' => $urls])->render();
             }
-
-            $services = $applyIsActiveFilter(Service::query(), 'services')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($services as $service) {
-                $addUrl($baseUrl . '/services/' . ltrim($service->slug, '/'), optional($service->updated_at)->toAtomString());
-            }
-
-            $serviceCategories = $applyIsActiveFilter(ServiceCategory::query(), 'service_categories')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($serviceCategories as $category) {
-                $addUrl($baseUrl . '/services/category/' . ltrim($category->slug, '/'), optional($category->updated_at)->toAtomString());
-            }
-
-            $industries = $applyIsActiveFilter(Industry::query(), 'industries')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($industries as $industry) {
-                $addUrl($baseUrl . '/industries/' . ltrim($industry->slug, '/'), optional($industry->updated_at)->toAtomString());
-            }
-
-            $useCases = $applyIsActiveFilter(UseCase::query(), 'use_cases')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($useCases as $useCase) {
-                $addUrl($baseUrl . '/use-cases/' . ltrim($useCase->slug, '/'), optional($useCase->updated_at)->toAtomString());
-            }
-
-            $solutions = $applyIsActiveFilter(Solution::query(), 'solutions')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($solutions as $solution) {
-                $addUrl($baseUrl . '/solutions/' . ltrim($solution->slug, '/'), optional($solution->updated_at)->toAtomString());
-            }
-
-            $integrations = $applyIsActiveFilter(Integration::query(), 'integrations')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($integrations as $integration) {
-                $addUrl($baseUrl . '/integrations/' . ltrim($integration->slug, '/'), optional($integration->updated_at)->toAtomString());
-            }
-
-            $blogCategories = $applyIsActiveFilter(BlogCategory::query(), 'blog_categories')
-                ->select(['slug', 'updated_at'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-
-            foreach ($blogCategories as $blogCategory) {
-                $addUrl($baseUrl . '/blog/category/' . ltrim($blogCategory->slug, '/'), optional($blogCategory->updated_at)->toAtomString());
-            }
-
-            return view('public.sitemap', [
-                'urls' => array_values($urlsByLoc),
-            ])->render();
         });
 
         return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
