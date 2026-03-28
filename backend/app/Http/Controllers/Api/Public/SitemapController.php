@@ -22,6 +22,41 @@ class SitemapController extends Controller
             try {
                 $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
 
+                $safeReport = function (\Throwable $e): void {
+                    try {
+                        report($e);
+                    } catch (\Throwable $ignored) {
+                    }
+                };
+
+                $toXml = function (array $urls): string {
+                    $lines = [
+                        '<?xml version="1.0" encoding="UTF-8"?>',
+                        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+                    ];
+
+                    foreach ($urls as $url) {
+                        $loc = isset($url['loc']) ? (string) $url['loc'] : '';
+                        $loc = rtrim($loc, '/');
+                        if ($loc === '') {
+                            continue;
+                        }
+
+                        $lines[] = '  <url>';
+                        $lines[] = '    <loc>' . htmlspecialchars($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
+
+                        $lastmod = $url['lastmod'] ?? null;
+                        if (!empty($lastmod)) {
+                            $lines[] = '    <lastmod>' . htmlspecialchars((string) $lastmod, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</lastmod>';
+                        }
+
+                        $lines[] = '  </url>';
+                    }
+
+                    $lines[] = '</urlset>';
+                    return implode("\n", $lines);
+                };
+
                 $selectColumns = function (string $table, array $columns): array {
                     $selected = [];
                     foreach ($columns as $column) {
@@ -190,26 +225,30 @@ class SitemapController extends Controller
                     }
                 }
 
-                return view('public.sitemap', [
-                    'urls' => array_values($urlsByLoc),
-                ])->render();
+                return $toXml(array_values($urlsByLoc));
             } catch (\Throwable $e) {
-                report($e);
+                try {
+                    report($e);
+                } catch (\Throwable $ignored) {
+                }
                 $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
-                $urls = [
-                    [
-                        'loc' => $baseUrl,
-                        'lastmod' => now()->toAtomString(),
-                    ],
-                ];
-                return view('public.sitemap', ['urls' => $urls])->render();
+                return '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+                    . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+                    . '  <url>' . "\n"
+                    . '    <loc>' . htmlspecialchars(rtrim($baseUrl, '/'), ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>' . "\n"
+                    . '    <lastmod>' . htmlspecialchars(now()->toAtomString(), ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</lastmod>' . "\n"
+                    . '  </url>' . "\n"
+                    . '</urlset>';
             }
         };
 
         try {
             $xml = Cache::remember('public_sitemap_xml', 600, $generate);
         } catch (\Throwable $e) {
-            report($e);
+            try {
+                report($e);
+            } catch (\Throwable $ignored) {
+            }
             $xml = $generate();
         }
 
