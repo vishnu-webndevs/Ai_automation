@@ -18,7 +18,7 @@ class SitemapController extends Controller
 {
     public function index()
     {
-        $xml = Cache::remember('public_sitemap_xml', 600, function () {
+        $generate = function () {
             try {
                 $baseUrl = rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
 
@@ -204,7 +204,14 @@ class SitemapController extends Controller
                 ];
                 return view('public.sitemap', ['urls' => $urls])->render();
             }
-        });
+        };
+
+        try {
+            $xml = Cache::remember('public_sitemap_xml', 600, $generate);
+        } catch (\Throwable $e) {
+            report($e);
+            $xml = $generate();
+        }
 
         return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
