@@ -52,6 +52,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/pages/{slug}', [PublicPageController::class, 'show']);
 Route::get('/menus/{location}', [PublicMenuController::class, 'show']);
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+Route::get('/sitemaps/{name}.xml', [SitemapController::class, 'show']);
 
 // Public Taxonomy Routes
 Route::get('/services', [PublicServiceController::class, 'index']);

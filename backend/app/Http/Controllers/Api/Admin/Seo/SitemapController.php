@@ -31,6 +31,10 @@ class SitemapController extends Controller
         // Clear existing cache
         SitemapCache::truncate();
         \Illuminate\Support\Facades\Cache::forget('public_sitemap_xml');
+        \Illuminate\Support\Facades\Cache::forget('public_sitemap_index_xml');
+        \Illuminate\Support\Facades\Cache::forget('public_sitemap_pages_xml');
+        \Illuminate\Support\Facades\Cache::forget('public_sitemap_services_xml');
+        \Illuminate\Support\Facades\Cache::forget('public_sitemap_blogs_xml');
 
         $count = 0;
 

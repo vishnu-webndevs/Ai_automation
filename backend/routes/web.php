@@ -20,6 +20,7 @@ Route::get('/robots.txt', function () {
 });
 
 Route::get('/sitemap.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'index']);
+Route::get('/sitemaps/{name}.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'show']);
 
 Route::get('/{slug}', [PageRenderController::class, 'show'])
-    ->where('slug', '^(?!api|up|robots\.txt|sitemap\.xml).*$');
+    ->where('slug', '^(?!api|up|robots\.txt|sitemap\.xml|sitemaps/).*$');
