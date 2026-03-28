@@ -88,6 +88,100 @@ class SitemapController extends Controller
         return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
+    public function xsl()
+    {
+        $xsl = <<<'XSL'
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:s="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <xsl:output method="html" encoding="UTF-8" indent="yes"/>
+
+  <xsl:template match="/">
+    <html>
+      <head>
+        <title>Sitemap</title>
+        <style>
+          body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:24px;color:#111827}
+          h1{font-size:20px;margin:0 0 16px}
+          table{border-collapse:collapse;width:100%}
+          th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:left;font-size:14px;vertical-align:top}
+          th{background:#f9fafb;font-weight:600}
+          a{color:#2563eb;text-decoration:none}
+          a:hover{text-decoration:underline}
+          .muted{color:#6b7280;font-size:12px}
+        </style>
+      </head>
+      <body>
+        <xsl:choose>
+          <xsl:when test="s:sitemapindex">
+            <h1>Sitemap Index</h1>
+            <div class="muted">
+              <xsl:value-of select="count(s:sitemapindex/s:sitemap)"/> sitemaps
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>URL</th>
+                  <th>Last Modified</th>
+                </tr>
+              </thead>
+              <tbody>
+                <xsl:for-each select="s:sitemapindex/s:sitemap">
+                  <tr>
+                    <td>
+                      <a>
+                        <xsl:attribute name="href"><xsl:value-of select="s:loc"/></xsl:attribute>
+                        <xsl:value-of select="s:loc"/>
+                      </a>
+                    </td>
+                    <td><xsl:value-of select="s:lastmod"/></td>
+                  </tr>
+                </xsl:for-each>
+              </tbody>
+            </table>
+          </xsl:when>
+          <xsl:when test="s:urlset">
+            <h1>Sitemap</h1>
+            <div class="muted">
+              <xsl:value-of select="count(s:urlset/s:url)"/> URLs
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>URL</th>
+                  <th>Last Modified</th>
+                </tr>
+              </thead>
+              <tbody>
+                <xsl:for-each select="s:urlset/s:url">
+                  <tr>
+                    <td>
+                      <a>
+                        <xsl:attribute name="href"><xsl:value-of select="s:loc"/></xsl:attribute>
+                        <xsl:value-of select="s:loc"/>
+                      </a>
+                    </td>
+                    <td><xsl:value-of select="s:lastmod"/></td>
+                  </tr>
+                </xsl:for-each>
+              </tbody>
+            </table>
+          </xsl:when>
+          <xsl:otherwise>
+            <h1>Sitemap</h1>
+            <div class="muted">Unsupported XML format</div>
+          </xsl:otherwise>
+        </xsl:choose>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+XSL;
+
+        return response($xsl, 200)->header('Content-Type', 'text/xsl; charset=UTF-8');
+    }
+
     private function getBaseUrl(): string
     {
         return rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
@@ -115,6 +209,7 @@ class SitemapController extends Controller
     {
         $lines = [
             '<?xml version="1.0" encoding="UTF-8"?>',
+            '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
             '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         ];
 
@@ -144,6 +239,7 @@ class SitemapController extends Controller
     {
         $lines = [
             '<?xml version="1.0" encoding="UTF-8"?>',
+            '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>',
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
         ];
 
