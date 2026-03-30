@@ -9,8 +9,8 @@ import '@/index.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata = {
-  title: 'Totan.ai',
-  description: 'Totan AI - Secure API Security Framework',
+  title: 'Totan AI | Custom AI Agents & Automation Solutions',
+  description: 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.',
 };
 
 export default function RootLayout({

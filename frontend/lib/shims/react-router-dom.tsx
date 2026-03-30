@@ -37,11 +37,11 @@ export const useParams = () => {
 export const useLocation = () => {
     const pathname = usePathname();
     const searchParams = useNextSearchParams();
-    return {
+    return React.useMemo(() => ({
         pathname: pathname || '/',
         search: searchParams?.toString() ? '?' + searchParams.toString() : '',
         hash: ''
-    };
+    }), [pathname, searchParams]);
 };
 
 export const useSearchParams = () => {

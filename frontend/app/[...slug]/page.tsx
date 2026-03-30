@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   }
 
   // Final fallback
-  if (!meta_title) meta_title = 'Totan API Security Framework';
+  if (!meta_title) meta_title = 'Totan AI Automation Services';
 
   return {
     title: meta_title,
