@@ -20,11 +20,11 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'hero',
                         order: 1,
                         content: {
-                            badge: 'API Studio is now in beta',
-                            heading: 'The API Security Framework',
-                            subheading: 'Our landing page template works on all devices, so you only have to set it up once, and get beautiful results forever.',
+                            badge: 'AI Solutions for the Future',
+                            heading: 'Empower Your Business with AI Automation',
+                            subheading: 'Totan.ai offers cutting-edge AI automation services designed to streamline operations, reduce operational costs, and drive unprecedented growth for your business.',
                             primary_cta: { text: 'Get Started', url: '/signup' },
-                            secondary_cta: { text: 'Read the docs', url: '/docs' }
+                            secondary_cta: { text: 'Explore Services', url: '/services' }
                         }
                     },
                     {
@@ -32,7 +32,7 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'logo_ticker',
                         order: 2,
                         content: {
-                            items: ['Facebook', 'Tinder', 'Airbnb', 'Hubspot', 'Amazon', 'Tesla', 'Google']
+                            items: ['Microsoft', 'OpenAI', 'Google Cloud', 'AWS', 'Meta', 'Hugging Face', 'Anthropic']
                         }
                     },
                     {
@@ -40,12 +40,12 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'features',
                         order: 3,
                         content: {
-                            heading: 'Simplify your security with authentication services',
-                            subheading: 'Define access roles for the end-users, and extend your authorization capabilities to implement dynamic access control.',
+                            heading: 'Transform your workflow with intelligent automation',
+                            subheading: 'Leverage state-of-the-art machine learning models to automate repetitive tasks, extract valuable insights from data, and provide personalized customer experiences 24/7.',
                             items: [
-                                { title: 'Simplify your security', description: '' },
-                                { title: 'Customer identity', description: '' },
-                                { title: 'Adaptable authentication', description: '' }
+                                { title: 'Seamless Integration', description: 'Easily integrate our AI solutions into your existing ecosystem without disruption.' },
+                                { title: 'Data-Driven Insights', description: 'Make smarter business decisions with predictive analytics and deep learning.' },
+                                { title: '24/7 AI Agents', description: 'Automate customer support and internal workflows with tireless digital agents.' }
                             ]
                         }
                     },
@@ -54,22 +54,31 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'bento_grid',
                         order: 4,
                         content: {
-                            heading: 'Faster. Smarter.',
-                            subheading: "There are many variations available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+                            heading: 'Smarter. Faster. Better.',
+                            subheading: "By integrating custom AI agents and automation pipelines, you can scale operations securely and interact with customers proactively.",
                             items: [
                                 {
-                                    title: 'Optimized for security',
-                                    description: 'Optimize for user experience and privacy. Use social login integrations, lower user friction, incorporate rich user profiling.',
+                                    title: 'Custom AI Agents',
+                                    description: 'Deploy bespoke AI agents trained on your proprietary data to automate customer inquiries, document processing, and more.',
                                     colSpan: 8,
                                     ctaText: 'Learn more',
-                                    ctaUrl: '#'
+                                    ctaUrl: '/services'
                                 },
                                 {
-                                    title: 'Extensibility',
-                                    description: 'Your login box must find the right balance between user convenience, privacy and security.',
+                                    title: 'Process Automation',
+                                    description: 'Eliminate manual bottlenecks and accelerate your entire operational workflow.',
                                     colSpan: 4
                                 }
                             ]
+                        }
+                    },
+                    {
+                        id: 45,
+                        block_type: 'latest_services',
+                        order: 4.5,
+                        content: {
+                            heading: 'Explore Our AI Services',
+                            count: 3
                         }
                     },
                     {
@@ -77,9 +86,9 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'mobile_section',
                         order: 5,
                         content: {
-                            heading: 'Spot issues faster',
-                            subheading: 'The security first platform',
-                            description: 'All the lorem ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.'
+                            heading: 'Stay ahead of the curve',
+                            subheading: 'The AI-first platform',
+                            description: 'Totan.ai ensures your business remains competitive by constantly updating our models to provide the most innovative capabilities in natural language processing and computer vision.'
                         }
                     },
                     {
@@ -87,8 +96,8 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'why_trust',
                         order: 6,
                         content: {
-                            heading: 'Why trust us?',
-                            description: 'Many desktop publishing packages and web page editors now use lorem ipsum as their default model text.'
+                            heading: 'Why trust Totan.ai?',
+                            description: 'We prioritize data security and system reliability while delivering top-tier performance, helping hundreds of businesses transition into the AI-first era securely.'
                         }
                     },
                     {
@@ -96,8 +105,8 @@ export const STATIC_PAGES: Record<string, Page> = {
                         block_type: 'cta',
                         order: 7,
                         content: {
-                            heading: 'Ready to get started?',
-                            subheading: 'Join thousands of developers building secure applications.',
+                            heading: 'Ready to automate?',
+                            subheading: 'Join the hundreds of forward-thinking businesses upgrading their operations with Totan.ai.',
                             buttonText: 'Get Started for Free',
                             buttonUrl: '/signup'
                         }
@@ -107,10 +116,10 @@ export const STATIC_PAGES: Record<string, Page> = {
         ],
         seo_meta: {
             id: 1,
-            meta_title: 'API Security Framework | Totan AI',
-            meta_description: 'The most secure API framework for modern applications.',
-            og_title: 'API Security Framework',
-            og_description: 'Secure your APIs with Totan AI.',
+            meta_title: 'AI Automation Services | Totan AI',
+            meta_description: 'Streamline operations with cutting-edge AI automation solutions from Totan.ai.',
+            og_title: 'Totan AI Automation',
+            og_description: 'Transform your business with intelligent AI automation and custom ML agents.',
             og_image: '',
             noindex: false,
             nofollow: false,

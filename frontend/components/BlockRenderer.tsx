@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import useSWR from 'swr';
+import { serviceService } from '../services/api';
 import { ContentBlock, Page } from '../types';
 import Hero from './Hero';
 import Features from './Features';
@@ -35,6 +37,69 @@ const FAQItem = ({ item }: { item: { question: string; answer: string } }) => {
                 <p className="text-slate-400">{item.answer}</p>
             </div>
         </div>
+    );
+};
+
+const LatestServicesBlock = ({ heading, count = 3 }: any) => {
+    const { data: services, isLoading } = useSWR('services', serviceService.getAll);
+    
+    if (isLoading) return <div className="py-12 text-center text-slate-400">Loading latest services...</div>;
+    if (!services || services.length === 0) return null;
+
+    // Show only the latest 'count' services
+    const latest = [...services].sort((a: any, b: any) => String(b?.updated_at || '').localeCompare(String(a?.updated_at || ''))).slice(0, count);
+
+    return (
+        <section className="py-16 sm:py-24">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+                <div className="flex justify-between items-end mb-10">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">{heading || 'Explore Our AI Services'}</h2>
+                    <Link to="/services" className="text-purple-400 hover:text-purple-300 font-medium text-sm flex items-center">
+                        View All
+                        <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {latest.map(service => (
+                        <Link
+                            to={`/services/${service.slug}`}
+                            key={service.id}
+                            className="group bg-slate-900/70 border border-slate-800 rounded-2xl p-7 hover:border-purple-500/60 hover:bg-slate-900 transition-colors flex flex-col shadow-lg shadow-black/20"
+                        >
+                            <div className="mb-4 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors text-xl">
+                                    <span>{(service as any).icon || '🤖'}</span>
+                                </div>
+                                <h3 className="text-lg font-semibold text-white">
+                                    {service.name}
+                                </h3>
+                            </div>
+                            <p className="text-slate-400 text-sm mb-4 line-clamp-3">
+                                {(service as any).short_description || 'AI service tailored for your business workflow.'}
+                            </p>
+                            <span className="mt-auto inline-flex items-center text-xs font-medium text-purple-300 group-hover:text-purple-200">
+                                View Service
+                                <svg
+                                    className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-0.5 transition-transform"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M9 5l7 7-7 7"
+                                    />
+                                </svg>
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 };
 
@@ -100,6 +165,9 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
         case 'blog-grid':
         case 'blog-list':
             return <BlogGrid {...content} />;
+
+        case 'latest_services':
+            return <LatestServicesBlock count={content.count} heading={content.heading} />;
 
         case 'newsletter':
             return <Newsletter {...content} />;

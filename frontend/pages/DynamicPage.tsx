@@ -10,18 +10,20 @@ import { getTemplateComponent } from '../templates/TemplateLoader';
 const DynamicPage: React.FC = () => {
     const params = useParams();
     const slugParam = params['*'] || 'home';
-    const slug = slugParam || 'home';
+    const slug = (slugParam as string) || 'home';
 
     const { data: apiPage, error, isLoading } = useSWR(
-        slug && slug !== 'home' ? `/pages/${slug}` : null,
-        () => pageService.getBySlug(slug),
+        slug ? `/pages/${slug}` : null,
+        () => pageService.getBySlug(slug as string),
         {
-            shouldRetryOnError: false
+            shouldRetryOnError: false,
+            revalidateOnFocus: false,
+            revalidateIfStale: false
         }
     );
 
     const page = useMemo(() => {
-        let resolved = slug === 'home' ? STATIC_PAGES['home'] || null : apiPage || STATIC_PAGES[slug] || null;
+        let resolved = apiPage || STATIC_PAGES[slug as string] || null;
 
         if (resolved && !resolved.template_slug && slug === 'contact-us') {
             resolved = { ...resolved, template_slug: 'contact-dark' };
