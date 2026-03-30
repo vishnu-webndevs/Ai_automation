@@ -60,7 +60,7 @@ const Authentication = () => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@example..com" />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@example.com" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
