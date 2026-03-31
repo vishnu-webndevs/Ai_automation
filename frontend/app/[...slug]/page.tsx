@@ -87,8 +87,14 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   };
 }
 
+import { Suspense } from 'react';
+
 export default function DynamicRoute({ params }: { params: { slug: string[] } }) {
-  return <ClientWrapper slug={params.slug} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
+      <ClientWrapper slug={params.slug} />
+    </Suspense>
+  );
 }
 
 // Separate client component to avoid passing non-serializable data from server component if needed

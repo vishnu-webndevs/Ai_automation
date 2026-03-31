@@ -96,6 +96,7 @@ export interface BlogCategory {
     slug: string;
     description?: string;
     pages_count?: number;
+    pages?: Page[];
 }
 
 export interface MenuItem {

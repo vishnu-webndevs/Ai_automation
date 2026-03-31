@@ -56,11 +56,15 @@ export default function RootLayout({
         
         <div className="relative min-h-screen bg-slate-950 text-slate-300 selection:bg-purple-500/30 selection:text-purple-200">
           <Particles />
-          <Navbar />
+          <React.Suspense fallback={<div className="h-16" />}>
+            <Navbar />
+          </React.Suspense>
           <main className="relative z-10">
             {children}
           </main>
-          <Footer />
+          <React.Suspense fallback={<div className="h-16" />}>
+            <Footer />
+          </React.Suspense>
         </div>
       </body>
     </html>

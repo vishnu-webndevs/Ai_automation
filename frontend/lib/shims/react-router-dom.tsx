@@ -22,16 +22,16 @@ export const useNavigate = () => {
     };
 };
 
-export const useParams = () => {
+export const useParams = <T extends Record<string, string | undefined> = Record<string, string | undefined>>(): T => {
     const params = useNextParams();
     if (params?.slug && Array.isArray(params.slug)) {
         return { 
             ...params, 
             slug: params.slug[params.slug.length - 1], 
             '*': params.slug.join('/') 
-        };
+        } as unknown as T;
     }
-    return params || {};
+    return (params || {}) as unknown as T;
 };
 
 export const useLocation = () => {
@@ -47,16 +47,17 @@ export const useLocation = () => {
 export const useSearchParams = () => {
     const searchParams = useNextSearchParams();
     return [
-        searchParams, 
+        searchParams || new URLSearchParams(), 
         (newParams: any) => {
             // Dummy setter to prevent crash for now, since Next.js uses router.push(?...) to mutate search params
         }
-    ];
+    ] as any;
 };
 
 export const BrowserRouter = ({ children }: any) => <>{children}</>;
 export const Routes = ({ children }: any) => <>{children}</>;
 export const Route = ({ children }: any) => <>{children}</>;
+export const Outlet = () => null;
 export const Navigate = ({ to }: any) => {
     const router = useRouter();
     React.useEffect(() => {

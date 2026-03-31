@@ -4,8 +4,8 @@ import useSWR from 'swr';
 import { blogCategoryService } from '../services/api';
 
 const BlogCategoryDetail: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: category, isLoading, error } = useSWR(slug ? `blog-category-${slug}` : null, () => blogCategoryService.getBySlug(slug!));
+    const { slug } = useParams() as { slug: string };
+    const { data: category, isLoading, error } = useSWR(slug ? `blog-category-${slug}` : null, () => blogCategoryService.getBySlug(slug as string));
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading category...</div>;
     if (error || !category) return <div className="text-center py-20 text-white">Category not found</div>;
@@ -33,7 +33,7 @@ const BlogCategoryDetail: React.FC = () => {
                             <div className="p-6 flex-1 flex flex-col">
                                 <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-400 transition-colors">{blog.title}</h3>
                                 <p className="text-slate-400 mb-4 line-clamp-3 flex-1">{blog.seo_meta?.meta_description}</p>
-                                <span className="text-sm text-slate-500 mt-auto">{new Date(blog.created_at).toLocaleDateString()}</span>
+                                <span className="text-sm text-slate-500 mt-auto">{new Date(blog.created_at || Date.now()).toLocaleDateString()}</span>
                             </div>
                         </Link>
                     ))}

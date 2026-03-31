@@ -90,7 +90,7 @@ const BlogModernTemplate: React.FC<TemplateProps> = ({ page }) => {
                                                 </div>
                                                 <div>
                                                     <h4 className="text-sm font-semibold text-slate-200 group-hover:text-purple-400 transition-colors line-clamp-2">{post.title}</h4>
-                                                    <span className="text-xs text-slate-500 mt-1 block">{new Date(post.created_at).toLocaleDateString()}</span>
+                                                    <span className="text-xs text-slate-500 mt-1 block">{new Date(post.created_at || Date.now()).toLocaleDateString()}</span>
                                                 </div>
                                             </Link>
                                         </li>
