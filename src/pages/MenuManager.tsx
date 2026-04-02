@@ -196,6 +196,7 @@ const MenuManager = () => {
   const [dragOver, setDragOver] = useState<{ id: number | null; mode: DropMode | null }>({ id: null, mode: null });
   const [expandedIds, setExpandedIds] = useState<Record<number, boolean>>({});
   const [editingIds, setEditingIds] = useState<Record<number, boolean>>({});
+  const [editingValues, setEditingValues] = useState<Record<number, Partial<MenuItem>>>({});
 
   // Clear error when inputs change
   useEffect(() => {
@@ -520,6 +521,7 @@ const MenuManager = () => {
     try {
       await updateMenuItem(id, patch);
       await loadActiveMenu(location);
+      setEditingIds((prev) => ({ ...prev, [id]: false }));
     } catch (e: unknown) {
       setError(getErrorMessage(e) || 'Failed to update item');
     } finally {
@@ -529,6 +531,8 @@ const MenuManager = () => {
 
   const handleItemDelete = async (id: number) => {
     if (!activeMenu) return;
+    if (!window.confirm('Are you sure you want to delete this menu item?')) return;
+    
     setLoading(true);
     setError(null);
     try {
@@ -591,6 +595,34 @@ const MenuManager = () => {
     const deviceLabel = node.show_on === 'all' ? 'All devices' : node.show_on === 'desktop' ? 'Desktop' : 'Mobile';
     const visibilityLabel = node.is_visible ? 'Visible' : 'Hidden';
 
+    const handleEditToggle = () => {
+      if (!editing) {
+        setEditingValues((prev) => ({
+          ...prev,
+          [node.id]: {
+            label: node.label,
+            show_on: node.show_on,
+            is_visible: node.is_visible,
+            parent_id: node.parent_id,
+          },
+        }));
+      }
+      setEditingIds((prev) => ({ ...prev, [node.id]: !editing }));
+    };
+
+    const currentEditingValue = editingValues[node.id] || {};
+
+    const handleSave = () => {
+      void handleItemUpdate(node.id, currentEditingValue);
+    };
+
+    const updateLocalValue = (patch: Partial<MenuItem>) => {
+      setEditingValues((prev) => ({
+        ...prev,
+        [node.id]: { ...currentEditingValue, ...patch },
+      }));
+    };
+
     return (
       <div className="relative">
         {depth > 0 && (
@@ -647,6 +679,7 @@ const MenuManager = () => {
                   {hasChildren ? (
                     <button
                       type="button"
+                      onMouseDown={(e) => e.stopPropagation()}
                       onClick={() => setExpandedIds((prev) => ({ ...prev, [node.id]: !expanded }))}
                       className="text-gray-500 hover:text-gray-800"
                       aria-label={expanded ? 'Collapse' : 'Expand'}
@@ -674,14 +707,16 @@ const MenuManager = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setEditingIds((prev) => ({ ...prev, [node.id]: !editing }))}
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={handleEditToggle}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-white text-sm text-gray-700 hover:bg-gray-50"
               >
                 <Pencil size={16} />
-                Edit
+                {editing ? 'Cancel' : 'Edit'}
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.stopPropagation()}
                 onClick={() => handleItemDelete(node.id)}
                 disabled={loading}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-sm text-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -693,59 +728,70 @@ const MenuManager = () => {
           </div>
 
           {editing && (
-            <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-12 gap-4">
-              <div className="md:col-span-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
-                <Input
-                  value={node.label}
-                  onChange={(e) => handleItemUpdate(node.id, { label: e.target.value })}
-                  disabled={loading}
-                  className="bg-white"
-                />
-              </div>
-              <div className="md:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Device visibility</label>
-                <select
-                  value={node.show_on}
-                  onChange={(e) => handleItemUpdate(node.id, { show_on: e.target.value as MenuItem['show_on'] })}
-                  className="w-full p-2 border rounded bg-white text-sm"
-                  disabled={loading}
-                >
-                  <option value="all">All devices</option>
-                  <option value="desktop">Desktop only</option>
-                  <option value="mobile">Mobile only</option>
-                </select>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Enabled</label>
-                <label className="flex items-center gap-2 px-3 py-2 border rounded bg-white text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={node.is_visible}
-                    onChange={(e) => handleItemUpdate(node.id, { is_visible: e.target.checked })}
+            <div className="mt-4 pt-4 border-t border-gray-200" onMouseDown={(e) => e.stopPropagation()}>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+                <div className="md:col-span-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                  <Input
+                    value={currentEditingValue.label || ''}
+                    onChange={(e) => updateLocalValue({ label: e.target.value })}
                     disabled={loading}
+                    className="bg-white"
                   />
-                  Show item
-                </label>
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Device visibility</label>
+                  <select
+                    value={currentEditingValue.show_on || 'all'}
+                    onChange={(e) => updateLocalValue({ show_on: e.target.value as MenuItem['show_on'] })}
+                    className="w-full p-2 border rounded bg-white text-sm"
+                    disabled={loading}
+                  >
+                    <option value="all">All devices</option>
+                    <option value="desktop">Desktop only</option>
+                    <option value="mobile">Mobile only</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Enabled</label>
+                  <label className="flex items-center gap-2 px-3 py-2 border rounded bg-white text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={currentEditingValue.is_visible ?? true}
+                      onChange={(e) => updateLocalValue({ is_visible: e.target.checked })}
+                      disabled={loading}
+                    />
+                    Show item
+                  </label>
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
+                  <select
+                    value={currentEditingValue.parent_id || ''}
+                    onChange={(e) => updateLocalValue({ parent_id: e.target.value ? Number(e.target.value) : null })}
+                    className="w-full p-2 border rounded bg-white text-sm"
+                    disabled={loading}
+                  >
+                    <option value="">No parent (Root)</option>
+                    {parentOptions
+                      .filter((p) => !descendantIds.has(p.id))
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.label}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
-              <div className="md:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Parent</label>
-                <select
-                  value={node.parent_id || ''}
-                  onChange={(e) => handleItemUpdate(node.id, { parent_id: e.target.value ? Number(e.target.value) : null })}
-                  className="w-full p-2 border rounded bg-white text-sm"
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="primary" 
+                  size="sm" 
+                  onClick={handleSave} 
                   disabled={loading}
                 >
-                  <option value="">No parent (Root)</option>
-                  {parentOptions
-                    .filter((p) => !descendantIds.has(p.id))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                </select>
-                <div className="mt-1 text-xs text-gray-500">Tip: Drag & drop to change hierarchy faster.</div>
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </Button>
               </div>
             </div>
           )}
