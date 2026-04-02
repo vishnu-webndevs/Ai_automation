@@ -17,6 +17,23 @@ const nextConfig = {
     };
     return config;
   },
+  async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.totan.ai/api';
+    return [
+      {
+        source: '/sitemap.xml',
+        destination: `${apiUrl}/sitemap.xml`,
+      },
+      {
+        source: '/sitemap.xsl',
+        destination: `${apiUrl}/sitemap.xsl`,
+      },
+      {
+        source: '/sitemaps/:path*',
+        destination: `${apiUrl}/sitemaps/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
