@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
 
           {/* Dynamic Columns from Admin Panel */}
           {dynamicColumns.map((column) => (
-            <div key={column.id} className="lg:col-span-3">
+            <div key={column.id} className="lg:col-span-2">
               <h4 className="text-white font-bold text-lg mb-8 tracking-tight">
                 {column.label}
               </h4>
@@ -107,7 +107,7 @@ const Footer: React.FC = () => {
           {/* Skeleton Loading */}
           {!footerMenu &&
             [1, 2].map((i) => (
-              <div key={i} className="lg:col-span-3">
+              <div key={i} className="lg:col-span-2">
                 <div className="h-6 w-24 bg-slate-800/50 rounded mb-8 animate-pulse"></div>
                 <div className="space-y-4">
                   <div className="h-4 w-32 bg-slate-800/50 rounded animate-pulse"></div>
