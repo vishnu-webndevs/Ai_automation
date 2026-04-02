@@ -13,9 +13,11 @@ const Footer: React.FC = () => {
     location.pathname === '/home' ||
     location.pathname.startsWith('/services/');
   
-  const { data: quickLinks } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
-  const { data: servicesLinks } = useSWR('menu-footer-secondary', () => menuService.getByLocation('footer-secondary').catch(() => null));
+  const { data: footerMenu } = useSWR('menu-footer', () => menuService.getByLocation('footer').catch(() => null));
 
+  // Determine dynamic columns from menu
+  const dynamicColumns = footerMenu?.items || [];
+  
   return (
     <footer className="relative pt-20 pb-10 overflow-hidden">
       {/* Background glow bottom */}
@@ -37,7 +39,7 @@ const Footer: React.FC = () => {
           </div>
         )}
 
-        <div className="border-t border-slate-800 pt-12 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-12 mb-12">
+        <div className="border-t border-slate-800 pt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-12 mb-12">
             <div className="col-span-1 lg:col-span-1">
                <a href="/" className="flex items-center gap-2 mb-4">
                   <img src="/totan_logo.png" alt="Totan AI" className="w-[100px] h-auto" />
@@ -50,41 +52,34 @@ const Footer: React.FC = () => {
                </div>
             </div>
 
-            {/* Quick Links Column */}
-            <div>
-              <h4 className="text-white font-semibold mb-6">Quick Links</h4>
-              <ul className="space-y-4 text-sm text-slate-400">
-                {quickLinks?.items?.map((link) => (
-                  <li key={link.id}>
-                    <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                {!quickLinks && [1, 2, 3].map(i => (
-                  <li key={i} className="h-4 w-24 bg-slate-800/50 rounded animate-pulse"></li>
-                ))}
-              </ul>
-            </div>
+            {/* Dynamic Columns from Admin Panel */}
+            {dynamicColumns.map((column) => (
+              <div key={column.id}>
+                <h4 className="text-white font-semibold mb-6">{column.label}</h4>
+                <ul className="space-y-4 text-sm text-slate-400">
+                  {column.children?.map((link) => (
+                    <li key={link.id}>
+                      <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
-            {/* Services Column */}
-            <div>
-              <h4 className="text-white font-semibold mb-6">Services</h4>
-              <ul className="space-y-4 text-sm text-slate-400">
-                {servicesLinks?.items?.map((link) => (
-                  <li key={link.id}>
-                    <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                {!servicesLinks && [1, 2, 3, 4].map(i => (
-                  <li key={i} className="h-4 w-32 bg-slate-800/50 rounded animate-pulse"></li>
-                ))}
-              </ul>
-            </div>
+            {/* Skeleton Loading */}
+            {!footerMenu && [1, 2].map(i => (
+              <div key={i}>
+                <div className="h-5 w-24 bg-slate-800/50 rounded mb-6 animate-pulse"></div>
+                <div className="space-y-4">
+                  <div className="h-4 w-32 bg-slate-800/50 rounded animate-pulse"></div>
+                  <div className="h-4 w-28 bg-slate-800/50 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))}
 
-            {/* Contact Column */}
+            {/* Contact Column - Always Last */}
             <div>
               <h4 className="text-white font-semibold mb-6">Contact Us</h4>
               <ul className="space-y-4 text-sm text-slate-400">
