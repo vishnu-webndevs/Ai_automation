@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 import useSWR from 'swr';
 import { menuService } from '../services/api';
 
@@ -19,47 +19,50 @@ const Footer: React.FC = () => {
   const dynamicColumns = footerMenu?.items || [];
   
   return (
-    <footer className="relative pt-20 pb-10 overflow-hidden">
+    <footer className="relative pt-24 pb-12 overflow-hidden border-t border-slate-800/50">
       {/* Background glow bottom */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[300px] bg-purple-900/20 blur-[100px] rounded-t-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[300px] bg-purple-900/10 blur-[120px] rounded-t-full pointer-events-none -z-10" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* CTA Section (hidden on Contact page) */}
+        {/* CTA Section (hidden on specific pages) */}
         {!hideCta && (
-          <div className="text-center mb-20">
-            <div className="text-purple-400 font-medium mb-2">The security first platform</div>
+          <div className="text-center mb-24">
+            <div className="text-purple-400 font-medium mb-3 tracking-wider uppercase text-sm">The security first platform</div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Take control of your business</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto mb-10">
-              All the lorem ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet.
+            <p className="text-slate-400 max-w-2xl mx-auto mb-10 text-lg leading-relaxed">
+              Empower your enterprise with AI-driven automation that scales with your growth.
             </p>
-            <button className="px-8 py-3 rounded-full bg-white text-slate-900 font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-purple-500/20">
-              Get Started
+            <button className="px-10 py-4 rounded-full bg-white text-slate-950 font-bold hover:bg-slate-100 transition-all shadow-xl shadow-purple-500/10 hover:scale-105 active:scale-95">
+              Get Started Now
             </button>
           </div>
         )}
 
-        <div className="border-t border-slate-800 pt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-12 mb-12">
-            <div className="col-span-1 lg:col-span-1">
-               <a href="/" className="flex items-center gap-2 mb-4">
-                  <img src="/totan_logo.png" alt="Totan AI" className="w-[100px] h-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-20">
+            {/* Column 1: Logo & Description */}
+            <div className="lg:col-span-4">
+               <a href="/" className="flex items-center gap-2 mb-6">
+                  <img src="/totan_logo.png" alt="Totan AI" className="w-[120px] h-auto" />
                </a>
-               <p className="text-slate-500 text-sm mb-6">© Totan.ai - All rights reserved.</p>
+               <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-sm">
+                 We specialize in the creation of custom AI solutions tailored to the specific needs of our clients around the world. Our team is dedicated to delivering the highest quality automation pipelines.
+               </p>
                <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Twitter size={16} /></div>
-                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Github size={16} /></div>
-                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Linkedin size={16} /></div>
+                  <a href="#" className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"><Twitter size={18} /></a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"><Github size={18} /></a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"><Linkedin size={18} /></a>
                </div>
             </div>
 
             {/* Dynamic Columns from Admin Panel */}
             {dynamicColumns.map((column) => (
-              <div key={column.id}>
-                <h4 className="text-white font-semibold mb-6">{column.label}</h4>
-                <ul className="space-y-4 text-sm text-slate-400">
+              <div key={column.id} className="lg:col-span-2">
+                <h4 className="text-white font-bold text-lg mb-8 tracking-tight">{column.label}</h4>
+                <ul className="space-y-4">
                   {column.children?.map((link) => (
                     <li key={link.id}>
-                      <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
+                      <a href={link.url} className="text-slate-400 hover:text-purple-400 transition-colors text-base inline-block" target={link.target}>
                         {link.label}
                       </a>
                     </li>
@@ -70,33 +73,48 @@ const Footer: React.FC = () => {
 
             {/* Skeleton Loading */}
             {!footerMenu && [1, 2].map(i => (
-              <div key={i}>
-                <div className="h-5 w-24 bg-slate-800/50 rounded mb-6 animate-pulse"></div>
+              <div key={i} className="lg:col-span-2">
+                <div className="h-6 w-24 bg-slate-800/50 rounded mb-8 animate-pulse"></div>
                 <div className="space-y-4">
                   <div className="h-4 w-32 bg-slate-800/50 rounded animate-pulse"></div>
                   <div className="h-4 w-28 bg-slate-800/50 rounded animate-pulse"></div>
+                  <div className="h-4 w-36 bg-slate-800/50 rounded animate-pulse"></div>
                 </div>
               </div>
             ))}
 
-            {/* Contact Column - Always Last */}
-            <div>
-              <h4 className="text-white font-semibold mb-6">Contact Us</h4>
-              <ul className="space-y-4 text-sm text-slate-400">
-                <li className="flex flex-col gap-1">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider">Email Address</span>
-                  <a href="mailto:hello@totan.ai" className="text-white hover:text-purple-400 transition-colors font-medium">
+            {/* Contact Info Column - Always Last */}
+            <div className="lg:col-span-2 xl:col-span-2">
+              <h4 className="text-white font-bold text-lg mb-8 tracking-tight">Contact Info</h4>
+              <ul className="space-y-6">
+                <li className="flex items-start gap-3">
+                  <Phone size={18} className="text-purple-500 mt-1 flex-shrink-0" />
+                  <div className="flex flex-col gap-1">
+                    <a href="tel:+17627603015" className="text-slate-400 hover:text-white transition-colors text-base">+1 (762) 760-3015</a>
+                    <a href="tel:+919887603015" className="text-slate-400 hover:text-white transition-colors text-base">+91-9887603015</a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Mail size={18} className="text-purple-500 mt-1 flex-shrink-0" />
+                  <a href="mailto:hello@totan.ai" className="text-slate-400 hover:text-white transition-colors text-base break-all">
                     hello@totan.ai
                   </a>
                 </li>
-                <li className="flex flex-col gap-1">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider">Support</span>
-                  <a href="mailto:support@totan.ai" className="text-white hover:text-purple-400 transition-colors font-medium">
-                    support@totan.ai
-                  </a>
+                <li className="flex items-start gap-3">
+                  <MapPin size={18} className="text-purple-500 mt-1 flex-shrink-0" />
+                  <span className="text-slate-400 text-base leading-relaxed">
+                    Custom AI Solutions, Global Office
+                  </span>
                 </li>
               </ul>
             </div>
+        </div>
+
+        {/* Bottom Copyright */}
+        <div className="pt-10 border-t border-slate-800/50 flex flex-col md:flex-row justify-center items-center gap-4 text-center">
+            <p className="text-slate-500 text-sm font-medium">
+              © {new Date().getFullYear()} Totan AI Automation Solutions. All rights reserved.
+            </p>
         </div>
       </div>
     </footer>
