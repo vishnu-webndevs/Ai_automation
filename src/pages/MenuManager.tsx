@@ -197,6 +197,11 @@ const MenuManager = () => {
   const [expandedIds, setExpandedIds] = useState<Record<number, boolean>>({});
   const [editingIds, setEditingIds] = useState<Record<number, boolean>>({});
 
+  // Clear error when inputs change
+  useEffect(() => {
+    setError(null);
+  }, [newLabel, newCustomUrl, newPageId, newLinkType, location]);
+
   const tree = useMemo(() => buildTree(items), [items]);
   const parentOptions = useMemo(() => items.map((i) => ({ id: i.id, label: i.label })), [items]);
   const linkTypeChoices: Array<{ value: LinkType; label: string }> = [
@@ -1039,6 +1044,12 @@ const MenuManager = () => {
                   </label>
                 </div>
               </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-gray-100">
+                <Button onClick={handleAddItem} disabled={loading} className="px-10">
+                    Add to Menu
+                </Button>
             </div>
           </div>
         </CardBody>
