@@ -12,7 +12,9 @@ const Footer: React.FC = () => {
     location.pathname === '/' ||
     location.pathname === '/home' ||
     location.pathname.startsWith('/services/');
-  const { data: menuData } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
+  
+  const { data: quickLinks } = useSWR('menu-footer-primary', () => menuService.getByLocation('footer-primary').catch(() => null));
+  const { data: servicesLinks } = useSWR('menu-footer-secondary', () => menuService.getByLocation('footer-secondary').catch(() => null));
 
   return (
     <footer className="relative pt-20 pb-10 overflow-hidden">
@@ -35,73 +37,72 @@ const Footer: React.FC = () => {
           </div>
         )}
 
-        <div className="border-t border-slate-800 pt-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-            <div className="col-span-2 lg:col-span-1">
-               <a href="#" className="flex items-center gap-2 mb-4">
-                  <img src="/totan_logo.png" alt="Totan AI" className="w-[80px] h-auto" />
+        <div className="border-t border-slate-800 pt-12 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-12 mb-12">
+            <div className="col-span-1 lg:col-span-1">
+               <a href="/" className="flex items-center gap-2 mb-4">
+                  <img src="/totan_logo.png" alt="Totan AI" className="w-[100px] h-auto" />
                </a>
-               <p className="text-slate-500 text-sm">© Totan.ai - All rights reserved.</p>
+               <p className="text-slate-500 text-sm mb-6">© Totan.ai - All rights reserved.</p>
+               <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Twitter size={16} /></div>
+                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Github size={16} /></div>
+                  <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Linkedin size={16} /></div>
+               </div>
             </div>
 
-            {/* Dynamic Footer Menu */}
-            {menuData?.items && menuData.items.some(item => item.children && item.children.length > 0) ? (
-               // Hierarchical Menu (Columns)
-               menuData.items.map((column) => (
-                  <div key={column.id}>
-                     <h4 className="text-white font-semibold mb-4">{column.label}</h4>
-                     <ul className="space-y-2 text-sm text-slate-400">
-                        {column.children?.map((link) => (
-                           <li key={link.id}>
-                               <a href={link.url} className="hover:text-purple-400" target={link.target}>
-                                   {link.label}
-                               </a>
-                           </li>
-                        ))}
-                     </ul>
-                  </div>
-               ))
-            ) : (
-               // Flat Menu (Fallback to single column or grid)
-               <div className="col-span-2 md:col-span-3 lg:col-span-4">
-                  <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-                  <ul className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-sm text-slate-400">
-                     {menuData?.items?.map((link) => (
-                        <li key={link.id}>
-                            <a href={link.url} className="hover:text-purple-400" target={link.target}>
-                                {link.label}
-                            </a>
-                        </li>
-                     ))}
-                  </ul>
-               </div>
-            )}
-            
-            {!menuData && (
-               <>
-                  <div>
-                    <div className="h-5 w-24 bg-slate-800/50 rounded mb-4 animate-pulse"></div>
-                    <div className="space-y-2">
-                        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
-                        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="h-5 w-24 bg-slate-800/50 rounded mb-4 animate-pulse"></div>
-                    <div className="space-y-2">
-                        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
-                    </div>
-                  </div>
-               </>
-            )}
+            {/* Quick Links Column */}
+            <div>
+              <h4 className="text-white font-semibold mb-6">Quick Links</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
+                {quickLinks?.items?.map((link) => (
+                  <li key={link.id}>
+                    <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+                {!quickLinks && [1, 2, 3].map(i => (
+                  <li key={i} className="h-4 w-24 bg-slate-800/50 rounded animate-pulse"></li>
+                ))}
+              </ul>
+            </div>
 
-        </div>
-        
-        <div className="flex gap-4 mb-4">
-             <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Twitter size={16} /></div>
-             <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Github size={16} /></div>
-             <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-purple-600 transition-colors cursor-pointer"><Linkedin size={16} /></div>
-        </div>
+            {/* Services Column */}
+            <div>
+              <h4 className="text-white font-semibold mb-6">Services</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
+                {servicesLinks?.items?.map((link) => (
+                  <li key={link.id}>
+                    <a href={link.url} className="hover:text-purple-400 transition-colors" target={link.target}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+                {!servicesLinks && [1, 2, 3, 4].map(i => (
+                  <li key={i} className="h-4 w-32 bg-slate-800/50 rounded animate-pulse"></li>
+                ))}
+              </ul>
+            </div>
 
+            {/* Contact Column */}
+            <div>
+              <h4 className="text-white font-semibold mb-6">Contact Us</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
+                <li className="flex flex-col gap-1">
+                  <span className="text-slate-500 text-xs uppercase tracking-wider">Email Address</span>
+                  <a href="mailto:hello@totan.ai" className="text-white hover:text-purple-400 transition-colors font-medium">
+                    hello@totan.ai
+                  </a>
+                </li>
+                <li className="flex flex-col gap-1">
+                  <span className="text-slate-500 text-xs uppercase tracking-wider">Support</span>
+                  <a href="mailto:support@totan.ai" className="text-white hover:text-purple-400 transition-colors font-medium">
+                    support@totan.ai
+                  </a>
+                </li>
+              </ul>
+            </div>
+        </div>
       </div>
     </footer>
   );

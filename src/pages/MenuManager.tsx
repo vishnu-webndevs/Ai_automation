@@ -773,7 +773,8 @@ const MenuManager = () => {
               disabled={loading}
             >
               <option value="header-main">Header</option>
-              <option value="footer-primary">Footer</option>
+              <option value="footer-primary">Footer (Quick Links)</option>
+              <option value="footer-secondary">Footer (Services)</option>
               <option value="sidebar-quick">Mobile</option>
             </select>
             {activeMenu && (
