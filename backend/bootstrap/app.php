@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.permission' => \App\Http\Middleware\EnsureAdminPermission::class,
         ]);
 
+        $middleware->append(\App\Http\Middleware\BlockMaliciousRequests::class);
         $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
