@@ -1,4 +1,4 @@
-import { Bot, Github, Twitter, Linkedin } from 'lucide-react';
+import { Bot, Github, Twitter, Linkedin, Facebook, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -53,9 +53,11 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} Totan AI. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a href="#" className="text-slate-500 hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-white transition-colors"><Twitter className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-white transition-colors"><Linkedin className="w-5 h-5" /></a>
+            <a href="https://www.facebook.com/people/TotanAI/61588253724105/" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors" title="Facebook"><Facebook className="w-5 h-5" /></a>
+            <a href="https://www.instagram.com/totan_ai/" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors" title="Instagram"><Instagram className="w-5 h-5" /></a>
+            <a href="https://www.linkedin.com/company/totan-ai/" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors" title="LinkedIn"><Linkedin className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-500 hover:text-white transition-colors" title="Twitter"><Twitter className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-500 hover:text-white transition-colors" title="GitHub"><Github className="w-5 h-5" /></a>
           </div>
         </div>
       </div>

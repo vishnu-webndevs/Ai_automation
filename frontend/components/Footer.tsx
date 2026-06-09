@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { Github, Twitter, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import { Github, Twitter, Linkedin, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
 import useSWR from "swr";
 import { menuService } from "../services/api";
 
@@ -62,22 +62,45 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex gap-4">
               <a
+                href="https://www.facebook.com/people/TotanAI/61588253724105/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Facebook"
+                className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href="https://www.instagram.com/totan_ai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Instagram"
+                className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
+              >
+                <Instagram size={18} />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/totan-ai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="LinkedIn"
+                className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
                 href="#"
+                title="Twitter"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Twitter size={18} />
               </a>
               <a
                 href="#"
+                title="GitHub"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Github size={18} />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
-              >
-                <Linkedin size={18} />
               </a>
             </div>
           </div>
