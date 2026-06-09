@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Particles from '@/components/Particles';
+import Script from 'next/script';
 
 import '@/index.css';
 
@@ -22,7 +23,9 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <head>
         <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
-        <script
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

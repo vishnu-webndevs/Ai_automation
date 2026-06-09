@@ -27,6 +27,7 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
       });
     }
 
+    let animationFrameId: number;
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
       
@@ -46,7 +47,7 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
         ctx.fill();
       });
 
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     const handleResize = () => {
@@ -59,6 +60,7 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 

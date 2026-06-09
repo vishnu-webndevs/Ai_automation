@@ -24,10 +24,17 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   let meta_title = '';
   let meta_description = '';
   let og_image = '';
+  let canonical_url = '';
+  let noindex = false;
+  let nofollow = false;
+  let twitter_card = 'summary_large_image';
   
   const first = slugArray[0];
   const second = slugArray.length > 1 ? slugArray[1] : null;
   const third = slugArray.length > 2 ? slugArray[2] : null;
+  
+  const slugPath = slugArray.join('/');
+  const fullUrl = `https://totan.ai/${slugPath}`;
 
   try {
     let data: any = null;
@@ -49,9 +56,6 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
     else if (first === 'integrations') {
       if (second) data = await integrationService.getBySlug(second);
     }
-    // For blogs it hits /blogs endpoint which is paginated, or /pages/{slug} ? 
-    // In Original App, BlogDetail is just a mapped dynamic page mostly, or has its own API?
-    // Let's fallback to pageService if it's not a known prefix
     else {
       // It's a dynamic page!
       const catchAllSlug = slugArray.join('/');
@@ -64,10 +68,14 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
     }
 
     if (data) {
-      // The API often returns { seo_meta: {...}, title: '...' }
-      meta_title = data.seo_meta?.meta_title || data.seo_meta?.og_title || data.title || data.name || 'Totan.ai';
-      meta_description = data.seo_meta?.meta_description || data.seo_meta?.og_description || '';
-      og_image = data.seo_meta?.og_image || '';
+      const meta = data.seo_meta;
+      meta_title = meta?.meta_title || meta?.og_title || data.title || data.name || '';
+      meta_description = meta?.meta_description || meta?.og_description || '';
+      og_image = meta?.og_image || '';
+      canonical_url = meta?.canonical_url || '';
+      noindex = meta?.noindex || false;
+      nofollow = meta?.nofollow || false;
+      twitter_card = meta?.twitter_card || 'summary_large_image';
     }
 
   } catch (error) {
@@ -76,13 +84,31 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   }
 
   // Final fallback
-  if (!meta_title) meta_title = 'Totan AI Automation Services';
+  if (!meta_title) meta_title = first.charAt(0).toUpperCase() + first.slice(1) + ' | Totan AI';
 
   return {
     title: meta_title,
     description: meta_description,
+    alternates: {
+      canonical: canonical_url || fullUrl,
+    },
     openGraph: {
-      images: og_image ? [og_image] : [],
+      title: meta_title,
+      description: meta_description,
+      url: fullUrl,
+      siteName: 'Totan AI',
+      images: og_image ? [{ url: og_image }] : [{ url: 'https://totan.ai/totan_logo.png' }],
+      type: 'website',
+    },
+    twitter: {
+      card: twitter_card as any,
+      title: meta_title,
+      description: meta_description,
+      images: og_image ? [og_image] : ['https://totan.ai/totan_logo.png'],
+    },
+    robots: {
+      index: !noindex,
+      follow: !nofollow,
     }
   };
 }
@@ -144,10 +170,20 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     console.error("Failed to fetch initial data for SSR:", error);
   }
 
+  const schema = initialData?.seo_meta?.schema_markup || null;
+
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
-      <ClientWrapper slug={slugArray} initialData={initialData} />
-    </Suspense>
+    <>
+      {schema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      )}
+      <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
+        <ClientWrapper slug={slugArray} initialData={initialData} />
+      </Suspense>
+    </>
   );
 }
 
