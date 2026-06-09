@@ -89,15 +89,69 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
 
 import { Suspense } from 'react';
 
-export default function DynamicRoute({ params }: { params: { slug: string[] } }) {
+export default async function DynamicRoute({ params }: { params: { slug: string[] } }) {
+  const slugArray = params.slug || [];
+  
+  if (slugArray.length === 0) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
+        <ClientWrapper slug={slugArray} />
+      </Suspense>
+    );
+  }
+
+  const first = slugArray[0];
+  const second = slugArray.length > 1 ? slugArray[1] : null;
+  const third = slugArray.length > 2 ? slugArray[2] : null;
+
+  let initialData: any = null;
+
+  try {
+    if (first === 'services') {
+      if (second === 'category' && third) {
+        initialData = await serviceCategoryService.getBySlug(third);
+      } else if (second) {
+        initialData = await serviceService.getBySlug(second);
+      }
+    } 
+    else if (first === 'industries' && second) {
+      initialData = await industryService.getBySlug(second);
+    } 
+    else if (first === 'use-cases' && second) {
+      initialData = await useCaseService.getBySlug(second);
+    } 
+    else if (first === 'solutions' && second) {
+      initialData = await solutionService.getBySlug(second);
+    } 
+    else if (first === 'integrations' && second) {
+      initialData = await integrationService.getBySlug(second);
+    }
+    else if (first === 'blog') {
+      if (second === 'category' && third) {
+        initialData = await blogCategoryService.getBySlug(third);
+      } else if (second && second !== 'categories') {
+        initialData = await pageService.getBySlug(second);
+      }
+    }
+    else {
+      const catchAllSlug = slugArray.join('/');
+      initialData = await pageService.getBySlug(catchAllSlug);
+      if (!initialData) {
+        initialData = STATIC_PAGES[catchAllSlug] || null;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch initial data for SSR:", error);
+  }
+
   return (
     <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
-      <ClientWrapper slug={params.slug} />
+      <ClientWrapper slug={slugArray} initialData={initialData} />
     </Suspense>
   );
 }
 
 // Separate client component to avoid passing non-serializable data from server component if needed
-function ClientWrapper({ slug }: { slug: string[] }) {
-  return <ClientRouter slug={slug} />;
+function ClientWrapper({ slug, initialData }: { slug: string[]; initialData?: any }) {
+  return <ClientRouter slug={slug} initialData={initialData} />;
 }

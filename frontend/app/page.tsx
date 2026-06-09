@@ -26,14 +26,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import { Suspense } from 'react';
 
-export default function HomePage() {
+export default async function HomePage() {
+  let initialData: any = null;
+  try {
+    initialData = await pageService.getBySlug('home');
+  } catch (e) {
+    initialData = STATIC_PAGES['home'] || null;
+  }
+
   return (
     <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
-      <ClientWrapper slug="home" />
+      <ClientWrapper slug="home" initialData={initialData} />
     </Suspense>
   );
 }
 
-function ClientWrapper({ slug }: { slug: string }) {
-  return <ClientRouter slug={slug} />;
+function ClientWrapper({ slug, initialData }: { slug: string; initialData?: any }) {
+  return <ClientRouter slug={slug} initialData={initialData} />;
 }
