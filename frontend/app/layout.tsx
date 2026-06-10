@@ -22,6 +22,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          if (typeof window !== 'undefined' && window.trustedTypes && window.trustedTypes.createPolicy && !window.trustedTypes.defaultPolicy) {
+            window.trustedTypes.createPolicy('default', {
+              createHTML: function(string) { return string; },
+              createScript: function(string) { return string; },
+              createScriptURL: function(string) { return string; }
+            });
+          }
+        `}} />
         <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
         <Script
           id="gtm-script"

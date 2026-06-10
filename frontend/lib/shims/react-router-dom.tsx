@@ -36,12 +36,11 @@ export const useParams = <T extends Record<string, string | undefined> = Record<
 
 export const useLocation = () => {
     const pathname = usePathname();
-    const searchParams = useNextSearchParams();
     return React.useMemo(() => ({
         pathname: pathname || '/',
-        search: searchParams?.toString() ? '?' + searchParams.toString() : '',
+        search: '',
         hash: ''
-    }), [pathname, searchParams]);
+    }), [pathname]);
 };
 
 export const useSearchParams = () => {

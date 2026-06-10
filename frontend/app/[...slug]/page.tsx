@@ -85,6 +85,7 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
 
   // Final fallback
   if (!meta_title) meta_title = first.charAt(0).toUpperCase() + first.slice(1) + ' | Totan AI';
+  if (!meta_description) meta_description = 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.';
 
   return {
     title: meta_title,
