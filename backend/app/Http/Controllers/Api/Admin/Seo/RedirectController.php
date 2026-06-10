@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin\Seo;
 use App\Http\Controllers\Controller;
 use App\Models\Redirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RedirectController extends Controller
 {
@@ -31,6 +32,7 @@ class RedirectController extends Controller
         }
 
         $redirect = Redirect::create($validated);
+        Cache::forget('public_redirects');
 
         return response()->json($redirect, 201);
     }
@@ -64,6 +66,7 @@ class RedirectController extends Controller
         }
 
         $redirect->update($validated);
+        Cache::forget('public_redirects');
 
         return response()->json($redirect);
     }
@@ -105,6 +108,7 @@ class RedirectController extends Controller
     {
         $redirect = Redirect::findOrFail($id);
         $redirect->delete();
+        Cache::forget('public_redirects');
 
         return response()->json(null, 204);
     }
