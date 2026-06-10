@@ -66,6 +66,7 @@ const Footer: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Facebook"
+                aria-label="Visit Facebook Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Facebook size={18} />
@@ -75,6 +76,7 @@ const Footer: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Instagram"
+                aria-label="Visit Instagram Profile"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Instagram size={18} />
@@ -84,6 +86,7 @@ const Footer: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="LinkedIn"
+                aria-label="Visit LinkedIn Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Linkedin size={18} />
@@ -91,6 +94,7 @@ const Footer: React.FC = () => {
               <a
                 href="#"
                 title="Twitter"
+                aria-label="Visit Twitter Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Twitter size={18} />
@@ -98,6 +102,7 @@ const Footer: React.FC = () => {
               <a
                 href="#"
                 title="GitHub"
+                aria-label="Visit GitHub Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Github size={18} />
