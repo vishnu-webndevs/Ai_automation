@@ -43,6 +43,13 @@ class BlockMaliciousRequests
             }
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        $host = $request->getHost();
+        if ($host === 'api.totan.ai' || $host === 'admin.totan.ai' || ($host !== 'totan.ai' && $host !== 'www.totan.ai')) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+        }
+
+        return $response;
     }
 }

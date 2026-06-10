@@ -8,6 +8,13 @@ Route::get('/', function () {
 });
 
 Route::get('/robots.txt', function () {
+    $host = request()->getHost();
+    
+    // Check if the request is for a subdomain (e.g., api.totan.ai or admin.totan.ai)
+    if ($host === 'api.totan.ai' || $host === 'admin.totan.ai' || ($host !== 'totan.ai' && $host !== 'www.totan.ai')) {
+        return response("User-agent: *\nDisallow: /\n", 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
     $env = config('app.env');
     $baseUrl = rtrim(env('FRONTEND_URL', env('PUBLIC_SITE_URL', config('app.url'))), '/');
     $sitemapUrl = $baseUrl . '/sitemap.xml';
