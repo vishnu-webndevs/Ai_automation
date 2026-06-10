@@ -113,9 +113,9 @@ const Footer: React.FC = () => {
           {/* Dynamic Columns from Admin Panel */}
           {dynamicColumns.map((column) => (
             <div key={column.id} className="lg:col-span-4">
-              <h4 className="text-white font-bold text-lg mb-8 tracking-tight">
+              <h3 className="text-white font-bold text-lg mb-8 tracking-tight">
                 {column.label}
-              </h4>
+              </h3>
               <ul className="space-y-4">
                 {column.children?.map((link) => (
                   <li key={link.id}>
@@ -147,9 +147,9 @@ const Footer: React.FC = () => {
 
           {/* Contact Info Column - Always Last */}
           <div className="lg:col-span-4 xl:col-span-4">
-            <h4 className="text-white font-bold text-lg mb-8 tracking-tight">
+            <h3 className="text-white font-bold text-lg mb-8 tracking-tight">
               Contact Info
-            </h4>
+            </h3>
             <ul className="space-y-6">
               <li className="flex items-start gap-3">
                 <Phone size={18} className="text-purple-500 mt-1 flex-shrink-0" />

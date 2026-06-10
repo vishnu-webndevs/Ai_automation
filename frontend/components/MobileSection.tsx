@@ -31,7 +31,7 @@ const MobileSection: React.FC<MobileSectionProps> = ({
                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4">
                     ⚡
                  </div>
-                 <h4 className="text-white font-semibold text-lg">Welcome Back!</h4>
+                 <div className="text-white font-semibold text-lg">Welcome Back!</div>
                  
                  <div className="w-full space-y-3">
                     <input type="text" placeholder="hello@cruip.com" className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-purple-500" disabled />

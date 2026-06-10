@@ -54,7 +54,7 @@ const WhyTrust: React.FC<WhyTrustProps> = ({
                 <div className="mb-4 bg-slate-800/50 w-10 h-10 flex items-center justify-center rounded-lg border border-slate-700/50 group-hover:bg-slate-800 transition-colors">
                    {f.icon && iconMap[f.icon] ? iconMap[f.icon] : <Zap className="text-slate-400" />}
                 </div>
-                <h4 className="text-white font-semibold text-lg mb-2">{f.title}</h4>
+                <h3 className="text-white font-semibold text-lg mb-2">{f.title}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{f.desc}</p>
              </div>
            ))}
