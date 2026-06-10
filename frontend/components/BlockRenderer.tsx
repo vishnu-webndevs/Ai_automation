@@ -279,7 +279,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
                                 <span className="flex-1 text-lg font-medium text-slate-200 group-hover:text-purple-400 transition-colors">
                                     {link.text}
                                 </span>
-                                <svg className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5 text-slate-400 group-hover:text-purple-400 transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>

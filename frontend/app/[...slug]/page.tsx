@@ -139,6 +139,12 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
         initialData = await serviceCategoryService.getBySlug(third);
       } else if (second) {
         initialData = await serviceService.getBySlug(second);
+      } else {
+        const [services, categories] = await Promise.all([
+          serviceService.getAll().catch(() => []),
+          serviceCategoryService.getAll().catch(() => [])
+        ]);
+        initialData = { services, categories };
       }
     } 
     else if (first === 'industries' && second) {
@@ -158,6 +164,12 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
         initialData = await blogCategoryService.getBySlug(third);
       } else if (second && second !== 'categories') {
         initialData = await pageService.getBySlug(second);
+      } else {
+        const [blogData, categories] = await Promise.all([
+          pageService.getBlogs(1).catch(() => null),
+          blogCategoryService.getAll().catch(() => [])
+        ]);
+        initialData = { blogData, categories };
       }
     }
     else {

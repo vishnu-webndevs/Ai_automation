@@ -184,7 +184,7 @@ const Footer: React.FC = () => {
 
         {/* Bottom Copyright */}
         <div className="pt-10 border-t border-slate-800/50 flex flex-col md:flex-row justify-center items-center gap-4 text-center">
-          <p className="text-slate-500 text-sm font-medium">
+          <p className="text-slate-400 text-sm font-medium">
             © {new Date().getFullYear()} Totan AI Automation Solutions. All
             rights reserved.
           </p>

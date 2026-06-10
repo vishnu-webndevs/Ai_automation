@@ -39,7 +39,7 @@ const MobileSection: React.FC<MobileSectionProps> = ({
                     <button className="w-full bg-white text-slate-900 font-semibold py-2 rounded-lg text-sm mt-2">Continue →</button>
                  </div>
                  
-                 <div className="text-xs text-slate-500 mt-4">or login with</div>
+                 <div className="text-xs text-slate-400 mt-4">or login with</div>
                  <div className="flex gap-4">
                     <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 text-xs">Tw</div>
                     <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 text-xs">Gi</div>

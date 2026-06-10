@@ -127,5 +127,146 @@ export const STATIC_PAGES: Record<string, Page> = {
             twitter_card: null,
             schema_markup: null
         }
+    },
+    'about-us': {
+        id: 4,
+        title: 'About Us',
+        slug: 'about-us',
+        status: 'published',
+        template_slug: undefined,
+        sections: [
+            {
+                id: 51,
+                name: 'Hero',
+                type: 'full-width',
+                content: {},
+                order: 0,
+                blocks: [
+                    {
+                        id: 80,
+                        block_type: 'heading',
+                        order: 0,
+                        content: 'Welcome to Our Company' as any
+                    },
+                    {
+                        id: 81,
+                        block_type: 'paragraph',
+                        order: 1,
+                        content: 'Learn more about our story, our mission, and the values that drive us towards excellence. We are committed to delivering top-notch services across various industries.' as any
+                    }
+                ]
+            },
+            {
+                id: 52,
+                name: 'Features',
+                type: 'default',
+                content: {},
+                order: 1,
+                blocks: [
+                    {
+                        id: 82,
+                        block_type: 'heading',
+                        order: 0,
+                        content: 'What Sets Us Apart' as any
+                    },
+                    {
+                        id: 83,
+                        block_type: 'list',
+                        order: 1,
+                        content: [
+                            'Exceptional Customer Service',
+                            'Innovative Solutions',
+                            'Proven Expertise',
+                            'Sustainable Practices'
+                        ] as any
+                    }
+                ]
+            },
+            {
+                id: 53,
+                name: 'CTA',
+                type: 'full-width',
+                content: {},
+                order: 2,
+                blocks: [
+                    {
+                        id: 84,
+                        block_type: 'heading',
+                        order: 0,
+                        content: 'Join Us on Our Journey' as any
+                    },
+                    {
+                        id: 85,
+                        block_type: 'paragraph',
+                        order: 1,
+                        content: 'We invite you to explore our services and discover how we can make a difference together. Connect with us today to learn more.' as any
+                    },
+                    {
+                        id: 86,
+                        block_type: 'button',
+                        order: 2,
+                        content: {
+                            url: '/contact',
+                            label: 'Contact Us'
+                        } as any
+                    }
+                ]
+            },
+            {
+                id: 54,
+                name: 'FAQs',
+                type: 'default',
+                content: {},
+                order: 1000,
+                blocks: [
+                    {
+                        id: 87,
+                        block_type: 'faq_list',
+                        order: 0,
+                        content: [
+                            {
+                                question: 'What is your mission?',
+                                answer: 'Our mission is to provide innovative solutions that enhance the lives of our customers while ensuring sustainable and ethical business practices.'
+                            },
+                            {
+                                question: 'How can I get in touch with you?',
+                                answer: 'You can contact us via the contact form on our website or call us at our customer service number available on the contact page.'
+                            }
+                        ] as any
+                    }
+                ]
+            },
+            {
+                id: 55,
+                name: 'Internal Links',
+                type: 'default',
+                content: {},
+                order: 1001,
+                blocks: [
+                    {
+                        id: 88,
+                        block_type: 'internal_links',
+                        order: 0,
+                        content: [
+                            { url: '/services', text: 'Our Services' },
+                            { url: '/contact', text: 'Contact' }
+                        ] as any
+                    }
+                ]
+            }
+        ],
+        seo_meta: {
+            id: 10,
+            meta_title: 'About Us - Professional Overview',
+            meta_description: 'Discover who we are, our mission, and the values that guide us. Learn more about our journey.',
+            canonical_url: null,
+            og_title: 'About Us - Professional Overview',
+            og_description: 'Discover who we are, our mission, and the values that guide us. Learn more about our journey.',
+            og_image: null,
+            twitter_card: null,
+            noindex: false,
+            nofollow: false,
+            schema_markup: null
+        }
     }
 };

@@ -42,37 +42,44 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
         const second = pathArray.length > 1 ? pathArray[1] : null;
         const third = pathArray.length > 2 ? pathArray[2] : null;
 
-        let cacheKey: string | null = null;
         if (first === 'home' || pathArray.length === 0) {
-            cacheKey = '/pages/home';
+            return { '/pages/home': initialData };
         } else if (first === 'services') {
             if (second === 'category' && third) {
-                cacheKey = `service-category-${third}`;
+                return { [`service-category-${third}`]: initialData };
             } else if (second) {
-                cacheKey = `service-${second}`;
+                return { [`service-${second}`]: initialData };
+            } else {
+                return {
+                    'services': initialData?.services || [],
+                    'service-categories': initialData?.categories || []
+                };
             }
         } else if (first === 'industries' && second) {
-            cacheKey = `industry-${second}`;
+            return { [`industry-${second}`]: initialData };
         } else if (first === 'use-cases' && second) {
-            cacheKey = `use-case-${second}`;
+            return { [`use-case-${second}`]: initialData };
         } else if (first === 'solutions' && second) {
-            cacheKey = `solution-${second}`;
+            return { [`solution-${second}`]: initialData };
         } else if (first === 'integrations' && second) {
-            cacheKey = `integration-${second}`;
+            return { [`integration-${second}`]: initialData };
         } else if (first === 'tools' && second) {
-            cacheKey = `tool-${second}`;
+            return { [`tool-${second}`]: initialData };
         } else if (first === 'blog') {
             if (second === 'category' && third) {
-                cacheKey = `blog-category-${third}`;
+                return { [`blog-category-${third}`]: initialData };
             } else if (second && second !== 'categories') {
-                cacheKey = `blog-${second}`;
+                return { [`blog-${second}`]: initialData };
+            } else {
+                return {
+                    'blogs': initialData?.blogData || null,
+                    'blog-categories': initialData?.categories || []
+                };
             }
         } else {
             const catchAllSlug = pathArray.join('/');
-            cacheKey = `/pages/${catchAllSlug}`;
+            return { [`/pages/${catchAllSlug}`]: initialData };
         }
-
-        return cacheKey ? { [cacheKey]: initialData } : {};
     }, [initialData, pathArray]);
 
     const renderContent = () => {
