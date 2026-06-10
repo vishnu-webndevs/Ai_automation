@@ -83,7 +83,7 @@ const BlogModernTemplate: React.FC<TemplateProps> = ({ page }) => {
                                             <Link to={`/${post.slug}`} className="flex gap-4">
                                                 <div className="w-16 h-16 bg-slate-700 rounded-lg overflow-hidden flex-shrink-0">
                                                     {post.seo_meta?.og_image ? (
-                                                        <img src={post.seo_meta.og_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                        <img src={post.seo_meta.og_image} alt={post.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-500">📝</div>
                                                     )}

@@ -56,6 +56,8 @@ const BlogList: React.FC = () => {
                                         <img
                                             src={blog.seo_meta.og_image}
                                             alt={blog.title}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                     ) : (
@@ -117,6 +119,7 @@ const BlogList: React.FC = () => {
                             </h2>
                             <input
                                 type="text"
+                                aria-label="Search articles"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search articles..."

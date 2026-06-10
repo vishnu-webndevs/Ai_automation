@@ -52,6 +52,10 @@ const Footer: React.FC = () => {
               <img
                 src="/totan_logo.png"
                 alt="Totan AI"
+                loading="lazy"
+                decoding="async"
+                width="120"
+                height="120"
                 className="w-[120px] h-auto"
               />
             </a>

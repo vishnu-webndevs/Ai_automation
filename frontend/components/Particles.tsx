@@ -14,7 +14,8 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
     let height = canvas.height = window.innerHeight;
 
     const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
-    const particleCount = 60; // Adjust for density
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 15 : 60; // Adjust for density
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({

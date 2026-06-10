@@ -27,7 +27,7 @@ const BlogCategoryDetail: React.FC = () => {
                         >
                             {blog.seo_meta?.og_image && (
                                 <div className="h-48 overflow-hidden">
-                                    <img src={blog.seo_meta.og_image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <img src={blog.seo_meta.og_image} alt={blog.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                 </div>
                             )}
                             <div className="p-6 flex-1 flex flex-col">

@@ -32,6 +32,8 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                             <img 
                             src={item.image} 
                             alt={item.author} 
+                            loading="lazy"
+                            decoding="async"
                             className="rounded-full w-full h-full object-cover border-2 border-slate-900"
                             />
                         </div>

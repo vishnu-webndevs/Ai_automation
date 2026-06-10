@@ -94,6 +94,8 @@ const BlogDetail: React.FC = () => {
                                 <img
                                     src={featuredImage}
                                     alt={page.title}
+                                    fetchPriority="high"
+                                    decoding="async"
                                     className="w-full h-full max-h-[420px] object-cover"
                                 />
                             </div>
@@ -119,6 +121,7 @@ const BlogDetail: React.FC = () => {
                             <h2 className="text-sm font-semibold text-white mb-3">Search</h2>
                             <input
                                 type="text"
+                                aria-label="Search articles"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search articles..."

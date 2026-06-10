@@ -76,6 +76,8 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 <img 
                                     src={blog.seo_meta.og_image} 
                                     alt={blog.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                             ) : (
@@ -142,6 +144,8 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 <img 
                                     src={blog.seo_meta.og_image} 
                                     alt={blog.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                             ) : (
