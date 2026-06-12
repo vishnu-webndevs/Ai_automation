@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { useCaseService } from '../services/api';
 import { Link } from 'react-router-dom';
 
-const UseCaseList: React.FC = () => {
-    const { data: useCases, isLoading } = useSWR('use-cases', useCaseService.getAll);
+const UseCaseList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: useCases, isLoading } = useSWR('use-cases', useCaseService.getAll, {
+        fallbackData: initialData
+    });
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading use cases...</div>;
 

@@ -3,9 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { blogCategoryService } from '../services/api';
 
-const BlogCategoryDetail: React.FC = () => {
+const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams() as { slug: string };
-    const { data: category, isLoading, error } = useSWR(slug ? `blog-category-${slug}` : null, () => blogCategoryService.getBySlug(slug as string));
+    const { data: category, isLoading, error } = useSWR(
+        slug ? `blog-category-${slug}` : null, 
+        () => blogCategoryService.getBySlug(slug as string),
+        { fallbackData: initialData }
+    );
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading category...</div>;
     if (error || !category) return <div className="text-center py-20 text-white">Category not found</div>;

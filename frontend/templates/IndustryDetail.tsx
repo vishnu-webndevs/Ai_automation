@@ -3,9 +3,13 @@ import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { industryService } from '../services/api';
 
-const IndustryDetail: React.FC = () => {
+const IndustryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
-    const { data: industry, isLoading, error } = useSWR(slug ? `industry-${slug}` : null, () => industryService.getBySlug(slug!));
+    const { data: industry, isLoading, error } = useSWR(
+        slug ? `industry-${slug}` : null, 
+        () => industryService.getBySlug(slug!),
+        { fallbackData: initialData }
+    );
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading industry...</div>;
     if (error || !industry) return <div className="text-center py-20 text-white">Industry not found</div>;

@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { blogCategoryService } from '../services/api';
 import { Link } from 'react-router-dom';
 
-const BlogCategoryList: React.FC = () => {
-    const { data: categories, isLoading } = useSWR('blog-categories', blogCategoryService.getAll);
+const BlogCategoryList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: categories, isLoading } = useSWR('blog-categories', blogCategoryService.getAll, {
+        fallbackData: initialData?.categories
+    });
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading categories...</div>;
 

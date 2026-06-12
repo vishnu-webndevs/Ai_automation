@@ -95,45 +95,45 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
         switch (first) {
             // Services
             case 'services':
-                if (!second) return <ServiceList />;
-                if (second === 'category' && third) return <ServiceCategoryDetail />;
-                return <ServiceDetail />;
+                if (!second) return <ServiceList initialData={initialData} />;
+                if (second === 'category' && third) return <ServiceCategoryDetail initialData={initialData} />;
+                return <ServiceDetail initialData={initialData} />;
             
             // Industries
             case 'industries':
-                if (!second) return <IndustryList />;
-                return <IndustryDetail />;
+                if (!second) return <IndustryList initialData={initialData} />;
+                return <IndustryDetail initialData={initialData} />;
                 
             // Use Cases
             case 'use-cases':
-                if (!second) return <UseCaseList />;
-                return <UseCaseDetail />;
+                if (!second) return <UseCaseList initialData={initialData} />;
+                return <UseCaseDetail initialData={initialData} />;
                 
             // Blog
             case 'blog':
-                if (!second) return <BlogList />;
-                if (second === 'categories' && !third) return <BlogCategoryList />;
-                if (second === 'category' && third) return <BlogCategoryDetail />;
-                return <BlogDetail />;
+                if (!second) return <BlogList initialData={initialData} />;
+                if (second === 'categories' && !third) return <BlogCategoryList initialData={initialData} />;
+                if (second === 'category' && third) return <BlogCategoryDetail initialData={initialData} />;
+                return <BlogDetail initialData={initialData} />;
                 
             // Solutions
             case 'solutions':
-                if (!second) return <SolutionList />;
-                return <SolutionDetail />;
+                if (!second) return <SolutionList initialData={initialData} />;
+                return <SolutionDetail initialData={initialData} />;
                 
             // Tools
             case 'tools':
-                if (!second) return <ToolsList />;
-                return <ToolDetail />;
+                if (!second) return <ToolsList initialData={initialData} />;
+                return <ToolDetail initialData={initialData} />;
                 
             // Integrations
             case 'integrations':
-                if (!second) return <IntegrationList />;
-                return <IntegrationDetail />;
+                if (!second) return <IntegrationList initialData={initialData} />;
+                return <IntegrationDetail initialData={initialData} />;
                 
             // Platform
             case 'platform':
-                return <PlatformList />;
+                return <PlatformList initialData={initialData} />;
                 
             // Static Pages
             case 'contact-us': return <ContactPage />;

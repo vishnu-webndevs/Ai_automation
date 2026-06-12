@@ -4,9 +4,13 @@ import { Link } from 'react-router-dom';
 import { pageService, blogCategoryService } from '../services/api';
 import type { BlogCategory, Page } from '../types';
 
-const BlogList: React.FC = () => {
-    const { data: blogData, isLoading } = useSWR('blogs', () => pageService.getBlogs(1));
-    const { data: categories } = useSWR<BlogCategory[]>('blog-categories', blogCategoryService.getAll);
+const BlogList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: blogData, isLoading } = useSWR('blogs', () => pageService.getBlogs(1), {
+        fallbackData: initialData?.blogData
+    });
+    const { data: categories } = useSWR<BlogCategory[]>('blog-categories', blogCategoryService.getAll, {
+        fallbackData: initialData?.categories
+    });
     const blogs: Page[] = blogData?.data || [];
 
     const [search, setSearch] = useState('');

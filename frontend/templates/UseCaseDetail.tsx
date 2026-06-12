@@ -3,9 +3,13 @@ import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { useCaseService } from '../services/api';
 
-const UseCaseDetail: React.FC = () => {
+const UseCaseDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
-    const { data: useCase, isLoading, error } = useSWR(slug ? `use-case-${slug}` : null, () => useCaseService.getBySlug(slug!));
+    const { data: useCase, isLoading, error } = useSWR(
+        slug ? `use-case-${slug}` : null, 
+        () => useCaseService.getBySlug(slug!),
+        { fallbackData: initialData }
+    );
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading use case...</div>;
     if (error || !useCase) return <div className="text-center py-20 text-white">Use Case not found</div>;

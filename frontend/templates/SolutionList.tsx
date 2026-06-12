@@ -3,10 +3,12 @@ import useSWR from 'swr';
 import { solutionService } from '../services/api';
 import { Link, useLocation } from 'react-router-dom';
 
-const SolutionList: React.FC = () => {
+const SolutionList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const location = useLocation();
     const isToolsRoute = location.pathname.startsWith('/tools');
-    const { data: solutions, isLoading } = useSWR('solutions', solutionService.getAll);
+    const { data: solutions, isLoading } = useSWR('solutions', solutionService.getAll, {
+        fallbackData: initialData
+    });
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading solutions...</div>;
 

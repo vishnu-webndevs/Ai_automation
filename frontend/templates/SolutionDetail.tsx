@@ -3,11 +3,15 @@ import { useLocation, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { solutionService } from '../services/api';
 
-const SolutionDetail: React.FC = () => {
+const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const location = useLocation();
     const isToolsRoute = location.pathname.startsWith('/tools/');
     const { slug } = useParams<{ slug: string }>();
-    const { data: solution, isLoading, error } = useSWR(slug ? `solution-${slug}` : null, () => solutionService.getBySlug(slug!));
+    const { data: solution, isLoading, error } = useSWR(
+        slug ? `solution-${slug}` : null, 
+        () => solutionService.getBySlug(slug!),
+        { fallbackData: initialData }
+    );
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading solution...</div>;
     if (error || !solution) return <div className="text-center py-20 text-white">Solution not found</div>;

@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { integrationService } from '../services/api';
 import { Link } from 'react-router-dom';
 
-const IntegrationList: React.FC = () => {
-    const { data: integrations, isLoading } = useSWR('integrations', integrationService.getAll);
+const IntegrationList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: integrations, isLoading } = useSWR('integrations', integrationService.getAll, {
+        fallbackData: initialData
+    });
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading integrations...</div>;
 

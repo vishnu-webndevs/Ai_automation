@@ -3,11 +3,12 @@ import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { solutionService } from '../services/api';
 
-const ToolDetail: React.FC = () => {
+const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
     const { data: tool, isLoading, error } = useSWR(
         slug ? `tool-${slug}` : null,
-        () => solutionService.getBySlug(slug!)
+        () => solutionService.getBySlug(slug!),
+        { fallbackData: initialData }
     );
 
     if (isLoading) {

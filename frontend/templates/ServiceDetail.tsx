@@ -72,11 +72,17 @@ const SectionShell: React.FC<{
     </section>
 );
 
-const ServiceDetail: React.FC = () => {
+const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
     const [searchParams] = useSearchParams();
-    const { data: service, isLoading, error } = useSWR(slug ? `service-${slug}` : null, () => serviceService.getBySlug(slug!));
-    const { data: allServices } = useSWR('services-all', () => serviceService.getAll());
+    const { data: service, isLoading, error } = useSWR(
+        slug ? `service-${slug}` : null, 
+        () => serviceService.getBySlug(slug!),
+        { fallbackData: initialData }
+    );
+    const { data: allServices } = useSWR('services-all', () => serviceService.getAll(), {
+        fallbackData: initialData ? [initialData] : undefined
+    });
     const [quickEmail, setQuickEmail] = useState('');
     const [quickMessage, setQuickMessage] = useState('');
     const [quickSubmitting, setQuickSubmitting] = useState(false);

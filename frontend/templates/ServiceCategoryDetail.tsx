@@ -11,11 +11,12 @@ const toMetaDescription = (value: string) => {
     return normalized.slice(0, 157).trim() + '...';
 };
 
-const ServiceCategoryDetail: React.FC = () => {
+const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
     const { data: category, isLoading, error } = useSWR<ServiceCategory>(
         slug ? `service-category-${slug}` : null,
-        () => serviceCategoryService.getBySlug(slug!)
+        () => serviceCategoryService.getBySlug(slug!),
+        { fallbackData: initialData }
     );
 
     const metaTitle = useMemo(() => {

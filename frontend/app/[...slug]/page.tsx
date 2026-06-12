@@ -46,15 +46,27 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
     } 
     else if (first === 'industries') {
       if (second) data = await industryService.getBySlug(second);
+      else meta_title = 'Industries We Serve | Totan AI';
     } 
     else if (first === 'use-cases') {
       if (second) data = await useCaseService.getBySlug(second);
+      else meta_title = 'AI Use Cases & Workflows | Totan AI';
     } 
     else if (first === 'solutions') {
       if (second) data = await solutionService.getBySlug(second);
+      else meta_title = 'AI Solutions for Enterprise | Totan AI';
     } 
     else if (first === 'integrations') {
       if (second) data = await integrationService.getBySlug(second);
+      else meta_title = 'Ecosystem Integrations | Totan AI';
+    }
+    else if (first === 'tools') {
+      if (second) data = await solutionService.getBySlug(second).catch(() => null);
+      else meta_title = 'AI Tools & Automations | Totan AI';
+    }
+    else if (first === 'blog') {
+      if (!second) meta_title = 'Insights & Blog | Totan AI';
+      else if (second === 'category' && third) data = await blogCategoryService.getBySlug(third);
     }
     else {
       // It's a dynamic page!
@@ -147,17 +159,47 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
         initialData = { services, categories };
       }
     } 
-    else if (first === 'industries' && second) {
-      initialData = await industryService.getBySlug(second);
+    else if (first === 'industries') {
+      if (second) {
+        initialData = await industryService.getBySlug(second);
+      } else {
+        initialData = await industryService.getAll().catch(() => []);
+      }
     } 
-    else if (first === 'use-cases' && second) {
-      initialData = await useCaseService.getBySlug(second);
+    else if (first === 'use-cases') {
+      if (second) {
+        initialData = await useCaseService.getBySlug(second);
+      } else {
+        initialData = await useCaseService.getAll().catch(() => []);
+      }
     } 
-    else if (first === 'solutions' && second) {
-      initialData = await solutionService.getBySlug(second);
+    else if (first === 'solutions') {
+      if (second) {
+        initialData = await solutionService.getBySlug(second);
+      } else {
+        initialData = await solutionService.getAll().catch(() => []);
+      }
     } 
-    else if (first === 'integrations' && second) {
-      initialData = await integrationService.getBySlug(second);
+    else if (first === 'integrations') {
+      if (second) {
+        initialData = await integrationService.getBySlug(second);
+      } else {
+        initialData = await integrationService.getAll().catch(() => []);
+      }
+    }
+    else if (first === 'tools') {
+      if (second) {
+        initialData = await solutionService.getBySlug(second).catch(() => null);
+      } else {
+        initialData = await solutionService.getAll().catch(() => []);
+      }
+    }
+    else if (first === 'platform') {
+      const [solutions, integrations] = await Promise.all([
+        solutionService.getAll().catch(() => []),
+        integrationService.getAll().catch(() => [])
+      ]);
+      initialData = { solutions, integrations };
     }
     else if (first === 'blog') {
       if (second === 'category' && third) {

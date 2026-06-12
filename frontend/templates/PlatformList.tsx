@@ -3,9 +3,13 @@ import useSWR from 'swr';
 import { solutionService, integrationService } from '../services/api';
 import { Link } from 'react-router-dom';
 
-const PlatformList: React.FC = () => {
-    const { data: solutions, isLoading: loadingSolutions } = useSWR('solutions', solutionService.getAll);
-    const { data: integrations, isLoading: loadingIntegrations } = useSWR('integrations', integrationService.getAll);
+const PlatformList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: solutions, isLoading: loadingSolutions } = useSWR('solutions', solutionService.getAll, {
+        fallbackData: initialData?.solutions
+    });
+    const { data: integrations, isLoading: loadingIntegrations } = useSWR('integrations', integrationService.getAll, {
+        fallbackData: initialData?.integrations
+    });
 
     const isLoading = loadingSolutions || loadingIntegrations;
 

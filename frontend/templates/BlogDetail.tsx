@@ -6,11 +6,12 @@ import BlockRenderer from '../components/BlockRenderer';
 import SeoHead from '../components/seo/SeoHead';
 import type { BlogCategory, Page, PageSection } from '../types';
 
-const BlogDetail: React.FC = () => {
+const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
     const { data: page, isLoading, error } = useSWR<Page | undefined>(
         slug ? `blog-${slug}` : null,
-        () => pageService.getBySlug(slug!)
+        () => pageService.getBySlug(slug!),
+        { fallbackData: initialData }
     );
     const { data: recentPosts } = useSWR('recent-posts', () => pageService.getBlogs(1));
     const { data: categories } = useSWR<BlogCategory[]>('blog-categories', blogCategoryService.getAll);

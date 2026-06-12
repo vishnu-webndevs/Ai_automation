@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { industryService } from '../services/api';
 import { Link } from 'react-router-dom';
 
-const IndustryList: React.FC = () => {
-    const { data: industries, isLoading } = useSWR('industries', industryService.getAll);
+const IndustryList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: industries, isLoading } = useSWR('industries', industryService.getAll, {
+        fallbackData: initialData
+    });
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading industries...</div>;
 

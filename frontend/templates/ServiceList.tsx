@@ -3,9 +3,13 @@ import useSWR from 'swr';
 import { Link } from 'react-router-dom';
 import { serviceCategoryService, serviceService } from '../services/api';
 
-const ServiceList: React.FC = () => {
-    const { data: services, error, isLoading } = useSWR('services', serviceService.getAll);
-    const { data: categories } = useSWR('service-categories', serviceCategoryService.getAll);
+const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: services, error, isLoading } = useSWR('services', serviceService.getAll, {
+        fallbackData: initialData?.services
+    });
+    const { data: categories } = useSWR('service-categories', serviceCategoryService.getAll, {
+        fallbackData: initialData?.categories
+    });
 
     const totalServices = services?.length || 0;
     const totalCategories = categories?.length || 0;

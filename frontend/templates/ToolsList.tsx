@@ -3,8 +3,10 @@ import useSWR from 'swr';
 import { Link } from 'react-router-dom';
 import { solutionService } from '../services/api';
 
-const ToolsList: React.FC = () => {
-    const { data: tools, isLoading } = useSWR('solutions', solutionService.getAll);
+const ToolsList: React.FC<{ initialData?: any }> = ({ initialData }) => {
+    const { data: tools, isLoading } = useSWR('solutions', solutionService.getAll, {
+        fallbackData: initialData
+    });
     const [search, setSearch] = useState('');
     const [showActiveOnly, setShowActiveOnly] = useState(true);
 

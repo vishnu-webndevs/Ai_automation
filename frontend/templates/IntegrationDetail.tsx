@@ -3,9 +3,13 @@ import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { integrationService } from '../services/api';
 
-const IntegrationDetail: React.FC = () => {
+const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { slug } = useParams<{ slug: string }>();
-    const { data: integration, isLoading, error } = useSWR(slug ? `integration-${slug}` : null, () => integrationService.getBySlug(slug!));
+    const { data: integration, isLoading, error } = useSWR(
+        slug ? `integration-${slug}` : null, 
+        () => integrationService.getBySlug(slug!),
+        { fallbackData: initialData }
+    );
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading integration...</div>;
     if (error || !integration) return <div className="text-center py-20 text-white">Integration not found</div>;
