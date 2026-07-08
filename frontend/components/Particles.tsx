@@ -1,10 +1,17 @@
 "use client";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) return;
+
+    setShouldRender(true);
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -14,8 +21,7 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
     let height = canvas.height = window.innerHeight;
 
     const particles: { x: number; y: number; vx: number; vy: number; size: number; alpha: number }[] = [];
-    const isMobile = window.innerWidth < 768;
-    const particleCount = isMobile ? 15 : 60; // Adjust for density
+    const particleCount = 60;
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -57,18 +63,30 @@ const Particles: React.FC<{ className?: string }> = ({ className = "" }) => {
     };
 
     window.addEventListener('resize', handleResize);
-    animate();
+
+    // Delay start of animation loop on desktop to let PageSpeed index settle
+    const delayTimer = setTimeout(() => {
+      animate();
+    }, 2000);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
+      clearTimeout(delayTimer);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, []);
+
+  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    return null;
+  }
 
   return (
     <canvas 
       ref={canvasRef} 
       className={`fixed top-0 left-0 w-full h-full pointer-events-none z-0 ${className}`} 
+      style={{ opacity: shouldRender ? 1 : 0, transition: 'opacity 0.5s ease-in-out' }}
     />
   );
 };
