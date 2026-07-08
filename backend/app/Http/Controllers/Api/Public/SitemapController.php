@@ -27,6 +27,9 @@ class SitemapController extends Controller
 
                 $items = [];
                 foreach ($locs as $name => $loc) {
+                    if (!$this->hasUrls($name)) {
+                        continue;
+                    }
                     $items[] = [
                         'loc' => $loc,
                         'lastmod' => $this->computeLastmod($name),
@@ -345,11 +348,95 @@ XSL;
                 }
                 return $this->toAtom(collect($lastmods)->filter()->max());
             }
+
+            if ($name === 'industries' && Schema::hasTable('industries') && Schema::hasColumn('industries', 'updated_at')) {
+                $q = $this->applyIsActiveFilter(Industry::query(), 'industries');
+                return $this->toAtom($q->max('updated_at'));
+            }
+
+            if ($name === 'use-cases' && Schema::hasTable('use_cases') && Schema::hasColumn('use_cases', 'updated_at')) {
+                $q = $this->applyIsActiveFilter(UseCase::query(), 'use_cases');
+                return $this->toAtom($q->max('updated_at'));
+            }
+
+            if ($name === 'solutions' && Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'updated_at')) {
+                $q = $this->applyIsActiveFilter(Solution::query(), 'solutions');
+                return $this->toAtom($q->max('updated_at'));
+            }
+
+            if ($name === 'integrations' && Schema::hasTable('integrations') && Schema::hasColumn('integrations', 'updated_at')) {
+                $q = $this->applyIsActiveFilter(Integration::query(), 'integrations');
+                return $this->toAtom($q->max('updated_at'));
+            }
+
+            if ($name === 'tools' && Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'updated_at')) {
+                $q = $this->applyIsActiveFilter(Solution::query(), 'solutions');
+                return $this->toAtom($q->max('updated_at'));
+            }
         } catch (\Throwable $e) {
             $this->safeReport($e);
         }
 
         return null;
+    }
+
+    private function hasUrls(string $name): bool
+    {
+        try {
+            if ($name === 'pages') {
+                if (!Schema::hasTable('pages')) return false;
+                $q = Page::query();
+                if (Schema::hasColumn('pages', 'status')) {
+                    $q->where('status', 'published');
+                }
+                if (Schema::hasColumn('pages', 'type')) {
+                    $q->where('type', '!=', 'blog');
+                }
+                return $q->exists();
+            }
+
+            if ($name === 'services') {
+                if (!Schema::hasTable('services')) return false;
+                return $this->applyIsActiveFilter(Service::query(), 'services')->exists();
+            }
+
+            if ($name === 'blogs') {
+                if (!Schema::hasTable('pages')) return false;
+                $q = Page::query()->where('type', 'blog');
+                if (Schema::hasColumn('pages', 'status')) {
+                    $q->where('status', 'published');
+                }
+                return $q->exists();
+            }
+
+            if ($name === 'industries') {
+                if (!Schema::hasTable('industries')) return false;
+                return $this->applyIsActiveFilter(Industry::query(), 'industries')->exists();
+            }
+
+            if ($name === 'use-cases') {
+                if (!Schema::hasTable('use_cases')) return false;
+                return $this->applyIsActiveFilter(UseCase::query(), 'use_cases')->exists();
+            }
+
+            if ($name === 'solutions') {
+                if (!Schema::hasTable('solutions')) return false;
+                return $this->applyIsActiveFilter(Solution::query(), 'solutions')->exists();
+            }
+
+            if ($name === 'integrations') {
+                if (!Schema::hasTable('integrations')) return false;
+                return $this->applyIsActiveFilter(Integration::query(), 'integrations')->exists();
+            }
+
+            if ($name === 'tools') {
+                if (!Schema::hasTable('solutions')) return false;
+                return $this->applyIsActiveFilter(Solution::query(), 'solutions')->exists();
+            }
+        } catch (\Throwable $e) {
+            $this->safeReport($e);
+        }
+        return false;
     }
 
     private function toAtom($value): ?string
