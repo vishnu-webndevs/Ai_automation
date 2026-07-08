@@ -566,6 +566,60 @@ class PageController extends Controller
         }
     }
 
+    public function generateText(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:industry,use-case,solution,integration',
+            'model' => 'required|in:lorum,openai,gemini',
+            'tone' => 'sometimes|nullable|string',
+        ]);
+
+        $name = $validated['name'];
+        $type = $validated['type'];
+        $model = $validated['model'];
+        $tone = $validated['tone'] ?? 'Professional';
+
+        try {
+            if ($model === 'lorum') {
+                $text = "This is a professionally generated {$tone} explanation and overview for the {$type} named '{$name}'. It contains human-sounding insights and details designed to captivate your audience, improve conversion rates, and convey the core value proposition of Totan AI's automation platform.";
+                if ($type === 'use-case') {
+                    $text = "<p>This is a professionally generated <strong>{$tone} use case</strong> details for <em>{$name}</em>.</p><p>It covers key operational bottlenecks, dynamic workflows, and custom artificial intelligence pipelines that revolutionize business efficiency.</p><ul><li>Automatic trigger detection</li><li>Intelligent routing and data formatting</li><li>Seamless CRM & API synchronization</li></ul>";
+                }
+                return response()->json([
+                    'text' => $text
+                ]);
+            }
+
+            $aiService = $this->aiManager->createService($model);
+
+            if ($type === 'use-case') {
+                $prompt = "Generate highly engaging, professional, and SEO-friendly detailed HTML content for the use case named '{$name}'. Use a {$tone} tone. The content must feel natural, humanized, and highly persuasive. Use clean HTML tags (such as paragraphs, lists, bold text, subheadings) but NO outer html/body tags. You MUST return strictly valid JSON content in this exact format: {\"text\": \"<p>HTML content here...</p>\"}. Return only the JSON object without markdown fences.";
+            } else {
+                $prompt = "Generate a highly engaging, professional, and SEO-friendly description (approximately 100-150 words) for the {$type} named '{$name}'. Use a {$tone} tone. The description must feel natural, humanized, and highly persuasive. You MUST return strictly valid JSON content in this exact format: {\"text\": \"Generated description text goes here...\"}. Return only the JSON object without markdown fences.";
+            }
+
+            $generated = $aiService->generatePageContent([
+                'prompt_override' => $prompt,
+                'model' => $model
+            ]);
+
+            $text = $generated['text'] ?? $generated['content'] ?? null;
+
+            if (empty($text)) {
+                throw new \Exception("AI service did not return a valid 'text' field. Response: " . json_encode($generated));
+            }
+
+            return response()->json([
+                'text' => $text
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('AI Text Generation Failed: ' . $e->getMessage());
+            return response()->json(['message' => 'AI Text Generation Failed', 'error' => $e->getMessage()], 500);
+        }
+    }
+
     private function buildPageStructureDescription(Page $page): string
     {
         $parts = [];

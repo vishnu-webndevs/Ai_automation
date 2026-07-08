@@ -108,6 +108,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/ai/generate-page-bulk', [PageController::class, 'bulkGenerate'])->middleware('throttle:ai-generation');
         Route::post('/ai/generate-service', [ServiceController::class, 'generateContent'])->middleware('throttle:ai-generation');
         Route::post('/ai/generate-service-bulk', [ServiceController::class, 'bulkGenerateContent'])->middleware('throttle:ai-generation');
+        Route::post('/ai/generate-text', [PageController::class, 'generateText'])->middleware('throttle:ai-generation');
 
         // Page Templates
         Route::get('/page-templates', [PageTemplateController::class, 'index']);

@@ -170,6 +170,15 @@ export const scanMediaUsage = async () => {
     return api.post('/media/scan-usage');
 };
 
+export const generateText = async (data: {
+    name: string;
+    type: 'industry' | 'use-case' | 'solution' | 'integration';
+    model: 'lorum' | 'openai' | 'gemini';
+    tone?: string;
+}) => {
+    return api.post('/ai/generate-text', data);
+};
+
 export const generatePageContent = async (data: any) => {
     return api.post('/ai/generate-page', data);
 };

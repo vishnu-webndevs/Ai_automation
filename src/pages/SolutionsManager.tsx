@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink } from 'lucide-react';
-import { api, toggleLock, FRONTEND_URL, listPageTemplates } from '../api';
+import { Plus, Search, Edit, Trash2, Lock, Unlock, ExternalLink, Sparkles } from 'lucide-react';
+import { api, toggleLock, FRONTEND_URL, listPageTemplates, generateText } from '../api';
+import { useFlash } from '../contexts/FlashContext';
 
 type TemplateSummary = { id: number; name: string; slug: string };
 
@@ -28,6 +29,38 @@ const SolutionsManager = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSolution, setCurrentSolution] = useState<Partial<Solution>>({});
     const [searchTerm, setSearchTerm] = useState('');
+    const flash = useFlash();
+
+    // AI Generation States
+    const [aiModel, setAiModel] = useState<'lorum' | 'openai' | 'gemini'>('lorum');
+    const [aiTone, setAiTone] = useState('Professional');
+    const [generatingText, setGeneratingText] = useState(false);
+
+    const handleGenerateDescription = async () => {
+        if (!currentSolution.name) {
+            flash.error('Please enter a Solution Name first.');
+            return;
+        }
+        setGeneratingText(true);
+        try {
+            const res = await generateText({
+                name: currentSolution.name,
+                type: 'solution',
+                model: aiModel,
+                tone: aiTone
+            });
+            setCurrentSolution(prev => ({
+                ...prev,
+                description: res.data.text
+            }));
+            flash.success('Description generated successfully!');
+        } catch (e: any) {
+            console.error(e);
+            flash.error(e?.response?.data?.message || 'Failed to generate description');
+        } finally {
+            setGeneratingText(false);
+        }
+    };
 
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(20);
@@ -423,6 +456,44 @@ const SolutionsManager = () => {
                                     value={currentSolution.description || ''}
                                     onChange={(e) => setCurrentSolution({ ...currentSolution, description: e.target.value })}
                                 />
+                            </div>
+                            <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-3 space-y-2 mb-4">
+                                <div className="text-xs font-semibold text-blue-800 uppercase tracking-wider">AI Assistant</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-bold text-gray-500 mb-0.5">Model</label>
+                                        <select
+                                            value={aiModel}
+                                            onChange={(e) => setAiModel(e.target.value as any)}
+                                            className="w-full text-xs p-1 border rounded bg-white"
+                                        >
+                                            <option value="lorum">Lorum (Mock)</option>
+                                            <option value="openai">OpenAI</option>
+                                            <option value="gemini">Gemini</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-bold text-gray-500 mb-0.5">Tone</label>
+                                        <select
+                                            value={aiTone}
+                                            onChange={(e) => setAiTone(e.target.value)}
+                                            className="w-full text-xs p-1 border rounded bg-white"
+                                        >
+                                            <option value="Professional">Professional</option>
+                                            <option value="Casual">Casual</option>
+                                            <option value="Technical">Technical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    disabled={generatingText || !currentSolution.name}
+                                    onClick={handleGenerateDescription}
+                                    className="w-full py-1.5 px-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                                >
+                                    <Sparkles size={14} />
+                                    {generatingText ? 'Generating...' : 'Generate Description with AI'}
+                                </button>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
