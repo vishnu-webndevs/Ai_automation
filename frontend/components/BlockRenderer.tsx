@@ -18,6 +18,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 interface BlockRendererProps {
     block: ContentBlock;
     page?: Page;
+    isFirstHeading?: boolean;
 }
 
 const FAQItem = ({ item }: { item: { question: string; answer: string } }) => {
@@ -103,7 +104,7 @@ const LatestServicesBlock = ({ heading, count = 3 }: any) => {
     );
 };
 
-const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
+const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page, isFirstHeading }) => {
     // Handle potential API vs Static data differences
     const type = block.block_type || block.type;
     const content = block.content || block.content_json || {};
@@ -201,8 +202,16 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page }) => {
                 </div>
             );
 
-        // Basic Content Blocks
         case 'heading':
+            if (isFirstHeading) {
+                return (
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+                        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 drop-shadow-sm leading-tight mb-2">
+                            {typeof content === 'string' ? content : content.text || ''}
+                        </h1>
+                    </div>
+                );
+            }
             return (
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
                     <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">

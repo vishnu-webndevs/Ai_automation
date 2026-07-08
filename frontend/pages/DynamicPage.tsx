@@ -7,7 +7,7 @@ import BlockRenderer from '../components/BlockRenderer';
 import { STATIC_PAGES } from '../data/static-fallbacks';
 import { getTemplateComponent } from '../templates/TemplateLoader';
 
-const DynamicPage: React.FC = () => {
+const DynamicPage: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const params = useParams();
     const slugParam = params['*'] || 'home';
     const slug = (slugParam as string) || 'home';
@@ -16,6 +16,7 @@ const DynamicPage: React.FC = () => {
         slug ? `/pages/${slug}` : null,
         () => pageService.getBySlug(slug as string),
         {
+            fallbackData: initialData,
             shouldRetryOnError: false,
             revalidateOnFocus: false,
             revalidateIfStale: false
@@ -47,6 +48,26 @@ const DynamicPage: React.FC = () => {
         const type = firstBlock.block_type || firstBlock.type;
         return type === 'hero';
     }, [page]);
+
+    // Find the very first heading block on the page if there is no Hero block
+    const firstHeadingBlockId = useMemo(() => {
+        if (hasHero) return null;
+        if (!page?.sections?.length) return null;
+        
+        const sortedSections = [...page.sections].sort((a, b) => a.order - b.order);
+        for (const sec of sortedSections) {
+            if (sec.blocks?.length) {
+                const sortedBlocks = [...sec.blocks].sort((a, b) => a.order - b.order);
+                for (const blk of sortedBlocks) {
+                    const type = blk.block_type || blk.type;
+                    if (type === 'heading') {
+                        return blk.id;
+                    }
+                }
+            }
+        }
+        return null;
+    }, [page, hasHero]);
 
     // Show loading only if we are waiting for API AND have no fallback
     if (isLoading && !page) {
@@ -94,7 +115,11 @@ const DynamicPage: React.FC = () => {
                 >
                     {/* Render Blocks within Section */}
                     {section.blocks?.sort((a, b) => a.order - b.order).map((block) => (
-                        <BlockRenderer key={block.id} block={block} />
+                        <BlockRenderer 
+                            key={block.id} 
+                            block={block} 
+                            isFirstHeading={block.id === firstHeadingBlockId}
+                        />
                     ))}
                 </section>
             ))}
