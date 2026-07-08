@@ -6,6 +6,13 @@ let lastFetch = 0;
 const CACHE_TTL = 60000; // 1 minute
 
 export async function middleware(request: NextRequest) {
+  const host = request.headers.get('host') || '';
+  if (host.startsWith('www.')) {
+    const nonWwwHost = host.slice(4);
+    const destination = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${nonWwwHost}`);
+    return NextResponse.redirect(destination.toString(), 301);
+  }
+
   const path = request.nextUrl.pathname;
   
   // Skip static files, images, and api routes to avoid unnecessary overhead
