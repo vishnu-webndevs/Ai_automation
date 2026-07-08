@@ -1,0 +1,12 @@
+# Totan AI
+
+> Custom AI Agents & Automation Solutions
+
+Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize business operations.
+
+## Key Resources
+- [About Us](https://totan.ai/about-us): Learn about our team, our mission, and the values that drive us.
+- [Services](https://totan.ai/services): Explore our artificial intelligence, ML agents, and custom automation solutions.
+- [Blog](https://totan.ai/blog): Read our latest articles and tech trends in AI.
+- [Contact Us](https://totan.ai/contact-us): Get in touch with our team for custom AI solutions.
+- [Sitemap](https://totan.ai/sitemap.xml): The XML sitemap containing all crawlable pages.
