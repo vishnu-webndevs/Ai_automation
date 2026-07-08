@@ -11,7 +11,7 @@ const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         { fallbackData: initialData }
     );
 
-    if (isLoading) {
+    if (isLoading && !tool) {
         return (
             <div className="bg-slate-900 min-h-screen flex items-center justify-center">
                 <p className="text-slate-200 text-lg">Loading tool...</p>

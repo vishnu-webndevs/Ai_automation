@@ -11,7 +11,7 @@ const PlatformList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         fallbackData: initialData?.integrations
     });
 
-    const isLoading = loadingSolutions || loadingIntegrations;
+    const isLoading = (loadingSolutions && !solutions) || (loadingIntegrations && !integrations);
 
     if (isLoading) return <div className="text-center py-20 text-white">Loading platform ecosystem...</div>;
 

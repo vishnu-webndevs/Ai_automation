@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { Github, Twitter, Linkedin, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
 import useSWR from "swr";
 import { menuService } from "../services/api";
 
-const Footer: React.FC = () => {
+const Footer: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   const location = useLocation();
   const hideCta =
     location.pathname === "/contact-us" ||
@@ -13,9 +13,9 @@ const Footer: React.FC = () => {
     location.pathname === "/home" ||
     location.pathname.startsWith("/services/");
 
-  const { data: footerMenu } = useSWR("menu-footer", () =>
-    menuService.getByLocation("footer").catch(() => null)
-  );
+  const { data: footerMenu } = useSWR("menu-footer", () => menuService.getByLocation("footer"), {
+    fallbackData: initialMenuData
+  });
 
   // Determine dynamic columns from menu
   const dynamicColumns = footerMenu?.items || [];
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-20">
           {/* Column 1: Logo & Description */}
           <div className="lg:col-span-4">
-            <a href="/" className="flex items-center gap-2 mb-6">
+            <Link to="/" className="flex items-center gap-2 mb-6">
               <img
                 src="/totan_logo.png"
                 alt="Totan AI"
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
                 height="120"
                 className="w-[120px] h-auto"
               />
-            </a>
+            </Link>
             <p className="text-slate-400 text-base leading-relaxed mb-8 max-w-sm">
               We specialize in the creation of custom AI solutions tailored to
               the specific needs of our clients around the world. Our team is

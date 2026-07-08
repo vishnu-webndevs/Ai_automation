@@ -23,7 +23,7 @@ const ToolsList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         });
     }, [tools, search, showActiveOnly]);
 
-    if (isLoading) {
+    if (isLoading && !tools) {
         return (
             <div className="bg-slate-900 min-h-screen flex items-center justify-center">
                 <p className="text-slate-300 text-lg">Loading tools...</p>

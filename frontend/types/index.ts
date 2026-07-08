@@ -129,6 +129,7 @@ export interface Page {
     industries?: Industry[];
     use_cases?: UseCase[];
     blog_categories?: BlogCategory[];
+    blog_tags?: any[];
     created_at?: string;
     updated_at?: string;
 }

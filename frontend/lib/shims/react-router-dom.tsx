@@ -1,7 +1,6 @@
-"use client";
 import React from 'react';
 import NextLink from 'next/link';
-import { useRouter, useParams as useNextParams, usePathname, useSearchParams as useNextSearchParams } from 'next/navigation';
+import { useRouter, useParams as useNextParams, usePathname } from 'next/navigation';
 
 export const Link = ({ to, children, className, onClick, ...props }: any) => {
     return (
@@ -38,17 +37,33 @@ export const useLocation = () => {
     const pathname = usePathname();
     return React.useMemo(() => ({
         pathname: pathname || '/',
-        search: '',
-        hash: ''
+        search: typeof window !== 'undefined' ? window.location.search : '',
+        hash: typeof window !== 'undefined' ? window.location.hash : ''
     }), [pathname]);
 };
 
 export const useSearchParams = () => {
-    const searchParams = useNextSearchParams();
+    const [params, setParams] = React.useState(() => {
+        if (typeof window === 'undefined') {
+            return new URLSearchParams();
+        }
+        return new URLSearchParams(window.location.search);
+    });
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const handleUrlChange = () => {
+                setParams(new URLSearchParams(window.location.search));
+            };
+            window.addEventListener('popstate', handleUrlChange);
+            return () => window.removeEventListener('popstate', handleUrlChange);
+        }
+    }, []);
+
     return [
-        searchParams || new URLSearchParams(), 
+        params,
         (newParams: any) => {
-            // Dummy setter to prevent crash for now, since Next.js uses router.push(?...) to mutate search params
+            // Dummy setter
         }
     ] as any;
 };

@@ -30,8 +30,34 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
         return toMetaDescription(base);
     }, [category]);
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading category...</div>;
+    const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
+
+    if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
     if (error || !category) return <div className="text-center py-20 text-white">Category not found</div>;
+
+    const faqs = [
+        {
+            question: `What custom automation services do you offer in ${category.name}?`,
+            answer: category.description || `We build bespoke AI agents, tools, and pipeline automations tailored to ${category.name}.`
+        },
+        {
+            question: `How do I request a custom solution for ${category.name}?`,
+            answer: `You can reach out to our team via our contact page or schedule an automation consultation directly.`
+        }
+    ];
+
+    const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map((faq) => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+            }
+        }))
+    };
 
     return (
         <div className="bg-slate-950 min-h-screen pt-28 pb-20">
@@ -40,20 +66,33 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
                 <meta name="description" content={metaDescription} />
             </Helmet>
 
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+            />
+
             <header className="px-4 sm:px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-sm text-slate-200">
+                    {/* Breadcrumbs */}
+                    <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
+                        <Link to="/" className="hover:text-white transition-colors">Home</Link>
+                        <span className="text-slate-600">/</span>
                         <Link to="/services" className="hover:text-white transition-colors">Services</Link>
-                        <span className="text-slate-500">/</span>
-                        <span className="text-slate-100">{category.name}</span>
+                        <span className="text-slate-600">/</span>
+                        <span className="text-slate-300">{category.name}</span>
                     </div>
 
-                    <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-white tracking-tight">
-                        {category.name} Services
-                    </h1>
-                    <p className="mt-4 text-base text-slate-300 max-w-3xl">
-                        {category.description || `Browse Totan.ai services in the ${category.name} category.`}
-                    </p>
+                    <div className="mb-6">
+                        <Link to="/services" className="inline-flex items-center text-sm font-semibold text-purple-400 hover:text-purple-300 transition-colors mb-6">
+                            &larr; Back to all services
+                        </Link>
+                        <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
+                            {category.name} Services
+                        </h1>
+                        <p className="mt-4 text-base text-slate-300 max-w-3xl leading-relaxed">
+                            {category.description || `Browse Totan.ai services in the ${category.name} category.`}
+                        </p>
+                    </div>
                 </div>
             </header>
 
@@ -69,10 +108,10 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
                                 <Link
                                     key={service.id}
                                     to={`/services/${service.slug}`}
-                                    className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-6 hover:border-slate-700 transition-colors"
+                                    className="group rounded-3xl bg-slate-900/45 border border-slate-800 p-6 hover:border-slate-700 transition-colors flex flex-col"
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-xl">
+                                    <div className="flex items-start gap-3 flex-1">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-xl flex-shrink-0">
                                             <span>{(service as any).icon || '🤖'}</span>
                                         </div>
                                         <div className="flex-1">
@@ -82,16 +121,39 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
                                             <p className="mt-2 text-base text-slate-300 leading-relaxed line-clamp-3">
                                                 {(service as any).short_description || 'Explore this service for workflows and outcomes.'}
                                             </p>
-                                            <div className="mt-4 inline-flex items-center text-sm font-semibold text-purple-300 group-hover:text-purple-200">
-                                                View service
-                                                <span className="ml-2 transition-transform group-hover:translate-x-0.5">→</span>
-                                            </div>
                                         </div>
+                                    </div>
+                                    <div className="mt-4 inline-flex items-center text-sm font-semibold text-purple-300 group-hover:text-purple-200">
+                                        View service
+                                        <span className="ml-2 transition-transform group-hover:translate-x-0.5">&rarr;</span>
                                     </div>
                                 </Link>
                             ))}
                         </div>
                     )}
+
+                    {/* FAQ Accordion Section */}
+                    <section className="mt-20 max-w-3xl mx-auto border-t border-slate-800 pt-16">
+                        <h2 className="text-2xl font-bold text-white mb-8 text-center">Frequently Asked Questions</h2>
+                        <div className="space-y-4">
+                            {faqs.map((faq, idx) => (
+                                <div key={idx} className="border border-slate-800 rounded-xl bg-slate-900/20 overflow-hidden">
+                                    <button 
+                                        onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                                        className="w-full text-left px-6 py-4 flex justify-between items-center text-slate-100 hover:text-white font-medium focus:outline-none"
+                                    >
+                                        <span>{faq.question}</span>
+                                        <span className="text-purple-400 text-lg">{activeFaq === idx ? '&minus;' : '+'}</span>
+                                    </button>
+                                    {activeFaq === idx && (
+                                        <div className="px-6 pb-4 text-slate-400 text-sm leading-relaxed border-t border-slate-850 pt-3">
+                                            {faq.answer}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </section>
                 </div>
             </main>
         </div>

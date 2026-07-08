@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { Helmet } from 'react-helmet-async';
 import { api, serviceService } from '../services/api';
@@ -482,7 +482,7 @@ const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         return items.map((label) => t(label));
     }, [resolvedContext.automationType, resolvedContext.city, resolvedContext.country, resolvedContext.industry, t]);
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading service...</div>;
+    if (isLoading && !service) return <div className="text-center py-20 text-white">Loading service...</div>;
     if (error || !service) return <div className="text-center py-20 text-white">Service not found</div>;
 
     return (
@@ -501,9 +501,9 @@ const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                     <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
                         <div className="lg:col-span-7">
                             <div className="text-sm text-slate-400 mb-4">
-                                <a href="/" className="hover:text-white transition-colors">Home</a>
+                                <Link to="/" className="hover:text-white transition-colors">Home</Link>
                                 <span className="mx-2 text-slate-600">/</span>
-                                <a href="/services" className="hover:text-white transition-colors">Services</a>
+                                <Link to="/services" className="hover:text-white transition-colors">Services</Link>
                                 <span className="mx-2 text-slate-600">/</span>
                                 <span className="text-slate-200">{serviceName}</span>
                             </div>

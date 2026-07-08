@@ -11,7 +11,7 @@ const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => 
         { fallbackData: initialData }
     );
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading integration...</div>;
+    if (isLoading && !integration) return <div className="text-center py-20 text-white">Loading integration...</div>;
     if (error || !integration) return <div className="text-center py-20 text-white">Integration not found</div>;
 
     return (

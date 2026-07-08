@@ -13,7 +13,7 @@ const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         { fallbackData: initialData }
     );
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading solution...</div>;
+    if (isLoading && !solution) return <div className="text-center py-20 text-white">Loading solution...</div>;
     if (error || !solution) return <div className="text-center py-20 text-white">Solution not found</div>;
 
     return (

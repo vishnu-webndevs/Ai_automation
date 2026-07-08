@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import useSWR from 'swr';
 import { Page, BlogCategory } from '../../types';
 import SectionRenderer from '../../components/SectionRenderer';
 import { blogCategoryService, pageService } from '../../services/api';
@@ -12,24 +13,13 @@ const BlogModernTemplate: React.FC<TemplateProps> = ({ page }) => {
     // Sort sections by order
     const sortedSections = [...(page.sections || [])].sort((a, b) => a.order - b.order);
 
-    const [categories, setCategories] = useState<BlogCategory[]>([]);
-    const [recentPosts, setRecentPosts] = useState<Page[]>([]);
+    const { data: catsData } = useSWR<BlogCategory[]>('blog-categories', () => blogCategoryService.getAll());
+    const categories = catsData || [];
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [cats, posts] = await Promise.all([
-                    blogCategoryService.getAll(),
-                    pageService.getBlogs(1)
-                ]);
-                setCategories(cats);
-                setRecentPosts(posts.data ? posts.data.slice(0, 5) : []);
-            } catch (error) {
-                console.error('Failed to fetch sidebar data', error);
-            }
-        };
-        fetchData();
-    }, []);
+    const { data: postsData } = useSWR('blogs-recent', () => pageService.getBlogs(1));
+    const recentPosts = useMemo(() => {
+        return postsData?.data ? postsData.data.slice(0, 5) : [];
+    }, [postsData]);
 
     return (
         <div className="blog-modern-template min-h-screen bg-slate-900 text-slate-200">
@@ -83,7 +73,7 @@ const BlogModernTemplate: React.FC<TemplateProps> = ({ page }) => {
                                             <Link to={`/${post.slug}`} className="flex gap-4">
                                                 <div className="w-16 h-16 bg-slate-700 rounded-lg overflow-hidden flex-shrink-0">
                                                     {post.seo_meta?.og_image ? (
-                                                        <img src={post.seo_meta.og_image} alt={post.title} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                                        <img src={post.seo_meta.og_image} alt={post.title} width={64} height={64} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-500">📝</div>
                                                     )}

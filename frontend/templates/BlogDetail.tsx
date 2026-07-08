@@ -36,7 +36,17 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
             .slice(0, 5);
     }, [otherPosts, search]);
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading article...</div>;
+    const prevNext = useMemo(() => {
+        const list = (recentPosts as any)?.data || [];
+        const index = list.findIndex((p: any) => p.id === page?.id);
+        if (index === -1) return { prev: null, next: null };
+        return {
+            prev: index < list.length - 1 ? list[index + 1] : null,
+            next: index > 0 ? list[index - 1] : null
+        };
+    }, [recentPosts, page?.id]);
+
+    if (isLoading && !page) return <div className="text-center py-20 text-white">Loading article...</div>;
     if (error || !page) return <div className="text-center py-20 text-white">Article not found</div>;
 
     const sortedSections: PageSection[] = [...(page.sections || [])].sort((a, b) => a.order - b.order);
@@ -65,6 +75,23 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
             <section className="relative pt-28 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden">
                 <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-r from-purple-700/40 via-purple-900/40 to-slate-950 pointer-events-none" />
                 <div className="relative max-w-6xl mx-auto">
+                    {/* Breadcrumbs */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mb-6">
+                        <Link to="/" className="hover:text-white transition-colors">Home</Link>
+                        <span className="text-slate-600">/</span>
+                        <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
+                        {page.blog_categories && page.blog_categories.length > 0 && (
+                            <>
+                                <span className="text-slate-600">/</span>
+                                <Link to={`/blog/category/${page.blog_categories[0].slug}`} className="hover:text-white transition-colors">
+                                    {page.blog_categories[0].name}
+                                </Link>
+                            </>
+                        )}
+                        <span className="text-slate-600">/</span>
+                        <span className="text-slate-300 line-clamp-1">{page.title}</span>
+                    </div>
+
                     <div className="mb-6">
                         <p className="text-xs font-semibold tracking-[0.25em] uppercase text-purple-300 mb-2">
                             Article
@@ -73,16 +100,35 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                             {page.title}
                         </h1>
                         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                            <span>{new Date(page.created_at || Date.now()).toLocaleDateString()}</span>
+                            <span>Published: {new Date(page.created_at || Date.now()).toLocaleDateString()}</span>
+                            <span>•</span>
+                            <span>Updated: {new Date(page.updated_at || page.created_at || Date.now()).toLocaleDateString()}</span>
+                            <span>•</span>
+                            <span>By Totan Team</span>
                             {page.blog_categories && page.blog_categories.length > 0 && (
                                 <>
-                                    <span className="text-slate-600">•</span>
+                                    <span>•</span>
                                     <span className="text-purple-300">
                                         {page.blog_categories.map((c: any) => c.name).join(', ')}
                                     </span>
                                 </>
                             )}
                         </div>
+
+                        {/* Tags */}
+                        {page.blog_tags && page.blog_tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-4">
+                                {page.blog_tags.map((tag: any) => (
+                                    <Link 
+                                        key={tag.id} 
+                                        to={`/blog/tag/${tag.slug}`} 
+                                        className="text-[10px] uppercase bg-slate-800/80 hover:bg-slate-700 px-3 py-1 rounded-full text-slate-300 transition-colors border border-slate-700/50"
+                                    >
+                                        #{tag.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -95,6 +141,8 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                 <img
                                     src={featuredImage}
                                     alt={page.title}
+                                    width={800}
+                                    height={420}
                                     fetchPriority="high"
                                     decoding="async"
                                     className="w-full h-full max-h-[420px] object-cover"
@@ -115,6 +163,25 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                 ))
                             )}
                         </div>
+
+                        {/* Previous / Next Article Navigation */}
+                        {(prevNext.prev || prevNext.next) && (
+                            <div className="mt-12 pt-6 border-t border-slate-800/80 flex justify-between gap-4">
+                                {prevNext.prev ? (
+                                    <Link to={`/blog/${prevNext.prev.slug}`} className="text-left group max-w-[45%]">
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Previous Post</p>
+                                        <p className="text-sm font-semibold text-slate-300 group-hover:text-purple-400 transition-colors line-clamp-1">{prevNext.prev.title}</p>
+                                    </Link>
+                                ) : <div />}
+                                
+                                {prevNext.next ? (
+                                    <Link to={`/blog/${prevNext.next.slug}`} className="text-right group max-w-[45%]">
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Next Post</p>
+                                        <p className="text-sm font-semibold text-slate-300 group-hover:text-purple-400 transition-colors line-clamp-1">{prevNext.next.title}</p>
+                                    </Link>
+                                ) : <div />}
+                            </div>
+                        )}
                     </article>
 
                     <aside className="space-y-6">

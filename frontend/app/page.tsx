@@ -49,12 +49,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import { prefetchBlockData } from '@/lib/prefetch';
+
 export default async function HomePage() {
   let initialData: any = null;
   try {
     initialData = await pageService.getBySlug('home');
   } catch (e) {
     initialData = STATIC_PAGES['home'] || null;
+  }
+
+  if (initialData) {
+    initialData._extraFallbacks = await prefetchBlockData(initialData, ['home']);
   }
 
   // Schema Markup (JSON-LD)
@@ -108,9 +114,7 @@ export default async function HomePage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       )}
-      <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">Loading...</div>}>
-        <ClientWrapper slug="home" initialData={initialData} />
-      </Suspense>
+      <ClientWrapper slug="home" initialData={initialData} />
     </>
   );
 }

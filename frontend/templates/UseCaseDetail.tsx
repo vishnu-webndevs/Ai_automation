@@ -11,7 +11,7 @@ const UseCaseDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         { fallbackData: initialData }
     );
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading use case...</div>;
+    if (isLoading && !useCase) return <div className="text-center py-20 text-white">Loading use case...</div>;
     if (error || !useCase) return <div className="text-center py-20 text-white">Use Case not found</div>;
 
     return (

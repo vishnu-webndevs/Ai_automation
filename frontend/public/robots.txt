@@ -1,3 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /search/
+Disallow: /*?*
+Disallow: /*&*
+
 Sitemap: https://totan.ai/sitemap.xml

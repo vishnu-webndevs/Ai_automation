@@ -4,9 +4,9 @@ import { Page, Menu, Service, Industry, UseCase, Solution, Integration, BlogCate
 const API_URL =
     (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) ||
     (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? 'http://localhost:8000/api'
+        ? 'http://127.0.0.1:8000/api'
         : (typeof process !== 'undefined' && process.env.NODE_ENV === 'development'
-            ? 'http://localhost:8000/api'
+            ? 'http://127.0.0.1:8000/api'
             : 'https://api.totan.ai/api'));
 
 export const api = axios.create({

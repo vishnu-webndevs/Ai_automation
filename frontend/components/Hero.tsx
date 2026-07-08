@@ -95,6 +95,8 @@ const Hero: React.FC<HeroProps> = ({
         <img 
           src={image} 
           alt={heading} 
+          width={600}
+          height={400}
           fetchPriority="high"
           decoding="async"
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"

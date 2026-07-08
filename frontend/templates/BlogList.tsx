@@ -25,7 +25,7 @@ const BlogList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         });
     }, [blogs, search]);
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading articles...</div>;
+    if (isLoading && !blogData) return <div className="text-center py-20 text-white">Loading articles...</div>;
 
     return (
         <div className="bg-slate-950 min-h-screen">
@@ -60,6 +60,8 @@ const BlogList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                         <img
                                             src={blog.seo_meta.og_image}
                                             alt={blog.title}
+                                            width={400}
+                                            height={250}
                                             loading="lazy"
                                             decoding="async"
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

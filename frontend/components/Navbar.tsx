@@ -115,12 +115,14 @@ const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => 
     );
 };
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const { data: menuData } = useSWR('menu-header-main', () => menuService.getByLocation('header-main').catch(() => null));
+  const { data: menuData } = useSWR('menu-header-main', () => menuService.getByLocation('header-main'), {
+    fallbackData: initialMenuData
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);

@@ -36,50 +36,53 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
     const pathArray = Array.isArray(slug) ? slug : [slug];
     
     const fallback = React.useMemo(() => {
-        if (!initialData) return {};
+        const res: Record<string, any> = {};
+        if (!initialData) return res;
 
         const first = pathArray[0];
         const second = pathArray.length > 1 ? pathArray[1] : null;
         const third = pathArray.length > 2 ? pathArray[2] : null;
 
         if (first === 'home' || pathArray.length === 0) {
-            return { '/pages/home': initialData };
+            res['/pages/home'] = initialData;
         } else if (first === 'services') {
             if (second === 'category' && third) {
-                return { [`service-category-${third}`]: initialData };
+                res[`service-category-${third}`] = initialData;
             } else if (second) {
-                return { [`service-${second}`]: initialData };
+                res[`service-${second}`] = initialData;
             } else {
-                return {
-                    'services': initialData?.services || [],
-                    'service-categories': initialData?.categories || []
-                };
+                res['services'] = initialData?.services || [];
+                res['service-categories'] = initialData?.categories || [];
             }
         } else if (first === 'industries' && second) {
-            return { [`industry-${second}`]: initialData };
+            res[`industry-${second}`] = initialData;
         } else if (first === 'use-cases' && second) {
-            return { [`use-case-${second}`]: initialData };
+            res[`use-case-${second}`] = initialData;
         } else if (first === 'solutions' && second) {
-            return { [`solution-${second}`]: initialData };
+            res[`solution-${second}`] = initialData;
         } else if (first === 'integrations' && second) {
-            return { [`integration-${second}`]: initialData };
+            res[`integration-${second}`] = initialData;
         } else if (first === 'tools' && second) {
-            return { [`tool-${second}`]: initialData };
+            res[`tool-${second}`] = initialData;
         } else if (first === 'blog') {
             if (second === 'category' && third) {
-                return { [`blog-category-${third}`]: initialData };
+                res[`blog-category-${third}`] = initialData;
             } else if (second && second !== 'categories') {
-                return { [`blog-${second}`]: initialData };
+                res[`blog-${second}`] = initialData;
             } else {
-                return {
-                    'blogs': initialData?.blogData || null,
-                    'blog-categories': initialData?.categories || []
-                };
+                res['blogs'] = initialData?.blogData || null;
+                res['blog-categories'] = initialData?.categories || [];
             }
         } else {
             const catchAllSlug = pathArray.join('/');
-            return { [`/pages/${catchAllSlug}`]: initialData };
+            res[`/pages/${catchAllSlug}`] = initialData;
         }
+
+        if (initialData._extraFallbacks) {
+            Object.assign(res, initialData._extraFallbacks);
+        }
+
+        return res;
     }, [initialData, pathArray]);
 
     const renderContent = () => {

@@ -8,7 +8,7 @@ const BlogCategoryList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         fallbackData: initialData?.categories
     });
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading categories...</div>;
+    if (isLoading && !categories) return <div className="text-center py-20 text-white">Loading categories...</div>;
 
     return (
         <div className="bg-slate-900 min-h-screen pt-32 pb-20">

@@ -8,7 +8,7 @@ const IndustryList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         fallbackData: initialData
     });
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading industries...</div>;
+    if (isLoading && !industries) return <div className="text-center py-20 text-white">Loading industries...</div>;
 
     return (
         <div className="bg-slate-900 min-h-screen py-20">

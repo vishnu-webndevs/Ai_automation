@@ -24,7 +24,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         .sort((a: any, b: any) => String(b?.updated_at || '').localeCompare(String(a?.updated_at || '')))
         .find(Boolean);
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading services...</div>;
+    if (isLoading && !services) return <div className="text-center py-20 text-white">Loading services...</div>;
 
     if (error)
         return (

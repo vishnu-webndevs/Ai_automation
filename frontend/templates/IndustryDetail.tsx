@@ -11,7 +11,7 @@ const IndustryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         { fallbackData: initialData }
     );
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading industry...</div>;
+    if (isLoading && !industry) return <div className="text-center py-20 text-white">Loading industry...</div>;
     if (error || !industry) return <div className="text-center py-20 text-white">Industry not found</div>;
 
     return (

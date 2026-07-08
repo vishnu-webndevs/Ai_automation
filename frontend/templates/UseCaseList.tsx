@@ -8,7 +8,7 @@ const UseCaseList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         fallbackData: initialData
     });
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading use cases...</div>;
+    if (isLoading && !useCases) return <div className="text-center py-20 text-white">Loading use cases...</div>;
 
     return (
         <div className="bg-slate-900 min-h-screen py-20">

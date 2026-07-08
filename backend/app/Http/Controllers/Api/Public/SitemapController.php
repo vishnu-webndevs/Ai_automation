@@ -58,7 +58,7 @@ class SitemapController extends Controller
 
     public function show(string $name)
     {
-        $allowed = ['pages', 'services', 'blogs'];
+        $allowed = ['pages', 'services', 'blogs', 'industries', 'use-cases', 'solutions', 'integrations', 'tools'];
         if (!in_array($name, $allowed, true)) {
             abort(404);
         }
@@ -202,6 +202,11 @@ XSL;
             'pages' => $baseUrl . '/sitemaps/pages.xml',
             'services' => $baseUrl . '/sitemaps/services.xml',
             'blogs' => $baseUrl . '/sitemaps/blogs.xml',
+            'industries' => $baseUrl . '/sitemaps/industries.xml',
+            'use-cases' => $baseUrl . '/sitemaps/use-cases.xml',
+            'solutions' => $baseUrl . '/sitemaps/solutions.xml',
+            'integrations' => $baseUrl . '/sitemaps/integrations.xml',
+            'tools' => $baseUrl . '/sitemaps/tools.xml',
         ];
     }
 
@@ -494,6 +499,71 @@ XSL;
                         $baseUrl . '/blog/tag/' . ltrim($blogTag->slug, '/'),
                         Schema::hasColumn('blog_tags', 'updated_at') ? optional($blogTag->updated_at)->toAtomString() : null
                     );
+                }
+            }
+        }
+
+        if ($name === 'industries') {
+            if (Schema::hasTable('industries') && Schema::hasColumn('industries', 'slug')) {
+                $cols = $this->selectColumns('industries', ['slug', 'updated_at']);
+                $query = $this->applyIsActiveFilter(Industry::query(), 'industries')->select($cols);
+                if (Schema::hasColumn('industries', 'updated_at')) {
+                    $query->orderBy('updated_at', 'desc');
+                }
+                foreach ($query->get() as $item) {
+                    $addUrl($baseUrl . '/industries/' . ltrim($item->slug, '/'), $this->toAtom($item->updated_at));
+                }
+            }
+        }
+
+        if ($name === 'use-cases') {
+            if (Schema::hasTable('use_cases') && Schema::hasColumn('use_cases', 'slug')) {
+                $cols = $this->selectColumns('use_cases', ['slug', 'updated_at']);
+                $query = $this->applyIsActiveFilter(UseCase::query(), 'use_cases')->select($cols);
+                if (Schema::hasColumn('use_cases', 'updated_at')) {
+                    $query->orderBy('updated_at', 'desc');
+                }
+                foreach ($query->get() as $item) {
+                    $addUrl($baseUrl . '/use-cases/' . ltrim($item->slug, '/'), $this->toAtom($item->updated_at));
+                }
+            }
+        }
+
+        if ($name === 'solutions') {
+            if (Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'slug')) {
+                $cols = $this->selectColumns('solutions', ['slug', 'updated_at']);
+                $query = $this->applyIsActiveFilter(Solution::query(), 'solutions')->select($cols);
+                if (Schema::hasColumn('solutions', 'updated_at')) {
+                    $query->orderBy('updated_at', 'desc');
+                }
+                foreach ($query->get() as $item) {
+                    $addUrl($baseUrl . '/solutions/' . ltrim($item->slug, '/'), $this->toAtom($item->updated_at));
+                }
+            }
+        }
+
+        if ($name === 'integrations') {
+            if (Schema::hasTable('integrations') && Schema::hasColumn('integrations', 'slug')) {
+                $cols = $this->selectColumns('integrations', ['slug', 'updated_at']);
+                $query = $this->applyIsActiveFilter(Integration::query(), 'integrations')->select($cols);
+                if (Schema::hasColumn('integrations', 'updated_at')) {
+                    $query->orderBy('updated_at', 'desc');
+                }
+                foreach ($query->get() as $item) {
+                    $addUrl($baseUrl . '/integrations/' . ltrim($item->slug, '/'), $this->toAtom($item->updated_at));
+                }
+            }
+        }
+
+        if ($name === 'tools') {
+            if (Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'slug')) {
+                $cols = $this->selectColumns('solutions', ['slug', 'updated_at']);
+                $query = $this->applyIsActiveFilter(Solution::query(), 'solutions')->select($cols);
+                if (Schema::hasColumn('solutions', 'updated_at')) {
+                    $query->orderBy('updated_at', 'desc');
+                }
+                foreach ($query->get() as $item) {
+                    $addUrl($baseUrl . '/tools/' . ltrim($item->slug, '/'), $this->toAtom($item->updated_at));
                 }
             }
         }

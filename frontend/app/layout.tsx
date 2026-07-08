@@ -4,21 +4,30 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Particles from '@/components/Particles';
 import Script from 'next/script';
+import { menuService } from '@/services/api';
 
 import '@/index.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+
+// We set this to dynamic because it fetches menu data from backend API
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Totan AI | Custom AI Agents & Automation Solutions',
   description: 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [headerMenu, footerMenu] = await Promise.all([
+    menuService.getByLocation('header-main').catch(() => null),
+    menuService.getByLocation('footer').catch(() => null),
+  ]);
+
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <head>
@@ -69,16 +78,17 @@ export default function RootLayout({
         <div className="relative min-h-screen bg-slate-950 text-slate-300 selection:bg-purple-500/30 selection:text-purple-200">
           <Particles />
           <React.Suspense fallback={<div className="h-16" />}>
-            <Navbar />
+            <Navbar initialMenuData={headerMenu} />
           </React.Suspense>
           <main className="relative z-10">
             {children}
           </main>
           <React.Suspense fallback={<div className="h-16" />}>
-            <Footer />
+            <Footer initialMenuData={footerMenu} />
           </React.Suspense>
         </div>
       </body>
     </html>
   );
 }
+

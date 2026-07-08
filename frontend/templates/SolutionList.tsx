@@ -10,7 +10,7 @@ const SolutionList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         fallbackData: initialData
     });
 
-    if (isLoading) return <div className="text-center py-20 text-white">Loading solutions...</div>;
+    if (isLoading && !solutions) return <div className="text-center py-20 text-white">Loading solutions...</div>;
 
     return (
         <div className="bg-slate-900 min-h-screen py-20">

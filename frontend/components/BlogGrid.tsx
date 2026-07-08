@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import useSWR from 'swr';
 import { pageService } from '../services/api';
 import { Page } from '../types';
 import { Calendar, ArrowRight } from 'lucide-react';
@@ -8,35 +9,23 @@ interface BlogGridProps {
     columns?: number;
     show_categories?: boolean;
     limit?: number;
+    initialData?: any;
 }
 
-const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true, limit }) => {
-    const [blogs, setBlogs] = useState<Page[]>([]);
-    const [loading, setLoading] = useState(true);
+const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true, limit, initialData }) => {
+    const { data: response, isLoading } = useSWR('blogs-1', () => pageService.getBlogs(1), {
+        fallbackData: initialData
+    });
 
-    useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                const response = await pageService.getBlogs(1);
-                // Filter out the current page if needed, or just take the list
-                let fetchedBlogs = response.data || [];
-                
-                if (limit) {
-                    fetchedBlogs = fetchedBlogs.slice(0, limit);
-                }
-                
-                setBlogs(fetchedBlogs);
-            } catch (error) {
-                console.error('Failed to fetch blogs', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const blogs = useMemo(() => {
+        let fetchedBlogs = response?.data || [];
+        if (limit) {
+            fetchedBlogs = fetchedBlogs.slice(0, limit);
+        }
+        return fetchedBlogs;
+    }, [response, limit]);
 
-        fetchBlogs();
-    }, [limit]);
-
-    if (loading) {
+    if (isLoading && blogs.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
                 <div className={`grid grid-cols-1 md:grid-cols-${columns > 1 ? '2' : '1'} lg:grid-cols-${columns} gap-8`}>
@@ -76,6 +65,8 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 <img 
                                     src={blog.seo_meta.og_image} 
                                     alt={blog.title}
+                                    width={400}
+                                    height={250}
                                     loading="lazy"
                                     decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -144,6 +135,8 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 <img 
                                     src={blog.seo_meta.og_image} 
                                     alt={blog.title}
+                                    width={400}
+                                    height={225}
                                     loading="lazy"
                                     decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
