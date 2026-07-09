@@ -151,11 +151,12 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
             case 'changelog':
             case 'customers':
             case 'pricing':
-                return <DynamicPage initialData={initialData} />;
+                return <DynamicPage initialData={initialData} slug={first} />;
                 
             // Catch-all
             default:
-                return <DynamicPage />;
+                const catchAllSlug = pathArray.join('/');
+                return <DynamicPage initialData={initialData} slug={catchAllSlug} />;
         }
     };
 

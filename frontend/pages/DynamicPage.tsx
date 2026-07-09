@@ -14,10 +14,29 @@ import SignUp from './SignUp';
 import StyleGuide from './StyleGuide';
 import ContactPage from './ContactPage';
 
-const DynamicPage: React.FC<{ initialData?: any }> = ({ initialData }) => {
+interface DynamicPageProps {
+    initialData?: any;
+    slug?: string;
+}
+
+const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }) => {
     const params = useParams();
-    const slugParam = params['*'] || 'home';
-    const slug = (slugParam as string) || 'home';
+    
+    const resolvedSlug = useMemo(() => {
+        if (propSlug) return propSlug;
+        
+        // Next.js App Router params
+        if (params && params.slug) {
+            const nextSlug = Array.isArray(params.slug) ? params.slug.join('/') : params.slug;
+            if (nextSlug) return nextSlug;
+        }
+        
+        // React Router params
+        const slugParam = params ? (params as any)['*'] : null;
+        return (slugParam as string) || 'home';
+    }, [propSlug, params]);
+
+    const slug = resolvedSlug;
 
     const { data: apiPage, error, isLoading } = useSWR(
         slug ? `/pages/${slug}` : null,
