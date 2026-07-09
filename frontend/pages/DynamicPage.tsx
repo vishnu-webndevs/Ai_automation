@@ -73,6 +73,7 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }
                         {
                             id: 99999,
                             block_type: 'pricing',
+                            content: {},
                             order: 1,
                             content_json: {
                                 heading: "Simple, Transparent Pricing",
