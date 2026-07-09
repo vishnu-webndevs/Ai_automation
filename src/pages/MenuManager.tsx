@@ -643,7 +643,10 @@ const MenuManager = () => {
             .join(' ')}
           style={{ marginLeft: depth * 24 }}
           draggable
-          onDragStart={() => setDragId(node.id)}
+          onDragStart={(e) => {
+            e.dataTransfer.setData('text/plain', node.id.toString());
+            setDragId(node.id);
+          }}
           onDragEnd={() => {
             setDragId(null);
             setDragOver({ id: null, mode: null });
@@ -654,7 +657,9 @@ const MenuManager = () => {
             const y = e.clientY - rect.top;
             const ratio = y / rect.height;
             const mode: DropMode = ratio < 0.25 ? 'before' : ratio > 0.75 ? 'after' : 'inside';
-            setDragOver({ id: node.id, mode });
+            if (dragOver.id !== node.id || dragOver.mode !== mode) {
+              setDragOver({ id: node.id, mode });
+            }
           }}
           onDrop={(e) => {
             e.preventDefault();
