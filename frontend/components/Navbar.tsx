@@ -115,6 +115,20 @@ const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => 
     );
 };
 
+const sanitizeMenuItems = (items: MenuItem[]): MenuItem[] => {
+    return items.map(item => {
+        let url = item.url;
+        if (item.label && item.label.toLowerCase() === 'pricing' && (!url || url === '#' || url === '/#')) {
+            url = '/pricing';
+        }
+        return {
+            ...item,
+            url,
+            children: item.children ? sanitizeMenuItems(item.children) : undefined
+        };
+    });
+};
+
 const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -123,6 +137,11 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   const { data: menuData } = useSWR('menu-header-main', () => menuService.getByLocation('header-main'), {
     fallbackData: initialMenuData
   });
+
+  const sanitizedItems = React.useMemo(() => {
+    if (!menuData?.items) return [];
+    return sanitizeMenuItems(menuData.items);
+  }, [menuData]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -153,7 +172,7 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex grow justify-end items-center gap-8">
-            {menuData?.items?.map((item) => (
+            {sanitizedItems.map((item) => (
                <DesktopMenuItem key={item.id} item={item} />
             ))}
             {!menuData && (
@@ -190,7 +209,7 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-slate-900 border-b border-white/10 absolute w-full top-20 left-0 animate-in slide-in-from-top-5 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto">
            <nav className="flex flex-col py-4">
-            {menuData?.items?.map((item) => (
+            {sanitizedItems.map((item) => (
                <MobileMenuItem key={item.id} item={item} closeMenu={() => setMobileMenuOpen(false)} />
             ))}
             <div className="border-t border-white/10 mt-2 pt-4 flex flex-col gap-4 px-4 pb-4">

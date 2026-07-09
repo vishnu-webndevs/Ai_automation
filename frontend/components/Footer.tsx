@@ -17,8 +17,20 @@ const Footer: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
     fallbackData: initialMenuData
   });
 
-  // Determine dynamic columns from menu
-  const dynamicColumns = footerMenu?.items || [];
+  // Determine dynamic columns from menu and sanitize "Pricing" urls
+  const dynamicColumns = React.useMemo(() => {
+    if (!footerMenu?.items) return [];
+    return footerMenu.items.map(col => {
+      const children = col.children?.map(child => {
+        let url = child.url;
+        if (child.label && child.label.toLowerCase() === 'pricing' && (!url || url === '#' || url === '/#')) {
+          url = '/pricing';
+        }
+        return { ...child, url };
+      });
+      return { ...col, children };
+    });
+  }, [footerMenu]);
 
   return (
     <footer className="relative pt-24 pb-12 overflow-hidden border-t border-slate-800/50">
