@@ -143,14 +143,15 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
                 return <PlatformList initialData={initialData} />;
                 
             // Static Pages
-            case 'contact-us': return <ContactPage />;
+            case 'contact-us':
             case 'login':
-            case 'signin': return <SignIn />;
-            case 'signup': return <SignUp />;
-            case 'style-guide': return <StyleGuide />;
-            case 'changelog': return <Changelog />;
-            case 'customers': return <Customers />;
-            case 'pricing': return <PricingPage />;
+            case 'signin':
+            case 'signup':
+            case 'style-guide':
+            case 'changelog':
+            case 'customers':
+            case 'pricing':
+                return <DynamicPage initialData={initialData} />;
                 
             // Catch-all
             default:

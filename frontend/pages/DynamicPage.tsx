@@ -6,6 +6,13 @@ import SeoHead from '../components/seo/SeoHead';
 import BlockRenderer from '../components/BlockRenderer';
 import { STATIC_PAGES } from '../data/static-fallbacks';
 import { getTemplateComponent } from '../templates/TemplateLoader';
+import PricingPage from './PricingPage';
+import Customers from './Customers';
+import Changelog from './Changelog';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
+import StyleGuide from './StyleGuide';
+import ContactPage from './ContactPage';
 
 const DynamicPage: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const params = useParams();
@@ -79,6 +86,25 @@ const DynamicPage: React.FC<{ initialData?: any }> = ({ initialData }) => {
     }
 
     if (!page) {
+        // Fallback to static page component based on slug
+        switch (slug) {
+            case 'pricing':
+                return <PricingPage />;
+            case 'customers':
+                return <Customers />;
+            case 'changelog':
+                return <Changelog />;
+            case 'contact-us':
+                return <ContactPage />;
+            case 'login':
+            case 'signin':
+                return <SignIn />;
+            case 'signup':
+                return <SignUp />;
+            case 'style-guide':
+                return <StyleGuide />;
+        }
+
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
                 <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
