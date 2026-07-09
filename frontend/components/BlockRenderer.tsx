@@ -149,7 +149,13 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ block, page, isFirstHeadi
             return <BentoGrid {...content} />;
             
         case 'pricing':
-            return <Pricing {...content} />;
+            return (
+                <Pricing 
+                    heading={content.heading || content.title} 
+                    subheading={content.subheading || content.subtitle} 
+                    plans={content.plans} 
+                />
+            );
             
         case 'testimonials':
             return <Testimonials {...content} />;
