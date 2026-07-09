@@ -173,10 +173,6 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
         data = await pageService.getBySlug(second).catch(() => null);
       }
     }
-    else if (first === 'pricing') {
-      meta_title = 'Simple, Transparent Pricing Plans | Totan AI';
-      meta_description = 'Choose the pricing plan that fits your business needs. Scale seamlessly from Starter to Enterprise with Totan AI.';
-    }
     else {
       // It's a dynamic page!
       data = await pageService.getBySlug(slugPath).catch(() => null);
@@ -451,9 +447,6 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
         ]);
         initialData = { blogData, categories };
       }
-    }
-    else if (first === 'pricing') {
-      initialData = null;
     }
     else {
       const catchAllSlug = slugArray.join('/');

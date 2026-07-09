@@ -150,10 +150,8 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
             case 'style-guide':
             case 'changelog':
             case 'customers':
-                return <DynamicPage initialData={initialData} slug={first} />;
-                
             case 'pricing':
-                return <PricingPage />;
+                return <DynamicPage initialData={initialData} slug={first} />;
                 
             // Catch-all
             default:

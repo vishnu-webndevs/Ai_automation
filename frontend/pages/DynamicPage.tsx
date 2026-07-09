@@ -56,41 +56,7 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }
             resolved = { ...resolved, template_slug: 'contact-dark' };
         }
 
-        // Auto-inject pricing block if database version exists but has no pricing block
-        if (resolved && slug === 'pricing') {
-            const hasPricingBlock = resolved.sections?.some(s => 
-                s.blocks?.some(b => (b.block_type || b.type) === 'pricing')
-            );
-            if (!hasPricingBlock) {
-                const sections = resolved.sections ? [...resolved.sections] : [];
-                const pricingSection = {
-                    id: 99999,
-                    name: 'Pricing Section',
-                    type: 'default',
-                    content: {},
-                    order: sections.length > 0 ? (sections[0].order + 0.5) : 1,
-                    blocks: [
-                        {
-                            id: 99999,
-                            block_type: 'pricing',
-                            content: {},
-                            order: 1,
-                            content_json: {
-                                heading: "Simple, Transparent Pricing",
-                                subheading: "Start for free, scale as you grow. No hidden fees.",
-                                plans: [
-                                    { name: 'Starter', price: 0, desc: 'For individuals and hobbyists', features: ['Up to 10k requests/mo', 'Basic analytics', 'Community support', '1 Project'] },
-                                    { name: 'Pro', price: 49, desc: 'For growing teams', featured: true, features: ['Up to 1M requests/mo', 'Advanced analytics', 'Priority support', 'Unlimited Projects', 'Custom Rate Limiting'] },
-                                    { name: 'Enterprise', price: 'Custom', desc: 'For large organizations', features: ['Unlimited requests', 'Dedicated infrastructure', '24/7 SLA support', 'SSO & Audit Logs', 'On-premise deployment'] }
-                                ]
-                            }
-                        }
-                    ]
-                };
-                sections.push(pricingSection);
-                resolved = { ...resolved, sections };
-            }
-        }
+
 
         return resolved;
     }, [apiPage, slug]);
@@ -170,6 +136,16 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }
                     Go Home
                 </Link>
             </div>
+        );
+    }
+
+    // If slug is pricing, render the static PricingPage component using database metadata
+    if (slug === 'pricing') {
+        return (
+            <>
+                <SeoHead meta={page.seo_meta} defaultTitle={page.title} />
+                <PricingPage />
+            </>
         );
     }
 
