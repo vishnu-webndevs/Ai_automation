@@ -67,6 +67,7 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }
                     id: 99999,
                     name: 'Pricing Section',
                     type: 'default',
+                    content: {},
                     order: sections.length > 0 ? (sections[0].order + 0.5) : 1,
                     blocks: [
                         {
