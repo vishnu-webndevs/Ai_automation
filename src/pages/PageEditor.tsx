@@ -373,22 +373,169 @@ const PageEditor = () => {
 
                                          {block.block_type === 'pricing' && (
                                             <>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
-                                                    <Input 
-                                                        value={block.content_json?.title || ''} 
-                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'title', e.target.value)}
-                                                    />
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-500 mb-1">Title</label>
+                                                        <Input 
+                                                            value={block.content_json?.title || block.content_json?.heading || ''} 
+                                                            onChange={(e) => {
+                                                                updateBlockContent(sIndex, bIndex, 'title', e.target.value);
+                                                                updateBlockContent(sIndex, bIndex, 'heading', e.target.value);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium text-gray-500 mb-1">Subtitle</label>
+                                                        <Input 
+                                                            value={block.content_json?.subtitle || block.content_json?.subheading || ''} 
+                                                            onChange={(e) => {
+                                                                updateBlockContent(sIndex, bIndex, 'subtitle', e.target.value);
+                                                                updateBlockContent(sIndex, bIndex, 'subheading', e.target.value);
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label className="block text-xs font-medium text-gray-500 mb-1">Subtitle</label>
-                                                    <Input 
-                                                        value={block.content_json?.subtitle || ''} 
-                                                        onChange={(e) => updateBlockContent(sIndex, bIndex, 'subtitle', e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="bg-blue-50 p-3 rounded text-sm text-blue-700">
-                                                    Pricing plans can be edited in the JSON view below.
+
+                                                <div className="mt-4 border-t pt-4">
+                                                    <div className="flex justify-between items-center mb-3">
+                                                        <h4 className="text-sm font-bold text-gray-700">Pricing Plans</h4>
+                                                        <Button
+                                                            size="sm"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const plans = block.content_json?.plans || [];
+                                                                const newPlans = [...plans, {
+                                                                    name: 'New Plan',
+                                                                    price: 29,
+                                                                    desc: 'Short description of this plan',
+                                                                    features: ['Feature 1', 'Feature 2'],
+                                                                    featured: false,
+                                                                    cta_text: 'Get Started',
+                                                                    cta_url: '/signup'
+                                                                }];
+                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                            }}
+                                                        >
+                                                            + Add Plan
+                                                        </Button>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        {(block.content_json?.plans || []).map((plan: any, pIndex: number) => (
+                                                            <div key={pIndex} className="p-4 border border-gray-200 rounded-lg bg-gray-50/50 relative">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const newPlans = (block.content_json?.plans || []).filter((_: any, idx: number) => idx !== pIndex);
+                                                                        updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                    }}
+                                                                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs font-medium"
+                                                                >
+                                                                    Remove Plan
+                                                                </button>
+                                                                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
+                                                                    <div className="sm:col-span-4">
+                                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase">Plan Name</label>
+                                                                        <Input
+                                                                            value={plan.name || ''}
+                                                                            onChange={(e) => {
+                                                                                const newPlans = [...(block.content_json?.plans || [])];
+                                                                                newPlans[pIndex] = { ...newPlans[pIndex], name: e.target.value };
+                                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="sm:col-span-3">
+                                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase">Price (number or 'Custom')</label>
+                                                                        <Input
+                                                                            value={plan.price !== undefined ? plan.price : ''}
+                                                                            onChange={(e) => {
+                                                                                const val = e.target.value;
+                                                                                const num = Number(val);
+                                                                                const priceVal = isNaN(num) || val.trim() === '' ? val : num;
+                                                                                const newPlans = [...(block.content_json?.plans || [])];
+                                                                                newPlans[pIndex] = { ...newPlans[pIndex], price: priceVal };
+                                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="sm:col-span-3">
+                                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase">CTA Text</label>
+                                                                        <Input
+                                                                            value={plan.cta_text || ''}
+                                                                            onChange={(e) => {
+                                                                                const newPlans = [...(block.content_json?.plans || [])];
+                                                                                newPlans[pIndex] = { ...newPlans[pIndex], cta_text: e.target.value };
+                                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="sm:col-span-2 flex items-center pt-4">
+                                                                        <label className="flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-gray-600 select-none">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={plan.featured || false}
+                                                                                onChange={(e) => {
+                                                                                    const newPlans = [...(block.content_json?.plans || [])];
+                                                                                    newPlans[pIndex] = { ...newPlans[pIndex], featured: e.target.checked };
+                                                                                    updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                                }}
+                                                                                className="rounded text-purple-600"
+                                                                            />
+                                                                            Featured
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
+                                                                    <div className="sm:col-span-6">
+                                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase">Short Description</label>
+                                                                        <Input
+                                                                            value={plan.desc || ''}
+                                                                            onChange={(e) => {
+                                                                                const newPlans = [...(block.content_json?.plans || [])];
+                                                                                newPlans[pIndex] = { ...newPlans[pIndex], desc: e.target.value };
+                                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="sm:col-span-6">
+                                                                        <label className="block text-[10px] font-bold text-gray-400 uppercase">CTA URL</label>
+                                                                        <Input
+                                                                            value={plan.cta_url || ''}
+                                                                            onChange={(e) => {
+                                                                                const newPlans = [...(block.content_json?.plans || [])];
+                                                                                newPlans[pIndex] = { ...newPlans[pIndex], cta_url: e.target.value };
+                                                                                updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-gray-400 uppercase">Features (one per line)</label>
+                                                                    <textarea
+                                                                        className="w-full border border-gray-300 rounded-md p-2 text-xs focus:ring-1 focus:ring-purple-500 outline-none bg-white"
+                                                                        rows={3}
+                                                                        value={(plan.features || []).join('\n')}
+                                                                        onChange={(e) => {
+                                                                            const features = e.target.value.split('\n').filter(f => f.trim() !== '');
+                                                                            const newPlans = [...(block.content_json?.plans || [])];
+                                                                            newPlans[pIndex] = { ...newPlans[pIndex], features };
+                                                                            updateBlockContent(sIndex, bIndex, 'plans', newPlans);
+                                                                        }}
+                                                                        placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                        
+                                                        {(block.content_json?.plans || []).length === 0 && (
+                                                            <div className="text-center p-6 border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-400">
+                                                                No pricing plans added yet. Click "+ Add Plan" above.
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </>
                                          )}
