@@ -192,7 +192,7 @@ const MenuManager = () => {
   const [newShowOn, setNewShowOn] = useState<'all' | 'desktop' | 'mobile'>('all');
   const [newVisible, setNewVisible] = useState(true);
 
-  const [dragId, setDragId] = useState<number | null>(null);
+  const dragIdRef = useRef<number | null>(null);
   const [dragOver, setDragOver] = useState<{ id: number | null; mode: DropMode | null }>({ id: null, mode: null });
   const [expandedIds, setExpandedIds] = useState<Record<number, boolean>>({});
   const [editingIds, setEditingIds] = useState<Record<number, boolean>>({});
@@ -581,7 +581,7 @@ const MenuManager = () => {
     }
   };
 
-  const handleDrop = async (targetId: number, mode: DropMode) => {
+  const handleDrop = async (targetId: number, mode: DropMode, dragId: number) => {
     if (!dragId || dragId === targetId) return;
     const nextTreeBase = cloneTree(tree);
     const { removed, next } = removeNodeById(nextTreeBase, dragId);
@@ -666,14 +666,17 @@ const MenuManager = () => {
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', node.id.toString());
-            setDragId(node.id);
+            dragIdRef.current = node.id;
           }}
           onDragEnd={() => {
-            setDragId(null);
+            dragIdRef.current = null;
             setDragOver({ id: null, mode: null });
           }}
           onDragOver={(e) => {
             e.preventDefault();
+            if (dragIdRef.current && descendantIds.has(node.id)) {
+              return;
+            }
             const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
             const y = e.clientY - rect.top;
             const ratio = y / rect.height;
@@ -684,8 +687,10 @@ const MenuManager = () => {
           }}
           onDrop={(e) => {
             e.preventDefault();
-            if (!dragOver.mode) return;
-            void handleDrop(node.id, dragOver.mode);
+            const idStr = e.dataTransfer.getData('text/plain');
+            const activeDragId = idStr ? Number(idStr) : dragIdRef.current;
+            if (!activeDragId || !dragOver.mode) return;
+            void handleDrop(node.id, dragOver.mode, activeDragId);
             setDragOver({ id: null, mode: null });
           }}
         >
