@@ -19,6 +19,7 @@ class BlogTagController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:blog_tags,slug',
+            'description' => 'nullable|string',
         ]);
 
         if (empty($validated['slug'])) {
@@ -43,6 +44,7 @@ class BlogTagController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:blog_tags,slug,' . $id,
+            'description' => 'nullable|string',
         ]);
 
         if (isset($validated['name']) && !isset($request->slug) && $tag->name !== $validated['name']) {

@@ -86,6 +86,7 @@ export interface BlogTag {
     id: number;
     name: string;
     slug: string;
+    description?: string;
 }
 
 export interface InternalLink {

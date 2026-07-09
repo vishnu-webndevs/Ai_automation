@@ -1,19 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, ChevronUp, ChevronDown, ExternalLink, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, ChevronUp, ChevronDown, ExternalLink, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { api } from '../api';
 import type { BlogTag } from '../types';
 import Modal from '../components/ui/Modal';
+import { useFlash } from '../contexts/FlashContext';
 
 interface BlogTagWithMeta extends BlogTag {
     updated_at?: string;
 }
 
 const BlogTagManager = () => {
+    const flash = useFlash();
     const [tags, setTags] = useState<BlogTagWithMeta[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTag, setCurrentTag] = useState<Partial<BlogTagWithMeta>>({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [generating, setGenerating] = useState(false);
+
+    const handleGenerateDescription = async () => {
+        if (!currentTag.name) {
+            flash.error('Please enter a tag name first.');
+            return;
+        }
+        setGenerating(true);
+        try {
+            const response = await api.post('/ai/generate-text', {
+                name: currentTag.name,
+                type: 'tag',
+                model: 'gemini',
+                tone: 'Professional'
+            });
+            if (response.data?.text) {
+                setCurrentTag(prev => ({ ...prev, description: response.data.text }));
+                flash.success('AI description generated successfully.');
+            }
+        } catch (error: any) {
+            console.error('Failed to generate tag description', error);
+            flash.error(error?.response?.data?.message || 'Failed to generate description.');
+        } finally {
+            setGenerating(false);
+        }
+    };
 
     // Pagination & Sorting
     const [page, setPage] = useState(1);
@@ -275,6 +303,27 @@ const BlogTagManager = () => {
                             value={currentTag.slug || ''}
                             onChange={(e) => setCurrentTag({ ...currentTag, slug: e.target.value })}
                             placeholder="Auto-generated if empty"
+                        />
+                    </div>
+                    <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="block text-sm font-medium text-gray-700">Description</label>
+                            <button
+                                type="button"
+                                onClick={handleGenerateDescription}
+                                disabled={generating}
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50 font-medium transition-colors"
+                            >
+                                <Sparkles size={12} className={generating ? "animate-spin" : ""} />
+                                {generating ? 'Generating...' : 'Generate with AI'}
+                            </button>
+                        </div>
+                        <textarea
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                            value={currentTag.description || ''}
+                            onChange={(e) => setCurrentTag({ ...currentTag, description: e.target.value })}
+                            placeholder="SEO-friendly description of the tag..."
                         />
                     </div>
                     <div className="flex justify-end gap-3 pt-4">

@@ -99,6 +99,14 @@ export interface BlogCategory {
     pages?: Page[];
 }
 
+export interface BlogTag {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    pages?: Page[];
+}
+
 export interface MenuItem {
     id: number;
     label: string;
@@ -129,7 +137,7 @@ export interface Page {
     industries?: Industry[];
     use_cases?: UseCase[];
     blog_categories?: BlogCategory[];
-    blog_tags?: any[];
+    blog_tags?: BlogTag[];
     created_at?: string;
     updated_at?: string;
 }

@@ -570,7 +570,7 @@ class PageController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'type' => 'required|in:industry,use-case,solution,integration',
+            'type' => 'required|in:industry,use-case,solution,integration,tag',
             'model' => 'required|in:lorum,openai,gemini',
             'tone' => 'sometimes|nullable|string',
         ]);

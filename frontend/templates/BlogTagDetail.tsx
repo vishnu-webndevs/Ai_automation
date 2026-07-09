@@ -61,7 +61,7 @@ const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                         &larr; Back to all articles
                     </Link>
                     <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">#{tag.name} Tag</h1>
-                    <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">Read expert articles and insights tagged under #{tag.name}.</p>
+                    <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">{tag.description || `Read expert articles and insights tagged under #${tag.name}.`}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
