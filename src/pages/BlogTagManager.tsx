@@ -28,7 +28,7 @@ const BlogTagManager = () => {
             const response = await api.post('/ai/generate-text', {
                 name: currentTag.name,
                 type: 'tag',
-                model: 'gemini',
+                model: 'openai',
                 tone: 'Professional'
             });
             if (response.data?.text) {
