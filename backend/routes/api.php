@@ -71,6 +71,8 @@ Route::get('/use-cases/{slug}', [PublicUseCaseController::class, 'show']);
 Route::get('/blogs', [PublicBlogController::class, 'index']); // Blog Listing
 Route::get('/blog-categories', [PublicBlogCategoryController::class, 'index']);
 Route::get('/blog-categories/{slug}', [PublicBlogCategoryController::class, 'show']);
+Route::get('/blog-tags', [\App\Http\Controllers\Api\Public\BlogTagController::class, 'index']);
+Route::get('/blog-tags/{slug}', [\App\Http\Controllers\Api\Public\BlogTagController::class, 'show']);
 Route::get('/redirects', [\App\Http\Controllers\Api\Public\RedirectController::class, 'index']);
 Route::post('/contact', [PublicContactController::class, 'store'])->middleware('throttle:20,1');
 

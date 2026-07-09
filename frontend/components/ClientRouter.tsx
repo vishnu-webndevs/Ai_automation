@@ -24,6 +24,7 @@ import BlogList from '@/templates/BlogList';
 import BlogDetail from '@/templates/BlogDetail';
 import BlogCategoryList from '@/templates/BlogCategoryList';
 import BlogCategoryDetail from '@/templates/BlogCategoryDetail';
+import BlogTagDetail from '@/templates/BlogTagDetail';
 import SolutionList from '@/templates/SolutionList';
 import SolutionDetail from '@/templates/SolutionDetail';
 import ToolsList from '@/templates/ToolsList';
@@ -67,6 +68,8 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
         } else if (first === 'blog') {
             if (second === 'category' && third) {
                 res[`blog-category-${third}`] = initialData;
+            } else if (second === 'tag' && third) {
+                res[`blog-tag-${third}`] = initialData;
             } else if (second && second !== 'categories') {
                 res[`blog-${second}`] = initialData;
             } else {
@@ -117,6 +120,7 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
                 if (!second) return <BlogList initialData={initialData} />;
                 if (second === 'categories' && !third) return <BlogCategoryList initialData={initialData} />;
                 if (second === 'category' && third) return <BlogCategoryDetail initialData={initialData} />;
+                if (second === 'tag' && third) return <BlogTagDetail initialData={initialData} />;
                 return <BlogDetail initialData={initialData} />;
                 
             // Solutions

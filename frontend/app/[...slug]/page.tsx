@@ -8,7 +8,8 @@ import {
   useCaseService,
   solutionService,
   integrationService,
-  blogCategoryService
+  blogCategoryService,
+  blogTagService
 } from '@/services/api';
 import { STATIC_PAGES } from '@/data/static-fallbacks';
 import ClientRouter from '@/components/ClientRouter';
@@ -159,8 +160,14 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
         }
       }
       else if (second === 'tag' && third) {
-        meta_title = `Articles tagged under #${third} | Totan AI`;
-        meta_description = `Browse our blog posts and guides tagged with #${third}.`;
+        data = await blogTagService.getBySlug(third).catch(() => null);
+        if (data) {
+          meta_title = `Articles tagged under #${data.name} | Totan AI`;
+          meta_description = `Browse our blog posts and guides tagged with #${data.name}.`;
+        } else {
+          meta_title = `Articles tagged under #${third} | Totan AI`;
+          meta_description = `Browse our blog posts and guides tagged with #${third}.`;
+        }
       }
       else {
         data = await pageService.getBySlug(second).catch(() => null);
@@ -429,6 +436,8 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     else if (first === 'blog') {
       if (second === 'category' && third) {
         initialData = await blogCategoryService.getBySlug(third);
+      } else if (second === 'tag' && third) {
+        initialData = await blogTagService.getBySlug(third);
       } else if (second && second !== 'categories') {
         initialData = await pageService.getBySlug(second);
       } else {

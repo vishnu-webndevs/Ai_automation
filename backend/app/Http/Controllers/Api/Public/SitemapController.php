@@ -384,15 +384,7 @@ XSL;
     {
         try {
             if ($name === 'pages') {
-                if (!Schema::hasTable('pages')) return false;
-                $q = Page::query();
-                if (Schema::hasColumn('pages', 'status')) {
-                    $q->where('status', 'published');
-                }
-                if (Schema::hasColumn('pages', 'type')) {
-                    $q->where('type', '!=', 'blog');
-                }
-                return $q->exists();
+                return true;
             }
 
             if ($name === 'services') {
@@ -471,6 +463,13 @@ XSL;
         };
 
         if ($name === 'pages' && Schema::hasTable('pages') && Schema::hasColumn('pages', 'slug')) {
+            // First, add the home page (root URL) and other static frontend pages
+            $addUrl($baseUrl . '/', now()->toAtomString());
+            $addUrl($baseUrl . '/pricing', now()->toAtomString());
+            $addUrl($baseUrl . '/customers', now()->toAtomString());
+            $addUrl($baseUrl . '/changelog', now()->toAtomString());
+            $addUrl($baseUrl . '/platform', now()->toAtomString());
+
             $pageColumns = $this->selectColumns('pages', ['id', 'slug', 'updated_at', 'type']);
             $pagesQuery = Page::query()->select($pageColumns);
 
@@ -491,7 +490,23 @@ XSL;
 
             $pages = $pagesQuery->get();
             foreach ($pages as $page) {
-                $loc = $baseUrl . '/' . ltrim($page->slug, '/');
+                $slug = ltrim($page->slug, '/');
+                
+                // If it's a home page or index page, canonicalize/update lastmod for the root URL
+                if ($slug === 'home' || $slug === 'index' || $slug === '') {
+                    $lastmod = Schema::hasColumn('pages', 'updated_at') ? optional($page->updated_at)->toAtomString() : null;
+                    $addUrl($baseUrl . '/', $lastmod);
+                    continue;
+                }
+
+                // If it's one of the static pages, update lastmod from DB
+                if (in_array($slug, ['pricing', 'customers', 'changelog', 'platform', 'contact-us'], true)) {
+                    $lastmod = Schema::hasColumn('pages', 'updated_at') ? optional($page->updated_at)->toAtomString() : null;
+                    $addUrl($baseUrl . '/' . $slug, $lastmod);
+                    continue;
+                }
+
+                $loc = $baseUrl . '/' . $slug;
                 $lastmod = Schema::hasColumn('pages', 'updated_at') ? optional($page->updated_at)->toAtomString() : null;
                 $addUrl($loc, $lastmod);
             }

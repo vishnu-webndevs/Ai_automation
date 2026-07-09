@@ -109,6 +109,17 @@ export const blogCategoryService = {
     },
 };
 
+export const blogTagService = {
+    getAll: async (): Promise<any[]> => {
+        const response = await api.get<any[]>('/blog-tags');
+        return response.data;
+    },
+    getBySlug: async (slug: string): Promise<any> => {
+        const response = await api.get<any>(`/blog-tags/${slug}`);
+        return response.data;
+    },
+};
+
 export const menuService = {
     getByLocation: async (location: string): Promise<Menu> => {
         const response = await api.get<Menu>(`/menus/${location}`);
