@@ -43,7 +43,7 @@ type MenuItem = {
 
 type TreeNode = MenuItem & { children: TreeNode[] };
 
-type LinkType = 'page' | 'service' | 'industry' | 'use-case' | 'solution' | 'integration' | 'custom';
+type LinkType = 'page' | 'service' | 'industry' | 'use-case' | 'solution' | 'integration' | 'custom' | 'header';
 type MultiSelectOption = { id: number; name: string; slug: string };
 
 type NewMenuItemPayload = {
@@ -205,15 +205,23 @@ const MenuManager = () => {
 
   const tree = useMemo(() => buildTree(items), [items]);
   const parentOptions = useMemo(() => items.map((i) => ({ id: i.id, label: i.label })), [items]);
-  const linkTypeChoices: Array<{ value: LinkType; label: string }> = [
-    { value: 'page', label: 'Page' },
-    { value: 'custom', label: 'Custom Link' },
-    { value: 'service', label: 'Service' },
-    { value: 'industry', label: 'Industry' },
-    { value: 'use-case', label: 'Use Case' },
-    { value: 'solution', label: 'Solution' },
-    { value: 'integration', label: 'Integration' },
-  ];
+  const linkTypeChoices = useMemo((): Array<{ value: LinkType; label: string }> => {
+    const list: Array<{ value: LinkType; label: string }> = [
+      { value: 'page', label: 'Page' },
+      { value: 'custom', label: 'Custom Link' },
+    ];
+    if (location === 'footer') {
+      list.push({ value: 'header', label: 'Footer Column Header' });
+    }
+    list.push(
+      { value: 'service', label: 'Service' },
+      { value: 'industry', label: 'Industry' },
+      { value: 'use-case', label: 'Use Case' },
+      { value: 'solution', label: 'Solution' },
+      { value: 'integration', label: 'Integration' }
+    );
+    return list;
+  }, [location]);
 
   const loadActiveMenu = async (loc: string) => {
     const res = await listMenus({ location: loc });
@@ -438,6 +446,19 @@ const MenuManager = () => {
                 show_on: newShowOn,
                 is_visible: newVisible
             });
+        });
+      } else if (newLinkType === 'header') {
+        if (!newLabel.trim()) {
+            setError('Column Name is required');
+            setLoading(false);
+            return;
+        }
+        itemsToAdd.push({
+            label: newLabel.trim(),
+            custom_url: '#',
+            parent_id: null,
+            show_on: 'all',
+            is_visible: true
         });
       } else {
         // Custom
@@ -967,6 +988,13 @@ const MenuManager = () => {
                       <div className="md:col-span-5">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Menu label</label>
                         <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="e.g. Services" className="bg-white" />
+                      </div>
+                    </div>
+                  ) : newLinkType === 'header' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                      <div className="md:col-span-12">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Column Name / Title</label>
+                        <Input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="e.g. Company, Resources, Legal" className="bg-white" />
                       </div>
                     </div>
                   ) : newLinkType === 'custom' ? (
