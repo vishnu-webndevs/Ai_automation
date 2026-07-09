@@ -88,6 +88,7 @@ function App() {
                 <Route path="taxonomy/service-categories" element={<ServiceCategoriesManager />} />
                 <Route path="taxonomy/industries" element={<IndustriesManager />} />
                 <Route path="taxonomy/use-cases" element={<UseCasesManager />} />
+                <Route path="taxonomy/solutions" element={<SolutionsManager />} />
                 <Route path="taxonomy/tools" element={<SolutionsManager />} />
                 <Route path="taxonomy/integrations" element={<IntegrationsManager />} />
             </Route>

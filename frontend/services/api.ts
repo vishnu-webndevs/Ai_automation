@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Page, Menu, Service, Industry, UseCase, Solution, Integration, BlogCategory, ServiceCategory } from '../types';
+import { FALLBACK_SOLUTIONS, FALLBACK_INTEGRATIONS } from '../data/platform-fallbacks';
 
 const API_URL =
     (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL) ||
@@ -78,23 +79,49 @@ export const useCaseService = {
 
 export const solutionService = {
     getAll: async (): Promise<Solution[]> => {
-        const response = await api.get<Solution[]>('/solutions');
-        return response.data;
+        try {
+            const response = await api.get<Solution[]>('/solutions');
+            const data = response.data;
+            return data && data.length > 0 ? data : (FALLBACK_SOLUTIONS as unknown as Solution[]);
+        } catch (error) {
+            return FALLBACK_SOLUTIONS as unknown as Solution[];
+        }
     },
     getBySlug: async (slug: string): Promise<Solution> => {
-        const response = await api.get<Solution>(`/solutions/${slug}`);
-        return response.data;
+        try {
+            const response = await api.get<Solution>(`/solutions/${slug}`);
+            return response.data;
+        } catch (error) {
+            const fallback = FALLBACK_SOLUTIONS.find(s => s.slug === slug);
+            if (fallback) {
+                return fallback as unknown as Solution;
+            }
+            throw error;
+        }
     },
 };
 
 export const integrationService = {
     getAll: async (): Promise<Integration[]> => {
-        const response = await api.get<Integration[]>('/integrations');
-        return response.data;
+        try {
+            const response = await api.get<Integration[]>('/integrations');
+            const data = response.data;
+            return data && data.length > 0 ? data : (FALLBACK_INTEGRATIONS as unknown as Integration[]);
+        } catch (error) {
+            return FALLBACK_INTEGRATIONS as unknown as Integration[];
+        }
     },
     getBySlug: async (slug: string): Promise<Integration> => {
-        const response = await api.get<Integration>(`/integrations/${slug}`);
-        return response.data;
+        try {
+            const response = await api.get<Integration>(`/integrations/${slug}`);
+            return response.data;
+        } catch (error) {
+            const fallback = FALLBACK_INTEGRATIONS.find(i => i.slug === slug);
+            if (fallback) {
+                return fallback as unknown as Integration;
+            }
+            throw error;
+        }
     },
 };
 
