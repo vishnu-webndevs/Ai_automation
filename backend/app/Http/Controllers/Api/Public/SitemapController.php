@@ -61,14 +61,15 @@ class SitemapController extends Controller
 
     public function show(string $name)
     {
+        $cleanName = str_starts_with($name, 'sitemap-') ? substr($name, 8) : $name;
         $allowed = ['pages', 'services', 'blogs', 'industries', 'use-cases', 'solutions', 'integrations', 'tools'];
-        if (!in_array($name, $allowed, true)) {
+        if (!in_array($cleanName, $allowed, true)) {
             abort(404);
         }
 
-        $generate = function () use ($name) {
+        $generate = function () use ($cleanName) {
             try {
-                return $this->generateUrlsetXml($name);
+                return $this->generateUrlsetXml($cleanName);
             } catch (\Throwable $e) {
                 $this->safeReport($e);
                 $baseUrl = $this->getBaseUrl();
@@ -82,7 +83,7 @@ class SitemapController extends Controller
         };
 
         try {
-            $xml = Cache::remember("public_sitemap_{$name}_xml", 600, $generate);
+            $xml = Cache::remember("public_sitemap_{$cleanName}_xml", 600, $generate);
         } catch (\Throwable $e) {
             $this->safeReport($e);
             $xml = $generate();
@@ -206,14 +207,14 @@ XSL;
     {
         $baseUrl = rtrim($baseUrl, '/');
         return [
-            'pages' => $baseUrl . '/sitemaps/pages.xml',
-            'services' => $baseUrl . '/sitemaps/services.xml',
-            'blogs' => $baseUrl . '/sitemaps/blogs.xml',
-            'industries' => $baseUrl . '/sitemaps/industries.xml',
-            'use-cases' => $baseUrl . '/sitemaps/use-cases.xml',
-            'solutions' => $baseUrl . '/sitemaps/solutions.xml',
-            'integrations' => $baseUrl . '/sitemaps/integrations.xml',
-            'tools' => $baseUrl . '/sitemaps/tools.xml',
+            'pages' => $baseUrl . '/sitemaps/sitemap-pages.xml',
+            'services' => $baseUrl . '/sitemaps/sitemap-services.xml',
+            'blogs' => $baseUrl . '/sitemaps/sitemap-blogs.xml',
+            'industries' => $baseUrl . '/sitemaps/sitemap-industries.xml',
+            'use-cases' => $baseUrl . '/sitemaps/sitemap-use-cases.xml',
+            'solutions' => $baseUrl . '/sitemaps/sitemap-solutions.xml',
+            'integrations' => $baseUrl . '/sitemaps/sitemap-integrations.xml',
+            'tools' => $baseUrl . '/sitemaps/sitemap-tools.xml',
         ];
     }
 
