@@ -187,7 +187,11 @@ XSL;
 
     private function getBaseUrl(): string
     {
-        return rtrim(env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL') ?: request()->getSchemeAndHttpHost(), '/');
+        $url = env('FRONTEND_URL') ?: env('PUBLIC_SITE_URL');
+        if (!$url || str_contains($url, 'api.totan.ai')) {
+            return 'https://totan.ai';
+        }
+        return rtrim($url, '/');
     }
 
     private function safeReport(\Throwable $e): void

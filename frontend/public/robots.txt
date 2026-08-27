@@ -3,7 +3,5 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /search/
-Disallow: /*?*
-Disallow: /*&*
 
-Sitemap: https://totan.ai/sitemap.xml
+Sitemap: https://totan.ai/sitemap-index.xml

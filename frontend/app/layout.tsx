@@ -41,6 +41,9 @@ export default async function RootLayout({
           }
         `}} />
         <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+        {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
+          <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
+        )}
         <Script
           id="gtm-script"
           strategy="lazyOnload"
