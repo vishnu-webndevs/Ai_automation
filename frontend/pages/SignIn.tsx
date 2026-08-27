@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Github, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Github, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/api';
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,12 +18,9 @@ const SignIn: React.FC = () => {
 
     try {
         const response = await authService.login({ email, password });
-        // Store token/user if needed, e.g. in context or localStorage
-        // For now, assuming basic flow
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        
-        navigate('/dashboard'); // Or wherever they should go
+        navigate('/dashboard');
     } catch (err: any) {
         console.error('Login error:', err);
         setError(err.response?.data?.message || "Failed to sign in. Please check your credentials.");
@@ -87,14 +85,22 @@ const SignIn: React.FC = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 pr-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
+                </button>
               </div>
             </div>
 

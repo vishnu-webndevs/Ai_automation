@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Github } from 'lucide-react';
+import { Mail, Lock, User, Github, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/api';
 
 const SignUp: React.FC = () => {
@@ -12,6 +12,8 @@ const SignUp: React.FC = () => {
     confirmPassword: '',
     agree: false
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,31 +30,37 @@ const SignUp: React.FC = () => {
     setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match");
-        return;
+      setError("Passwords do not match");
+      return;
     }
 
     if (!formData.agree) {
-        setError("You must agree to the Terms of Service");
-        return;
+      setError("You must agree to the Terms of Service and Privacy Policy");
+      return;
     }
 
     setLoading(true);
 
     try {
-        await authService.register({
+        const response = await authService.register({
             name: formData.name,
             email: formData.email,
             password: formData.password,
             password_confirmation: formData.confirmPassword
         });
+
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
         
-        // On success, redirect to sign in or dashboard
-        // For now, redirect to sign in with a success message state if possible, or just sign in
-        navigate('/signin');
+        navigate('/dashboard');
     } catch (err: any) {
         console.error('Registration error:', err);
-        setError(err.response?.data?.message || "Failed to create account. Please try again.");
+        if (err.response?.data?.errors) {
+            const firstError = Object.values(err.response.data.errors)[0] as string[];
+            setError(firstError[0] || "Failed to create account.");
+        } else {
+            setError(err.response?.data?.message || "Failed to create account. Please try again.");
+        }
     } finally {
         setLoading(false);
     }
@@ -141,13 +149,21 @@ const SignUp: React.FC = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 pr-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
+                </button>
               </div>
             </div>
 
@@ -162,13 +178,21 @@ const SignUp: React.FC = () => {
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pl-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 pr-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
+                </button>
               </div>
             </div>
 
