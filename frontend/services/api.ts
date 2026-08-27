@@ -163,6 +163,14 @@ export const authService = {
         const response = await api.post('/auth/login', data);
         return response.data;
     },
+    forgotPassword: async (data: { email: string }) => {
+        const response = await api.post('/auth/forgot-password', data);
+        return response.data;
+    },
+    resetPassword: async (data: { email: string; otp: string; password: string; password_confirmation: string }) => {
+        const response = await api.post('/auth/reset-password', data);
+        return response.data;
+    },
     logout: async () => {
         const response = await api.post('/auth/logout');
         return response.data;

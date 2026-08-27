@@ -8,6 +8,8 @@ import Customers from '@/pages/Customers';
 import Changelog from '@/pages/Changelog';
 import SignIn from '@/pages/SignIn';
 import SignUp from '@/pages/SignUp';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 import StyleGuide from '@/pages/StyleGuide';
 import DynamicPage from '@/pages/DynamicPage';
 import ContactPage from '@/pages/ContactPage';
@@ -142,6 +144,11 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
             case 'platform':
                 return <PlatformList initialData={initialData} />;
                 
+            case 'forgot-password':
+                return <ForgotPassword />;
+            case 'reset-password':
+                return <ResetPassword />;
+
             // Static Pages
             case 'contact-us':
             case 'login':

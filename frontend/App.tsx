@@ -9,6 +9,8 @@ import Customers from './pages/Customers';
 import Changelog from './pages/Changelog';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import StyleGuide from './pages/StyleGuide';
 import DynamicPage from './pages/DynamicPage';
 import ContactPage from './pages/ContactPage';
@@ -91,6 +93,8 @@ const App: React.FC = () => {
           <Route path="login" element={<SignIn />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="signup" element={<SignUp />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           <Route path="style-guide" element={<StyleGuide />} />
           <Route path="changelog" element={<Changelog />} />
           <Route path="customers" element={<Customers />} />

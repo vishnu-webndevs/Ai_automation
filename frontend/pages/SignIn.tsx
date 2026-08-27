@@ -118,9 +118,9 @@ const SignIn: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-purple-500 hover:text-purple-400">
+                <Link to="/forgot-password" className="font-medium text-purple-500 hover:text-purple-400 transition-colors">
                   Forgot your password?
-                </a>
+                </Link>
               </div>
             </div>
 

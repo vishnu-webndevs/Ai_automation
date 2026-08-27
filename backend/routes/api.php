@@ -81,6 +81,8 @@ Route::post('/contact', [PublicContactController::class, 'store'])->middleware('
 
 Route::post('/auth/register', [PublicAuthController::class, 'register']);
 Route::post('/auth/login', [PublicAuthController::class, 'login']);
+Route::post('/auth/forgot-password', [PublicAuthController::class, 'forgotPassword']);
+Route::post('/auth/reset-password', [PublicAuthController::class, 'resetPassword']);
 Route::middleware('auth:sanctum')->post('/auth/logout', [PublicAuthController::class, 'logout']);
 
 Route::prefix('admin')->group(function () {
