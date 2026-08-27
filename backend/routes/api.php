@@ -51,6 +51,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/pages/{slug}', [PublicPageController::class, 'show']);
 Route::get('/menus/{location}', [PublicMenuController::class, 'show']);
+Route::get('/sitemap.index.xml', [SitemapController::class, 'index']);
 Route::get('/sitemap-index.xml', [SitemapController::class, 'index']);
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 Route::get('/sitemap.xsl', [SitemapController::class, 'xsl']);

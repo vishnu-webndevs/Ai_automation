@@ -19,11 +19,12 @@ Route::get('/robots.txt', function () {
     if (!$baseUrl || str_contains($baseUrl, 'api.totan.ai')) {
         $baseUrl = 'https://totan.ai';
     }
-    $sitemapUrl = rtrim($baseUrl, '/') . '/sitemap-index.xml';
+    $sitemapUrl = rtrim($baseUrl, '/') . '/sitemap.index.xml';
 
     return response("User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nSitemap: {$sitemapUrl}\n", 200)->header('Content-Type', 'text/plain; charset=UTF-8');
 });
 
+Route::get('/sitemap.index.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'index']);
 Route::get('/sitemap-index.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'index']);
 Route::get('/sitemap.xml', [\App\Http\Controllers\Api\Public\SitemapController::class, 'index']);
 Route::get('/sitemap.xsl', [\App\Http\Controllers\Api\Public\SitemapController::class, 'xsl']);
