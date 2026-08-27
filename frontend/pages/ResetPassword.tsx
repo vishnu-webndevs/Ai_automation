@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Lock, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Lock, CheckCircle2, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { authService } from '../services/api';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState(searchParams.get('email') || '');
+  const [otp, setOtp] = useState(searchParams.get('otp') || searchParams.get('token') || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +31,7 @@ const ResetPassword: React.FC = () => {
     try {
       const response = await authService.resetPassword({
         email,
+        otp,
         password,
         password_confirmation: confirmPassword,
       });
@@ -52,7 +54,7 @@ const ResetPassword: React.FC = () => {
           Reset your password
         </h2>
         <p className="mt-2 text-center text-sm text-slate-400">
-          Enter your email and new password below.
+          Enter your email, 6-digit OTP, and new password below.
         </p>
       </div>
 
@@ -88,6 +90,28 @@ const ResetPassword: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="block w-full px-3 py-2 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="otp" className="block text-sm font-medium text-slate-300">
+                  6-Digit OTP Code
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <KeyRound className="h-5 w-5 text-slate-500" aria-hidden="true" />
+                  </div>
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="block w-full pl-10 px-3 py-2 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm tracking-widest font-mono"
+                    placeholder="123456"
                   />
                 </div>
               </div>

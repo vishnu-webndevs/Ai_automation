@@ -167,7 +167,7 @@ export const authService = {
         const response = await api.post('/auth/forgot-password', data);
         return response.data;
     },
-    resetPassword: async (data: { email: string; otp: string; password: string; password_confirmation: string }) => {
+    resetPassword: async (data: { email: string; otp?: string; password: string; password_confirmation: string }) => {
         const response = await api.post('/auth/reset-password', data);
         return response.data;
     },
