@@ -3,7 +3,7 @@ import { motion, Variants } from 'framer-motion';
 
 const Customers: React.FC = () => {
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -14,7 +14,7 @@ const Customers: React.FC = () => {
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,

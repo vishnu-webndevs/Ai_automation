@@ -28,7 +28,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
     }, [response, limit]);
 
     const containerVariants: Variants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -39,7 +39,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
     };
 
     const cardVariants: Variants = {
-        hidden: { opacity: 0, y: 25 },
+        hidden: { opacity: 1, y: 0 },
         visible: {
             opacity: 1,
             y: 0,
@@ -78,7 +78,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, amount: 0.05 }}
                 className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8"
             >
                 {blogs.map((blog) => (
@@ -157,7 +157,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, amount: 0.05 }}
                 className={`grid ${gridCols} gap-8`}
             >
                 {blogs.map((blog) => (

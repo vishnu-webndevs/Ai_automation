@@ -29,7 +29,7 @@ export default async function RootLayout({
   ]);
 
   return (
-    <html lang="en" className={`scroll-smooth ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${inter.variable}`}>
       <head>
         <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
         {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
@@ -49,7 +49,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="bg-slate-950 text-slate-300 antialiased overflow-x-hidden">
+      <body suppressHydrationWarning className="bg-slate-950 text-slate-300 antialiased overflow-x-hidden">
         <noscript>
           <iframe 
             src="https://www.googletagmanager.com/ns.html?id=GTM-55R2B6S4" 

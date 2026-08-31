@@ -44,7 +44,7 @@ const PricingPage: React.FC = () => {
     const [annual, setAnnual] = useState(true);
 
     const containerVariants: Variants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -55,7 +55,7 @@ const PricingPage: React.FC = () => {
     };
 
     const cardVariants: Variants = {
-        hidden: { opacity: 0, y: 30 },
+        hidden: { opacity: 1, y: 0 },
         visible: {
             opacity: 1,
             y: 0,
@@ -220,7 +220,7 @@ const PricingPage: React.FC = () => {
             <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, amount: 0.05 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mt-24"
             >

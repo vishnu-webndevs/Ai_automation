@@ -42,7 +42,7 @@ const WhyTrust: React.FC<WhyTrustProps> = ({
   ]
 }) => {
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -53,7 +53,7 @@ const WhyTrust: React.FC<WhyTrustProps> = ({
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
@@ -79,7 +79,7 @@ const WhyTrust: React.FC<WhyTrustProps> = ({
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, amount: 0.05 }}
           className="grid md:grid-cols-3 gap-x-8 gap-y-12"
         >
            {features.map((f, i) => (

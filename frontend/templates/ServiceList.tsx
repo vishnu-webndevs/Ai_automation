@@ -28,7 +28,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const MotionLink = motion.create(Link);
 
     const containerVariants: Variants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -39,7 +39,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     };
 
     const cardVariants: Variants = {
-        hidden: { opacity: 0, y: 25 },
+        hidden: { opacity: 1, y: 0 },
         visible: {
             opacity: 1,
             y: 0,
@@ -191,7 +191,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                         variants={containerVariants}
                         initial="hidden"
                         whileInView="visible"
-                        viewport={{ once: true, margin: "-50px" }}
+                        viewport={{ once: true, amount: 0.05 }}
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
                         {services && services.length === 0 && (
@@ -259,7 +259,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                             variants={containerVariants}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true, margin: "-50px" }}
+                            viewport={{ once: true, amount: 0.05 }}
                             className="md:col-span-2 space-y-6"
                         >
                             <motion.div variants={cardVariants} className="flex gap-4">

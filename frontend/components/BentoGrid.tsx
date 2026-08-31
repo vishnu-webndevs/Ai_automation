@@ -36,7 +36,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({
   ]
 }) => {
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -47,7 +47,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
@@ -75,7 +75,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, amount: 0.05 }}
           className="grid md:grid-cols-12 gap-6 mb-32"
         >
             {items.map((item, idx) => (

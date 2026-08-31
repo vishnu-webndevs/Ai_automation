@@ -27,7 +27,7 @@ const ToolsList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     }, [tools, search, showActiveOnly]);
 
     const containerVariants: Variants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -38,7 +38,7 @@ const ToolsList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     };
 
     const cardVariants: Variants = {
-        hidden: { opacity: 0, y: 25 },
+        hidden: { opacity: 1, y: 0 },
         visible: {
             opacity: 1,
             y: 0,

@@ -56,7 +56,7 @@ const Pricing: React.FC<PricingProps> = ({
   const MotionLink = motion.create(Link);
 
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -67,7 +67,7 @@ const Pricing: React.FC<PricingProps> = ({
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
@@ -111,7 +111,7 @@ const Pricing: React.FC<PricingProps> = ({
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, amount: 0.05 }}
           className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch"
         >
           {plans.map((plan, idx) => {

@@ -37,7 +37,7 @@ const Features: React.FC<FeaturesProps> = ({
           <motion.div 
             initial={{ opacity: 0, x: layout === 'right' ? 30 : -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.05 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className={layout === 'right' ? 'md:order-2' : ''}
           >
@@ -70,7 +70,7 @@ const Features: React.FC<FeaturesProps> = ({
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, x: layout === 'right' ? -30 : 30 }}
             whileInView={{ opacity: 1, scale: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.05 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className={`relative ${layout === 'right' ? 'md:order-1' : ''}`}
           >

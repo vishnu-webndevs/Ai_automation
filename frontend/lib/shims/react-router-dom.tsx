@@ -2,13 +2,14 @@ import React from 'react';
 import NextLink from 'next/link';
 import { useRouter, useParams as useNextParams, usePathname } from 'next/navigation';
 
-export const Link = ({ to, children, className, onClick, ...props }: any) => {
+export const Link = React.forwardRef<HTMLAnchorElement, any>(({ to, children, className, onClick, ...props }, ref) => {
     return (
-        <NextLink href={to || '#'} className={className} onClick={onClick} {...props}>
+        <NextLink ref={ref} href={to || '#'} className={className} onClick={onClick} {...props}>
             {children}
         </NextLink>
     );
-};
+});
+Link.displayName = 'Link';
 
 export const useNavigate = () => {
     const router = useRouter();
@@ -35,23 +36,29 @@ export const useParams = <T extends Record<string, string | undefined> = Record<
 
 export const useLocation = () => {
     const pathname = usePathname();
-    return React.useMemo(() => ({
+    const [location, setLocation] = React.useState(() => ({
         pathname: pathname || '/',
-        search: typeof window !== 'undefined' ? window.location.search : '',
-        hash: typeof window !== 'undefined' ? window.location.hash : ''
-    }), [pathname]);
+        search: '',
+        hash: ''
+    }));
+
+    React.useEffect(() => {
+        setLocation({
+            pathname: pathname || '/',
+            search: typeof window !== 'undefined' ? window.location.search : '',
+            hash: typeof window !== 'undefined' ? window.location.hash : ''
+        });
+    }, [pathname]);
+
+    return location;
 };
 
 export const useSearchParams = () => {
-    const [params, setParams] = React.useState(() => {
-        if (typeof window === 'undefined') {
-            return new URLSearchParams();
-        }
-        return new URLSearchParams(window.location.search);
-    });
+    const [params, setParams] = React.useState<URLSearchParams>(() => new URLSearchParams());
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
+            setParams(new URLSearchParams(window.location.search));
             const handleUrlChange = () => {
                 setParams(new URLSearchParams(window.location.search));
             };
@@ -62,9 +69,7 @@ export const useSearchParams = () => {
 
     return [
         params,
-        (newParams: any) => {
-            // Dummy setter
-        }
+        (newParams: any) => {}
     ] as any;
 };
 

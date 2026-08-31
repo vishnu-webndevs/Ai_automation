@@ -23,7 +23,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   ]
 }) => {
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -34,7 +34,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 25 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
@@ -49,7 +49,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, amount: 0.05 }}
           className={`grid gap-12 ${items.length > 1 ? 'md:grid-cols-2 lg:grid-cols-3' : 'place-items-center'}`}
         >
             {items.map((item, idx) => (
