@@ -21,6 +21,10 @@ const nextConfig = {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.totan.ai/api';
     return [
       {
+        source: '/robots.txt',
+        destination: `${apiUrl.replace(/\/api$/, '')}/robots.txt`,
+      },
+      {
         source: '/sitemap.index.xml',
         destination: `${apiUrl}/sitemap.index.xml`,
       },

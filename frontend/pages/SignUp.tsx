@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Github, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/api';
+import { motion } from 'framer-motion';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -67,8 +68,13 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-80px)] pt-20 pb-12 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-[calc(100vh-80px)] pt-20 pb-12 flex flex-col justify-center py-12 sm:px-6 lg:px-8 overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="sm:mx-auto sm:w-full sm:max-w-md"
+      >
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-white">
           Create your account
         </h2>
@@ -78,12 +84,21 @@ const SignUp: React.FC = () => {
             Sign in
           </Link>
         </p>
-      </div>
+      </motion.div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-slate-900/50 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-white/10">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0"
+      >
+        <div className="bg-slate-900/60 py-8 px-4 shadow-xl backdrop-blur-md sm:rounded-2xl sm:px-10 border border-white/10">
           {error && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-4 bg-red-500/10 border border-red-500/50 text-red-400 text-sm p-3 rounded-xl"
+            >
                 {error}
                 {error.includes('email has already been taken') && (
                     <div className="mt-2">
@@ -92,10 +107,10 @@ const SignUp: React.FC = () => {
                         </Link>
                     </div>
                 )}
-            </div>
+            </motion.div>
           )}
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-slate-300">
                 Full Name
@@ -111,7 +126,7 @@ const SignUp: React.FC = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="block w-full pl-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 bg-slate-800/80 border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm py-2.5 transition-all"
                   placeholder="John Doe"
                 />
               </div>
@@ -132,7 +147,7 @@ const SignUp: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="block w-full pl-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 bg-slate-800/80 border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm py-2.5 transition-all"
                   placeholder="you@example.com"
                 />
               </div>
@@ -153,13 +168,13 @@ const SignUp: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 pr-10 bg-slate-800/80 border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm py-2.5 transition-all"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
@@ -182,13 +197,13 @@ const SignUp: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full pl-10 pr-10 bg-slate-800 border-slate-700 rounded-md text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="block w-full pl-10 pr-10 bg-slate-800/80 border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-purple-500 focus:border-purple-500 sm:text-sm py-2.5 transition-all"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5 text-slate-400" /> : <Eye className="h-5 w-5 text-slate-400" />}
@@ -219,13 +234,15 @@ const SignUp: React.FC = () => {
             </div>
 
             <div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="flex w-full justify-center rounded-md border border-transparent bg-purple-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex w-full justify-center rounded-xl border border-transparent bg-purple-600 py-3 px-4 text-sm font-semibold text-white shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
-              </button>
+              </motion.button>
             </div>
           </form>
 
@@ -240,24 +257,29 @@ const SignUp: React.FC = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 type="button"
-                className="flex w-full items-center justify-center rounded-md border border-slate-700 bg-slate-800 py-2 px-4 text-sm font-medium text-slate-300 shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+                className="flex w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-800 py-2.5 px-4 text-sm font-medium text-slate-300 shadow-sm hover:bg-slate-700 transition-all cursor-pointer"
               >
                 <Github className="h-5 w-5" />
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 type="button"
-                className="flex w-full items-center justify-center rounded-md border border-slate-700 bg-slate-800 py-2 px-4 text-sm font-medium text-slate-300 shadow-sm hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors"
+                className="flex w-full items-center justify-center rounded-xl border border-slate-700 bg-slate-800 py-2.5 px-4 text-sm font-medium text-slate-300 shadow-sm hover:bg-slate-700 transition-all cursor-pointer"
               >
                 <span className="h-5 w-5 flex items-center justify-center font-bold font-serif">G</span>
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
 export default SignUp;
+

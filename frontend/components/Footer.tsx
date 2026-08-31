@@ -33,11 +33,11 @@ const Footer: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   }, [footerMenu]);
 
   return (
-    <footer className="relative pt-24 pb-12 overflow-hidden border-t border-slate-800/50">
+    <footer className="relative pt-24 pb-12 overflow-hidden border-t border-slate-800/50 w-full max-w-full">
       {/* Background glow bottom */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[300px] bg-purple-900/10 blur-[120px] rounded-t-full pointer-events-none -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* CTA Section (hidden on specific pages) */}
         {!hideCta && (
           <div className="text-center mb-24">

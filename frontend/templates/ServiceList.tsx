@@ -2,6 +2,7 @@ import React from 'react';
 import useSWR from 'swr';
 import { Link } from 'react-router-dom';
 import { serviceCategoryService, serviceService } from '../services/api';
+import { motion, Variants } from 'framer-motion';
 
 const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const { data: services, error, isLoading } = useSWR('services', serviceService.getAll, {
@@ -24,6 +25,28 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         .sort((a: any, b: any) => String(b?.updated_at || '').localeCompare(String(a?.updated_at || '')))
         .find(Boolean);
 
+    const MotionLink = motion.create(Link);
+
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.05
+            }
+        }
+    };
+
+    const cardVariants: Variants = {
+        hidden: { opacity: 0, y: 25 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: "easeOut" }
+        }
+    };
+
     if (isLoading && !services) return <div className="text-center py-20 text-white">Loading services...</div>;
 
     if (error)
@@ -34,40 +57,53 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
         );
 
     return (
-        <div className="bg-slate-950 min-h-screen">
-            <section className="relative pt-32 pb-16 overflow-hidden">
-                <div className="absolute -top-40 right-0 w-[480px] h-[480px] bg-purple-700/15 blur-[140px] rounded-full pointer-events-none" />
-                <div className="absolute top-40 -left-40 w-[420px] h-[420px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="bg-slate-950 min-h-screen overflow-hidden max-w-full w-full">
+            <section className="relative pt-32 pb-16 overflow-hidden max-w-full w-full">
+                <div className="absolute -top-40 right-0 w-full max-w-[480px] h-[480px] bg-purple-700/15 blur-[140px] rounded-full pointer-events-none" />
+                <div className="absolute top-40 left-0 -translate-x-1/2 w-full max-w-[420px] h-[420px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
 
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div>
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                        >
                             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-3">
                                 Services
                             </p>
                             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
                                 AI services built around real business workflows
                             </h1>
-                            <p className="text-slate-400 text-base md:text-lg mb-6 max-w-xl">
+                            <p className="text-slate-400 text-base md:text-lg mb-6 max-w-xl leading-relaxed">
                                 Instead of a single generic chatbot, we design focused AI services for your support,
                                 sales and operations teams – each wired into your stack, data and compliance rules.
                             </p>
                             <div className="flex flex-wrap gap-3">
-                                <Link
+                                <MotionLink
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.97 }}
                                     to="/contact-us"
-                                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-white text-slate-900 text-sm font-semibold hover:bg-slate-200 transition-colors"
+                                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-white text-slate-900 text-sm font-semibold hover:bg-slate-200 transition-colors shadow-md"
                                 >
                                     Book a strategy call
-                                </Link>
-                                <Link
+                                </MotionLink>
+                                <MotionLink
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
                                     to="/use-cases"
                                     className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-700 text-sm font-semibold text-slate-100 hover:bg-slate-900 transition-colors"
                                 >
                                     See live use cases
-                                </Link>
+                                </MotionLink>
                             </div>
                             {topCategories.length > 0 && (
-                                <div className="mt-6 flex flex-wrap gap-2">
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2, duration: 0.4 }}
+                                    className="mt-6 flex flex-wrap gap-2"
+                                >
                                     {topCategories.map((c: any) => (
                                         <Link
                                             key={c.id}
@@ -80,12 +116,17 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                             )}
                                         </Link>
                                     ))}
-                                </div>
+                                </motion.div>
                             )}
-                        </div>
+                        </motion.div>
 
-                        <div className="lg:pl-8">
-                            <div className="relative rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-purple-900/40 p-6 shadow-2xl">
+                        <motion.div 
+                            initial={{ opacity: 0, x: 30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+                            className="lg:pl-8"
+                        >
+                            <div className="relative rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900/40 to-purple-900/40 p-6 shadow-2xl backdrop-blur-md">
                                 <div className="flex items-center justify-between mb-4">
                                     <div>
                                         <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-1">
@@ -96,7 +137,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                         </p>
                                     </div>
                                     {mostPopularCategory && (
-                                        <span className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-200">
+                                        <span className="inline-flex items-center gap-2 rounded-full bg-purple-500/10 border border-purple-500/20 px-3 py-1 text-xs font-medium text-purple-200">
                                             Top category: {mostPopularCategory.name}
                                         </span>
                                     )}
@@ -124,7 +165,7 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
@@ -146,17 +187,26 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <motion.div 
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-50px" }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    >
                         {services && services.length === 0 && (
                             <p className="col-span-full text-sm text-slate-500">
                                 No services are available yet. Add services in the admin panel to see them here.
                             </p>
                         )}
                         {services?.map((service) => (
-                            <Link
-                                to={`/services/${service.slug}`}
+                            <MotionLink
                                 key={service.id}
-                                className="group bg-slate-900/70 border border-slate-800 rounded-2xl p-7 hover:border-purple-500/60 hover:bg-slate-900 transition-colors flex flex-col"
+                                variants={cardVariants}
+                                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                                whileTap={{ scale: 0.99 }}
+                                to={`/services/${service.slug}`}
+                                className="group bg-slate-900/70 border border-slate-800 rounded-2xl p-7 hover:border-purple-500/60 hover:bg-slate-900 transition-colors flex flex-col shadow-lg backdrop-blur-sm"
                             >
                                 <div className="mb-4 flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors text-xl">
@@ -185,9 +235,9 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                         />
                                     </svg>
                                 </span>
-                            </Link>
+                            </MotionLink>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -201,12 +251,18 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                             <h2 className="text-2xl font-bold text-white mb-3">
                                 How an AI service goes live
                             </h2>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-slate-400 leading-relaxed">
                                 Each service is packaged and repeatable. We start with one workflow, then expand.
                             </p>
                         </div>
-                        <div className="md:col-span-2 space-y-6">
-                            <div className="flex gap-4">
+                        <motion.div 
+                            variants={containerVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: "-50px" }}
+                            className="md:col-span-2 space-y-6"
+                        >
+                            <motion.div variants={cardVariants} className="flex gap-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/10 border border-purple-500/40 flex items-center justify-center text-xs font-semibold text-purple-200">
                                     1
                                 </div>
@@ -214,12 +270,12 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                     <h3 className="text-sm font-semibold text-white mb-1">
                                         Map your stack and guardrails
                                     </h3>
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-slate-400 leading-relaxed">
                                         We capture channels, systems, data sources and all the rules that the AI must respect before any prompts are written.
                                     </p>
                                 </div>
-                            </div>
-                            <div className="flex gap-4">
+                            </motion.div>
+                            <motion.div variants={cardVariants} className="flex gap-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/10 border border-purple-500/40 flex items-center justify-center text-xs font-semibold text-purple-200">
                                     2
                                 </div>
@@ -227,12 +283,12 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                     <h3 className="text-sm font-semibold text-white mb-1">
                                         Build, test and shadow‑run the service
                                     </h3>
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-slate-400 leading-relaxed">
                                         The service runs against real conversations and tickets in a safe sand‑box so you can see exactly how it behaves.
                                     </p>
                                 </div>
-                            </div>
-                            <div className="flex gap-4">
+                            </motion.div>
+                            <motion.div variants={cardVariants} className="flex gap-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/10 border border-purple-500/40 flex items-center justify-center text-xs font-semibold text-purple-200">
                                     3
                                 </div>
@@ -240,12 +296,12 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                     <h3 className="text-sm font-semibold text-white mb-1">
                                         Go live with monitoring and controls
                                     </h3>
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-slate-400 leading-relaxed">
                                         We gradually open traffic, add human‑in‑the‑loop approvals where needed and give your team dashboards to monitor performance.
                                     </p>
                                 </div>
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
@@ -254,3 +310,4 @@ const ServiceList: React.FC<{ initialData?: any }> = ({ initialData }) => {
 };
 
 export default ServiceList;
+

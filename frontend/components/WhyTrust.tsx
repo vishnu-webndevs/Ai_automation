@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageSquare, Users, Search, BarChart2, Bell, Share2, Shield, Download, Zap } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
 
 export interface TrustFeature {
   title: string;
@@ -40,28 +41,65 @@ const WhyTrust: React.FC<WhyTrustProps> = ({
     { icon: 'zap', title: "Real-time sync", desc: "Login box must find the right balance for the user convenience, privacy and security." },
   ]
 }) => {
-  return (
-    <section className="py-20 bg-slate-900/20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="mb-16">
-           <h2 className="text-3xl font-bold text-white mb-4">{heading}</h2>
-           <p className="text-slate-400 max-w-2xl">{description}</p>
-        </div>
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.05
+      }
+    }
+  };
 
-        <div className="grid md:grid-cols-3 gap-x-8 gap-y-12">
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35, ease: "easeOut" }
+    }
+  };
+
+  return (
+    <section className="py-20 bg-slate-900/20 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <motion.div 
+          initial={{ opacity: 0, y: -15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="mb-16"
+        >
+           <h2 className="text-3xl font-bold text-white mb-4">{heading}</h2>
+           <p className="text-slate-400 max-w-2xl leading-relaxed">{description}</p>
+        </motion.div>
+
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid md:grid-cols-3 gap-x-8 gap-y-12"
+        >
            {features.map((f, i) => (
-             <div key={i} className="group">
-                <div className="mb-4 bg-slate-800/50 w-10 h-10 flex items-center justify-center rounded-lg border border-slate-700/50 group-hover:bg-slate-800 transition-colors">
+             <motion.div 
+               key={i} 
+               variants={itemVariants}
+               whileHover={{ x: 4 }}
+               className="group cursor-pointer"
+             >
+                <div className="mb-4 bg-slate-800/50 w-10 h-10 flex items-center justify-center rounded-lg border border-slate-700/50 group-hover:bg-slate-800 transition-colors shadow-sm">
                    {f.icon && iconMap[f.icon] ? iconMap[f.icon] : <Zap className="text-slate-400" />}
                 </div>
-                <h3 className="text-white font-semibold text-lg mb-2">{f.title}</h3>
+                <h3 className="text-white font-semibold text-lg mb-2 group-hover:text-purple-400 transition-colors">{f.title}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{f.desc}</p>
-             </div>
+             </motion.div>
            ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 };
 
-export default WhyTrust;
+export default WhyTrust;

@@ -31,15 +31,6 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `
-          if (typeof window !== 'undefined' && window.trustedTypes && window.trustedTypes.createPolicy && !window.trustedTypes.defaultPolicy) {
-            window.trustedTypes.createPolicy('default', {
-              createHTML: function(string) { return string; },
-              createScript: function(string) { return string; },
-              createScriptURL: function(string) { return string; }
-            });
-          }
-        `}} />
         <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
         {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
           <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
@@ -57,20 +48,8 @@ export default async function RootLayout({
             `,
           }}
         />
-        <style>{`
-          body {
-            background-color: #020617;
-            color: #f8fafc;
-            overflow-x: hidden;
-            font-family: var(--font-inter), sans-serif;
-          }
-          ::-webkit-scrollbar { width: 8px; }
-          ::-webkit-scrollbar-track { background: #0f172a; }
-          ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-          ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        `}</style>
       </head>
-      <body>
+      <body className="bg-slate-950 text-slate-300 antialiased overflow-x-hidden">
         <noscript>
           <iframe 
             src="https://www.googletagmanager.com/ns.html?id=GTM-55R2B6S4" 

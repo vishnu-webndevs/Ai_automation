@@ -159,9 +159,9 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
     `text-sm font-medium transition-colors ${isActive(path) ? 'text-white' : 'text-slate-300 hover:text-white'}`;
 
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md border-b border-white/10' : 'bg-transparent'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-20">
+    <header className={`fixed top-0 w-full max-w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md border-b border-white/10' : 'bg-transparent'}`}>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-20 w-full min-w-0">
           
           {/* Logo */}
           <div className="shrink-0 mr-4">
@@ -207,8 +207,8 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
 
       {/* Mobile Nav */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 border-b border-white/10 absolute w-full top-20 left-0 animate-in slide-in-from-top-5 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto">
-           <nav className="flex flex-col py-4">
+        <div className="md:hidden bg-slate-900 border-b border-white/10 absolute w-full max-w-full top-20 left-0 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto overflow-x-hidden z-50">
+           <nav className="flex flex-col py-4 w-full max-w-full overflow-x-hidden">
             {sanitizedItems.map((item) => (
                <MobileMenuItem key={item.id} item={item} closeMenu={() => setMobileMenuOpen(false)} />
             ))}

@@ -470,10 +470,12 @@ XSL;
         if ($name === 'pages' && Schema::hasTable('pages') && Schema::hasColumn('pages', 'slug')) {
             // First, add the home page (root URL) and other static frontend pages
             $addUrl($baseUrl . '/', now()->toAtomString());
+            $addUrl($baseUrl . '/about-us', now()->toAtomString());
             $addUrl($baseUrl . '/pricing', now()->toAtomString());
             $addUrl($baseUrl . '/customers', now()->toAtomString());
             $addUrl($baseUrl . '/changelog', now()->toAtomString());
             $addUrl($baseUrl . '/platform', now()->toAtomString());
+            $addUrl($baseUrl . '/contact-us', now()->toAtomString());
 
             $pageColumns = $this->selectColumns('pages', ['id', 'slug', 'updated_at', 'type']);
             $pagesQuery = Page::query()->select($pageColumns);
@@ -518,6 +520,7 @@ XSL;
         }
 
         if ($name === 'services') {
+            $addUrl($baseUrl . '/services', now()->toAtomString());
             if (Schema::hasTable('services') && Schema::hasColumn('services', 'slug')) {
                 $servicesColumns = $this->selectColumns('services', ['slug', 'updated_at']);
                 $servicesQuery = $this->applyIsActiveFilter(Service::query(), 'services')->select($servicesColumns);
@@ -552,6 +555,7 @@ XSL;
         }
 
         if ($name === 'blogs') {
+            $addUrl($baseUrl . '/blog', now()->toAtomString());
             if (Schema::hasTable('pages') && Schema::hasColumn('pages', 'slug') && Schema::hasColumn('pages', 'type')) {
                 $pageColumns = $this->selectColumns('pages', ['id', 'slug', 'updated_at', 'type']);
                 $blogsQuery = Page::query()->select($pageColumns)->where('type', 'blog');
@@ -611,6 +615,7 @@ XSL;
         }
 
         if ($name === 'industries') {
+            $addUrl($baseUrl . '/industries', now()->toAtomString());
             if (Schema::hasTable('industries') && Schema::hasColumn('industries', 'slug')) {
                 $cols = $this->selectColumns('industries', ['slug', 'updated_at']);
                 $query = $this->applyIsActiveFilter(Industry::query(), 'industries')->select($cols);
@@ -624,6 +629,7 @@ XSL;
         }
 
         if ($name === 'use-cases') {
+            $addUrl($baseUrl . '/use-cases', now()->toAtomString());
             if (Schema::hasTable('use_cases') && Schema::hasColumn('use_cases', 'slug')) {
                 $cols = $this->selectColumns('use_cases', ['slug', 'updated_at']);
                 $query = $this->applyIsActiveFilter(UseCase::query(), 'use_cases')->select($cols);
@@ -637,6 +643,7 @@ XSL;
         }
 
         if ($name === 'solutions') {
+            $addUrl($baseUrl . '/solutions', now()->toAtomString());
             if (Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'slug')) {
                 $cols = $this->selectColumns('solutions', ['slug', 'updated_at']);
                 $query = $this->applyIsActiveFilter(Solution::query(), 'solutions')->select($cols);
@@ -650,6 +657,7 @@ XSL;
         }
 
         if ($name === 'integrations') {
+            $addUrl($baseUrl . '/integrations', now()->toAtomString());
             if (Schema::hasTable('integrations') && Schema::hasColumn('integrations', 'slug')) {
                 $cols = $this->selectColumns('integrations', ['slug', 'updated_at']);
                 $query = $this->applyIsActiveFilter(Integration::query(), 'integrations')->select($cols);
@@ -663,6 +671,7 @@ XSL;
         }
 
         if ($name === 'tools') {
+            $addUrl($baseUrl . '/tools', now()->toAtomString());
             if (Schema::hasTable('solutions') && Schema::hasColumn('solutions', 'slug')) {
                 $cols = $this->selectColumns('solutions', ['slug', 'updated_at']);
                 $query = $this->applyIsActiveFilter(Solution::query(), 'solutions')->select($cols);

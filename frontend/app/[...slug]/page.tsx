@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { 
   pageService, 
@@ -197,28 +197,27 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
   }
 
   if (!meta_title) meta_title = first.charAt(0).toUpperCase() + first.slice(1) + ' | Totan AI';
-  if (!meta_description) meta_description = 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.';
-
-  const cleanCanonical = canonical_url || fullUrl;
+  const defaultTitle = 'Totan.ai';
+  const defaultDesc = 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.';
 
   return {
-    title: meta_title,
-    description: meta_description,
+    title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+    description: meta_description || defaultDesc,
     alternates: {
-      canonical: cleanCanonical,
+      canonical: canonical_url || fullUrl,
     },
     openGraph: {
-      title: meta_title,
-      description: meta_description,
-      url: cleanCanonical,
-      siteName: 'Totan AI',
+      title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+      description: meta_description || defaultDesc,
+      url: canonical_url || fullUrl,
+      siteName: 'Totan.ai',
       images: og_image ? [{ url: og_image }] : [{ url: 'https://totan.ai/totan_logo.png' }],
       type: 'website',
     },
     twitter: {
       card: twitter_card as any,
-      title: meta_title,
-      description: meta_description,
+      title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+      description: meta_description || defaultDesc,
       images: og_image ? [og_image] : ['https://totan.ai/totan_logo.png'],
     },
     robots: {
@@ -358,7 +357,6 @@ function generateSchema(slugArray: string[], data: any) {
   };
 }
 
-import { Suspense } from 'react';
 
 export default async function DynamicRoute({ params }: { params: { slug: string[] } }) {
   const slugArray = params.slug || [];
@@ -371,7 +369,16 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     );
   }
 
-  const first = slugArray[0];
+  const first = slugArray[0] || '';
+  // Ignore internal Next.js asset/webpack/HMR requests from triggering backend API calls
+  if (first.startsWith('_next') || first === 'favicon.ico' || first === 'pages' || slugArray.join('/').includes('_next') || slugArray.join('/').includes('webpack')) {
+    return (
+      <Suspense fallback={null}>
+        <ClientWrapper slug={slugArray} />
+      </Suspense>
+    );
+  }
+
   const second = slugArray.length > 1 ? slugArray[1] : null;
   const third = slugArray.length > 2 ? slugArray[2] : null;
 
@@ -380,9 +387,9 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
   try {
     if (first === 'services') {
       if (second === 'category' && third) {
-        initialData = await serviceCategoryService.getBySlug(third);
+        initialData = await serviceCategoryService.getBySlug(third).catch(() => null);
       } else if (second) {
-        initialData = await serviceService.getBySlug(second);
+        initialData = await serviceService.getBySlug(second).catch(() => null);
       } else {
         const [services, categories] = await Promise.all([
           serviceService.getAll().catch(() => []),
@@ -393,28 +400,28 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     } 
     else if (first === 'industries') {
       if (second) {
-        initialData = await industryService.getBySlug(second);
+        initialData = await industryService.getBySlug(second).catch(() => null);
       } else {
         initialData = await industryService.getAll().catch(() => []);
       }
     } 
     else if (first === 'use-cases') {
       if (second) {
-        initialData = await useCaseService.getBySlug(second);
+        initialData = await useCaseService.getBySlug(second).catch(() => null);
       } else {
         initialData = await useCaseService.getAll().catch(() => []);
       }
     } 
     else if (first === 'solutions') {
       if (second) {
-        initialData = await solutionService.getBySlug(second);
+        initialData = await solutionService.getBySlug(second).catch(() => null);
       } else {
         initialData = await solutionService.getAll().catch(() => []);
       }
     } 
     else if (first === 'integrations') {
       if (second) {
-        initialData = await integrationService.getBySlug(second);
+        initialData = await integrationService.getBySlug(second).catch(() => null);
       } else {
         initialData = await integrationService.getAll().catch(() => []);
       }
@@ -435,11 +442,11 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     }
     else if (first === 'blog') {
       if (second === 'category' && third) {
-        initialData = await blogCategoryService.getBySlug(third);
+        initialData = await blogCategoryService.getBySlug(third).catch(() => null);
       } else if (second === 'tag' && third) {
-        initialData = await blogTagService.getBySlug(third);
+        initialData = await blogTagService.getBySlug(third).catch(() => null);
       } else if (second && second !== 'categories') {
-        initialData = await pageService.getBySlug(second);
+        initialData = await pageService.getBySlug(second).catch(() => null);
       } else {
         const [blogData, categories] = await Promise.all([
           pageService.getBlogs(1).catch(() => null),
@@ -450,13 +457,13 @@ export default async function DynamicRoute({ params }: { params: { slug: string[
     }
     else {
       const catchAllSlug = slugArray.join('/');
-      initialData = await pageService.getBySlug(catchAllSlug);
+      initialData = await pageService.getBySlug(catchAllSlug).catch(() => null);
       if (!initialData) {
         initialData = STATIC_PAGES[catchAllSlug] || null;
       }
     }
   } catch (error) {
-    console.error("Failed to fetch initial data for SSR:", error);
+    // Silent fallback for SSR errors
   }
 
   if (initialData) {

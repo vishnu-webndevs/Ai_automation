@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { pageService } from '../services/api';
-import { Page } from '../types';
 import { Calendar, ArrowRight } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
 
 interface BlogGridProps {
     columns?: number;
@@ -17,6 +17,8 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
         fallbackData: initialData
     });
 
+    const MotionLink = motion.create(Link);
+
     const blogs = useMemo(() => {
         let fetchedBlogs = response?.data || [];
         if (limit) {
@@ -24,6 +26,26 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
         }
         return fetchedBlogs;
     }, [response, limit]);
+
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.05
+            }
+        }
+    };
+
+    const cardVariants: Variants = {
+        hidden: { opacity: 0, y: 25 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: "easeOut" }
+        }
+    };
 
     if (isLoading && blogs.length === 0) {
         return (
@@ -52,12 +74,21 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
     // List View (Horizontal Card) for 1 column
     if (columns === 1) {
         return (
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8"
+            >
                 {blogs.map((blog) => (
-                    <Link 
+                    <MotionLink 
                         key={blog.id} 
+                        variants={cardVariants}
+                        whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                        whileTap={{ scale: 0.99 }}
                         to={`/${blog.slug}`}
-                        className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 flex flex-col md:flex-row h-full md:h-64"
+                        className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 flex flex-col md:flex-row h-full md:h-64 backdrop-blur-sm shadow-lg"
                     >
                         {/* Image (Left side on desktop) */}
                         <div className="md:w-2/5 h-48 md:h-full bg-slate-800 relative overflow-hidden shrink-0">
@@ -79,7 +110,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                             
                             {show_categories && blog.blog_categories && blog.blog_categories.length > 0 && (
                                 <div className="absolute top-4 left-4">
-                                    <span className="bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full">
+                                    <span className="bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                                         {blog.blog_categories[0].name}
                                     </span>
                                 </div>
@@ -107,9 +138,9 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 Read Article <ArrowRight className="w-4 h-4 ml-1" />
                             </div>
                         </div>
-                    </Link>
+                    </MotionLink>
                 ))}
-            </div>
+            </motion.div>
         );
     }
 
@@ -122,12 +153,21 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-            <div className={`grid ${gridCols} gap-8`}>
+            <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                className={`grid ${gridCols} gap-8`}
+            >
                 {blogs.map((blog) => (
-                    <Link 
+                    <MotionLink 
                         key={blog.id} 
+                        variants={cardVariants}
+                        whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                        whileTap={{ scale: 0.99 }}
                         to={`/${blog.slug}`}
-                        className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 flex flex-col h-full"
+                        className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-300 flex flex-col h-full backdrop-blur-sm shadow-lg"
                     >
                         {/* Image */}
                         <div className="aspect-video bg-slate-800 relative overflow-hidden">
@@ -149,7 +189,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                             
                             {show_categories && blog.blog_categories && blog.blog_categories.length > 0 && (
                                 <div className="absolute top-4 left-4">
-                                    <span className="bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full">
+                                    <span className="bg-purple-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                                         {blog.blog_categories[0].name}
                                     </span>
                                 </div>
@@ -178,11 +218,12 @@ const BlogGrid: React.FC<BlogGridProps> = ({ columns = 3, show_categories = true
                                 Read Article <ArrowRight className="w-4 h-4 ml-1" />
                             </div>
                         </div>
-                    </Link>
+                    </MotionLink>
                 ))}
-            </div>
+            </motion.div>
         </div>
     );
 };
 
 export default BlogGrid;
+
