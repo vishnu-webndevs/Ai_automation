@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const PricingPage: React.FC = () => {
     const [annual, setAnnual] = useState(true);
@@ -19,7 +20,7 @@ const PricingPage: React.FC = () => {
                     <span className={`text-sm ${!annual ? 'text-white font-medium' : 'text-slate-400'}`}>Monthly</span>
                     <button 
                         onClick={() => setAnnual(!annual)}
-                        className="w-14 h-8 bg-slate-800 rounded-full relative transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-14 h-8 bg-slate-800 rounded-full relative transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
                         aria-label="Toggle annual pricing"
                     >
                         <div className={`absolute top-1 w-6 h-6 bg-purple-500 rounded-full transition-transform ${annual ? 'left-7' : 'left-1'}`} />
@@ -62,13 +63,16 @@ const PricingPage: React.FC = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button className={`w-full py-3 px-6 rounded-lg font-medium transition-all ${
-                            plan.featured 
-                                ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/25' 
-                                : 'bg-slate-800 hover:bg-slate-700 text-white hover:text-white'
-                        }`}>
+                        <Link 
+                            to={typeof plan.price === 'number' ? `/signup?plan=${encodeURIComponent(plan.name)}` : '/contact-us'}
+                            className={`w-full py-3 px-6 rounded-lg font-medium transition-all text-center ${
+                                plan.featured 
+                                    ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/25' 
+                                    : 'bg-slate-800 hover:bg-slate-700 text-white hover:text-white'
+                            }`}
+                        >
                             {typeof plan.price === 'number' ? 'Start Free Trial' : 'Contact Sales'}
-                        </button>
+                        </Link>
                     </div>
                 ))}
             </div>
