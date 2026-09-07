@@ -88,6 +88,11 @@ const App: React.FC = () => {
           <Route path="integrations/:slug" element={<IntegrationDetail />} />
           <Route path="platform" element={<PlatformList />} />
 
+          {/* Redirect Routes */}
+          <Route path="ai-trends" element={<Navigate to="/blog/category/tech-trends" replace />} />
+          <Route path="about" element={<Navigate to="/about-us" replace />} />
+          <Route path="our-services" element={<Navigate to="/services" replace />} />
+
           {/* Static Pages */}
           <Route path="contact-us" element={<ContactPage />} />
           <Route path="login" element={<SignIn />} />

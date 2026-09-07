@@ -25,11 +25,17 @@ class ServiceCategoryController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        $services = $category->services()
+        $pivotServices = $category->services()
             ->where('is_active', true)
             ->with(['category', 'categories'])
-            ->orderBy('name')
             ->get();
+
+        $primaryServices = $category->primaryServices()
+            ->where('is_active', true)
+            ->with(['category', 'categories'])
+            ->get();
+
+        $services = $pivotServices->concat($primaryServices)->unique('id')->sortBy('name')->values();
 
         $payload = $category->toArray();
         $payload['services'] = $services;
@@ -37,4 +43,3 @@ class ServiceCategoryController extends Controller
         return response()->json($payload);
     }
 }
-

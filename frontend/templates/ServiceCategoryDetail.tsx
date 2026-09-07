@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { Helmet } from 'react-helmet-async';
-import { serviceCategoryService } from '../services/api';
+import { serviceCategoryService, serviceService } from '../services/api';
 import type { ServiceCategory } from '../types';
 
 const toMetaDescription = (value: string) => {
@@ -45,7 +45,24 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
         );
     }
 
-    const hasServices = category.services && category.services.length > 0;
+    const { data: allServices } = useSWR(
+        (!category?.services || category.services.length === 0) ? 'services-all' : null,
+        serviceService.getAll
+    );
+
+    const displayServices = useMemo(() => {
+        if (category?.services && category.services.length > 0) {
+            return category.services;
+        }
+        if (!allServices || !category) return [];
+        return allServices.filter((s: any) => {
+            const catId = s.service_category_id || s.category_id || s.category?.id;
+            const catSlug = s.category?.slug;
+            return catId === category.id || (catSlug && catSlug === category.slug);
+        });
+    }, [category, allServices]);
+
+    const hasServices = displayServices.length > 0;
 
     const faqs = [
         {
@@ -112,13 +129,13 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
 
             <main className="mt-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-6xl mx-auto">
-                    {(!category.services || category.services.length === 0) ? (
+                    {!hasServices ? (
                         <div className="text-center text-slate-400 py-16">
                             No services found in this category.
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {category.services.map((service) => (
+                            {displayServices.map((service) => (
                                 <Link
                                     key={service.id}
                                     to={`/services/${service.slug}`}
