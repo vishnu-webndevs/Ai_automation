@@ -7,12 +7,14 @@ import { solutionService } from '../services/api';
 const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const location = useLocation();
     const isToolsRoute = location.pathname.startsWith('/tools/');
-    const { slug } = useParams<{ slug: string }>();
-    const { data: solution, isLoading, error } = useSWR(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: solutionData, isLoading, error } = useSWR(
         slug ? `solution-${slug}` : null, 
         () => solutionService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const solution = solutionData || initialData;
 
     if (isLoading && !solution) return <div className="text-center py-20 text-white">Loading solution...</div>;
     if (error || !solution) {

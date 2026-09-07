@@ -5,12 +5,14 @@ import { Helmet } from 'react-helmet-async';
 import { useCaseService } from '../services/api';
 
 const UseCaseDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: useCase, isLoading, error } = useSWR(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: useCaseData, isLoading, error } = useSWR(
         slug ? `use-case-${slug}` : null, 
         () => useCaseService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const useCase = useCaseData || initialData;
 
     if (isLoading && !useCase) return <div className="text-center py-20 text-white">Loading use case...</div>;
     if (error || !useCase) {

@@ -73,13 +73,15 @@ const SectionShell: React.FC<{
 );
 
 const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
     const [searchParams] = useSearchParams();
-    const { data: service, isLoading, error } = useSWR(
+    const { data: serviceData, isLoading, error } = useSWR(
         slug ? `service-${slug}` : null, 
         () => serviceService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const service = serviceData || initialData;
     const { data: allServices } = useSWR('services-all', () => serviceService.getAll(), {
         fallbackData: initialData ? [initialData] : undefined
     });

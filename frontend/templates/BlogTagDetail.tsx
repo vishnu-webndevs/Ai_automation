@@ -5,12 +5,14 @@ import { Helmet } from 'react-helmet-async';
 import { blogTagService } from '../services/api';
 
 const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams() as { slug: string };
-    const { data: tag, isLoading, error } = useSWR(
+    const params = useParams() as { slug?: string };
+    const slug = params.slug || initialData?.slug;
+    const { data: tagData, isLoading, error } = useSWR(
         slug ? `blog-tag-${slug}` : null, 
         () => blogTagService.getBySlug(slug as string),
         { fallbackData: initialData }
     );
+    const tag = tagData || initialData;
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !tag) return <div className="text-center py-20 text-white">Loading tag...</div>;

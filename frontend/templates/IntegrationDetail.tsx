@@ -5,12 +5,14 @@ import { Helmet } from 'react-helmet-async';
 import { integrationService } from '../services/api';
 
 const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: integration, isLoading, error } = useSWR(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: integrationData, isLoading, error } = useSWR(
         slug ? `integration-${slug}` : null, 
         () => integrationService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const integration = integrationData || initialData;
 
     if (isLoading && !integration) return <div className="text-center py-20 text-white">Loading integration...</div>;
     if (error || !integration) {

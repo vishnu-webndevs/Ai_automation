@@ -8,12 +8,14 @@ import SeoHead from '../components/seo/SeoHead';
 import type { BlogCategory, Page, PageSection } from '../types';
 
 const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: page, isLoading, error } = useSWR<Page | undefined>(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: pageData, isLoading, error } = useSWR<Page | undefined>(
         slug ? `blog-${slug}` : null,
         () => pageService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const page = pageData || initialData;
     const { data: recentPosts } = useSWR('recent-posts', () => pageService.getBlogs(1));
     const { data: categories } = useSWR<BlogCategory[]>('blog-categories', blogCategoryService.getAll);
 

@@ -5,12 +5,14 @@ import { Helmet } from 'react-helmet-async';
 import { solutionService } from '../services/api';
 
 const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: tool, isLoading, error } = useSWR(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: toolData, isLoading, error } = useSWR(
         slug ? `tool-${slug}` : null,
         () => solutionService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const tool = toolData || initialData;
 
     if (isLoading && !tool) {
         return (

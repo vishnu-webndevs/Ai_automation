@@ -12,12 +12,14 @@ const toMetaDescription = (value: string) => {
 };
 
 const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams<{ slug: string }>();
-    const { data: category, isLoading, error } = useSWR<ServiceCategory>(
+    const params = useParams<{ slug?: string }>();
+    const slug = params.slug || initialData?.slug;
+    const { data: categoryData, isLoading, error } = useSWR<ServiceCategory>(
         slug ? `service-category-${slug}` : null,
         () => serviceCategoryService.getBySlug(slug!),
         { fallbackData: initialData }
     );
+    const category = categoryData || initialData;
 
     const metaTitle = useMemo(() => {
         if (!category) return 'Service Category | Totan.ai';
