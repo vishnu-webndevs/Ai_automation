@@ -37,12 +37,15 @@ export async function middleware(request: NextRequest) {
   }
 
   if (cachedRedirects && Array.isArray(cachedRedirects)) {
-    const currentUrl = request.url;
-    const reqPath = path.replace(/\/$/, '') || '/';
+    const cleanPath = path.toLowerCase().replace(/^\/+|\/+$/g, '');
     
     const match = cachedRedirects.find(r => {
-      const source = r.source_url.replace(/\/$/, '') || '/';
-      return source === currentUrl || source === reqPath || source === `https://totan.ai${reqPath}` || source === `http://localhost:3000${reqPath}`;
+      if (!r.source_url) return false;
+      const cleanSource = r.source_url
+        .replace(/^https?:\/\/[^\/]+/, '')
+        .toLowerCase()
+        .replace(/^\/+|\/+$/g, '');
+      return cleanSource === cleanPath;
     });
 
     if (match) {
@@ -52,7 +55,7 @@ export async function middleware(request: NextRequest) {
       if (target.startsWith('http')) {
         return NextResponse.redirect(target, status);
       } else {
-        return NextResponse.redirect(new URL(target, request.url), status);
+        return NextResponse.redirect(new URL(target.startsWith('/') ? target : `/${target}`, request.url), status);
       }
     }
   }

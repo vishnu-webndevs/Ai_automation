@@ -5,21 +5,22 @@ import { Helmet } from 'react-helmet-async';
 import { blogCategoryService } from '../services/api';
 
 const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
-    const { slug } = useParams() as { slug: string };
+    const params = useParams() as { slug?: string };
+    const slug = params.slug || initialData?.slug;
     const { data: category, isLoading, error } = useSWR(
         slug ? `blog-category-${slug}` : null, 
         () => blogCategoryService.getBySlug(slug as string),
         { fallbackData: initialData }
     );
+    const activeCategory = category || initialData;
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
-    if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
-    if (error || !category) {
+    if (isLoading && !activeCategory) return <div className="text-center py-20 text-white">Loading category...</div>;
+    if (!activeCategory) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>
-                    <title>Blog Category Not Found | Totan.ai</title>
-                    <meta name="robots" content="noindex, follow" />
+                    <title>Category Not Found | Totan AI</title>
                 </Helmet>
                 Category not found
             </div>
@@ -28,12 +29,12 @@ const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) =>
 
     const faqs = [
         {
-            question: `What articles are included in the ${category.name} category?`,
-            answer: category.description || `In this section, we cover various topics and guides relating to ${category.name}.`
+            question: `What articles are included in the ${activeCategory.name} category?`,
+            answer: activeCategory.description || `In this section, we cover various topics and guides relating to ${activeCategory.name}.`
         },
         {
-            question: `Why choose Totan AI's insights on ${category.name}?`,
-            answer: `Totan AI provides expert, production-grade guidelines and case studies on ${category.name} and AI-driven business automation.`
+            question: `Why choose Totan AI's insights on ${activeCategory.name}?`,
+            answer: `Totan AI provides expert, production-grade guidelines and case studies on ${activeCategory.name} and AI-driven business automation.`
         }
     ];
 
@@ -64,19 +65,19 @@ const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) =>
                     <span className="text-slate-600">/</span>
                     <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
                     <span className="text-slate-600">/</span>
-                    <span className="text-slate-300">{category.name}</span>
+                    <span className="text-slate-300">{activeCategory.name}</span>
                 </div>
 
                 <div className="mb-12">
                     <Link to="/blog" className="inline-flex items-center text-sm font-semibold text-purple-400 hover:text-purple-300 transition-colors mb-6">
                         &larr; Back to all articles
                     </Link>
-                    <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">{category.name} Category</h1>
-                    <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">{category.description || `Read expert articles and insights in the ${category.name} category.`}</p>
+                    <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">{activeCategory.name} Category</h1>
+                    <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">{activeCategory.description || `Read expert articles and insights in the ${activeCategory.name} category.`}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {category.pages?.map((blog) => (
+                    {activeCategory.pages?.map((blog: any) => (
                         <Link 
                             to={`/blog/${blog.slug}`} 
                             key={blog.id}
@@ -94,7 +95,7 @@ const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) =>
                             </div>
                         </Link>
                     ))}
-                    {(!category.pages || category.pages.length === 0) && (
+                    {(!activeCategory.pages || activeCategory.pages.length === 0) && (
                         <div className="col-span-full text-center text-slate-500">
                             No articles found in this category.
                         </div>
