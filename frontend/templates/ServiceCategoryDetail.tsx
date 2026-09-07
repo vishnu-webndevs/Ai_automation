@@ -35,7 +35,7 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
-    if (error || !category) {
+    if (!category) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

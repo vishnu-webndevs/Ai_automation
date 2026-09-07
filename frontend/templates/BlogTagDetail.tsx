@@ -16,7 +16,7 @@ const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !tag) return <div className="text-center py-20 text-white">Loading tag...</div>;
-    if (error || !tag) {
+    if (!tag) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

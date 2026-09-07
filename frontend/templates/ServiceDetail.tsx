@@ -485,7 +485,7 @@ const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     }, [resolvedContext.automationType, resolvedContext.city, resolvedContext.country, resolvedContext.industry, t]);
 
     if (isLoading && !service) return <div className="text-center py-20 text-white">Loading service...</div>;
-    if (error || !service) {
+    if (!service) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

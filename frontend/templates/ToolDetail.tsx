@@ -22,7 +22,7 @@ const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         );
     }
 
-    if (error || !tool) {
+    if (!tool) {
         return (
             <div className="bg-slate-900 min-h-screen flex items-center justify-center">
                 <Helmet>

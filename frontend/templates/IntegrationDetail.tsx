@@ -15,7 +15,7 @@ const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => 
     const integration = integrationData || initialData;
 
     if (isLoading && !integration) return <div className="text-center py-20 text-white">Loading integration...</div>;
-    if (error || !integration) {
+    if (!integration) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

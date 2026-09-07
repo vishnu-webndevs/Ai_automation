@@ -17,7 +17,7 @@ const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const solution = solutionData || initialData;
 
     if (isLoading && !solution) return <div className="text-center py-20 text-white">Loading solution...</div>;
-    if (error || !solution) {
+    if (!solution) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

@@ -51,7 +51,7 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     }, [recentPosts, page]);
 
     if (isLoading && !page) return <div className="text-center py-20 text-white">Loading article...</div>;
-    if (error || !page) {
+    if (!page) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>

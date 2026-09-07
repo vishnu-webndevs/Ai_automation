@@ -15,7 +15,7 @@ const IndustryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const industry = industryData || initialData;
 
     if (isLoading && !industry) return <div className="text-center py-20 text-white">Loading industry...</div>;
-    if (error || !industry) {
+    if (!industry) {
         return (
             <div className="text-center py-20 text-white">
                 <Helmet>
