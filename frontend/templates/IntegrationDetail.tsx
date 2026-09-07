@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { integrationService } from '../services/api';
 
 const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -12,7 +13,17 @@ const IntegrationDetail: React.FC<{ initialData?: any }> = ({ initialData }) => 
     );
 
     if (isLoading && !integration) return <div className="text-center py-20 text-white">Loading integration...</div>;
-    if (error || !integration) return <div className="text-center py-20 text-white">Integration not found</div>;
+    if (error || !integration) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Integration Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Integration not found
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-900 min-h-screen">

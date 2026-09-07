@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { blogCategoryService } from '../services/api';
 
 const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -13,7 +14,17 @@ const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) =>
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
-    if (error || !category) return <div className="text-center py-20 text-white">Category not found</div>;
+    if (error || !category) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Blog Category Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Category not found
+            </div>
+        );
+    }
 
     const faqs = [
         {

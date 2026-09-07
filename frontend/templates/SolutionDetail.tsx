@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { solutionService } from '../services/api';
 
 const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -14,7 +15,17 @@ const SolutionDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     );
 
     if (isLoading && !solution) return <div className="text-center py-20 text-white">Loading solution...</div>;
-    if (error || !solution) return <div className="text-center py-20 text-white">Solution not found</div>;
+    if (error || !solution) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Solution Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Solution not found
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-900 min-h-screen">

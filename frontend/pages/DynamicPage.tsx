@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { pageService } from '../services/api';
 import SeoHead from '../components/seo/SeoHead';
 import BlockRenderer from '../components/BlockRenderer';
@@ -128,6 +129,10 @@ const DynamicPage: React.FC<DynamicPageProps> = ({ initialData, slug: propSlug }
 
         return (
             <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+                <Helmet>
+                    <title>404 Page Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
                 <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
                     404
                 </h1>

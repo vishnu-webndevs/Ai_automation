@@ -483,7 +483,17 @@ const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     }, [resolvedContext.automationType, resolvedContext.city, resolvedContext.country, resolvedContext.industry, t]);
 
     if (isLoading && !service) return <div className="text-center py-20 text-white">Loading service...</div>;
-    if (error || !service) return <div className="text-center py-20 text-white">Service not found</div>;
+    if (error || !service) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Service Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Service not found
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-950 min-h-screen">

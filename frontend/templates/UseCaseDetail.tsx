@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { useCaseService } from '../services/api';
 
 const UseCaseDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -12,7 +13,17 @@ const UseCaseDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     );
 
     if (isLoading && !useCase) return <div className="text-center py-20 text-white">Loading use case...</div>;
-    if (error || !useCase) return <div className="text-center py-20 text-white">Use Case not found</div>;
+    if (error || !useCase) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Use Case Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Use Case not found
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-900 min-h-screen">

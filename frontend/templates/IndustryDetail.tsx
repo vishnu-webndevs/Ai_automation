@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { industryService } from '../services/api';
 
 const IndustryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -12,7 +13,17 @@ const IndustryDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     );
 
     if (isLoading && !industry) return <div className="text-center py-20 text-white">Loading industry...</div>;
-    if (error || !industry) return <div className="text-center py-20 text-white">Industry not found</div>;
+    if (error || !industry) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Industry Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Industry not found
+            </div>
+        );
+    }
 
     return (
         <div className="bg-slate-900 min-h-screen">

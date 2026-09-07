@@ -8,10 +8,15 @@ interface SeoHeadProps {
 }
 
 const SeoHead: React.FC<SeoHeadProps> = ({ meta, defaultTitle = 'Totan.ai' }) => {
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const rawCanonical = meta?.canonical_url || `https://totan.ai${currentPath}`;
+    const canonicalUrl = rawCanonical.replace('://www.totan.ai', '://totan.ai');
+
     if (!meta) {
         return (
             <Helmet>
                 <title>{defaultTitle}</title>
+                <link rel="canonical" href={canonicalUrl} />
             </Helmet>
         );
     }
@@ -20,7 +25,7 @@ const SeoHead: React.FC<SeoHeadProps> = ({ meta, defaultTitle = 'Totan.ai' }) =>
         <Helmet>
             <title>{meta.meta_title || meta.og_title || defaultTitle}</title>
             <meta name="description" content={meta.meta_description || meta.og_description || ''} />
-            {meta.canonical_url && <link rel="canonical" href={meta.canonical_url} />}
+            <link rel="canonical" href={canonicalUrl} />
             
             {/* OpenGraph */}
             <meta property="og:title" content={meta.og_title || meta.meta_title || defaultTitle} />

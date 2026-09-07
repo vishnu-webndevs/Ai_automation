@@ -33,7 +33,19 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
-    if (error || !category) return <div className="text-center py-20 text-white">Category not found</div>;
+    if (error || !category) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Category Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Category not found
+            </div>
+        );
+    }
+
+    const hasServices = category.services && category.services.length > 0;
 
     const faqs = [
         {
@@ -64,6 +76,8 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
             <Helmet>
                 <title>{metaTitle}</title>
                 <meta name="description" content={metaDescription} />
+                <link rel="canonical" href={`https://totan.ai/services/category/${category.slug}`} />
+                {!hasServices && <meta name="robots" content="noindex, follow" />}
             </Helmet>
 
             <script

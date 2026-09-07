@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { blogTagService } from '../services/api';
 
 const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -13,7 +14,17 @@ const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
     if (isLoading && !tag) return <div className="text-center py-20 text-white">Loading tag...</div>;
-    if (error || !tag) return <div className="text-center py-20 text-white">Tag not found</div>;
+    if (error || !tag) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Tag Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Tag not found
+            </div>
+        );
+    }
 
     const faqs = [
         {

@@ -538,8 +538,16 @@ XSL;
             }
 
             if (Schema::hasTable('service_categories') && Schema::hasColumn('service_categories', 'slug')) {
-                $serviceCategoryColumns = $this->selectColumns('service_categories', ['slug', 'updated_at']);
-                $serviceCategoriesQuery = $this->applyIsActiveFilter(ServiceCategory::query(), 'service_categories')->select($serviceCategoryColumns);
+                $serviceCategoryColumns = $this->selectColumns('service_categories', ['id', 'slug', 'updated_at']);
+                $serviceCategoriesQuery = $this->applyIsActiveFilter(ServiceCategory::query(), 'service_categories')
+                    ->where(function ($q) {
+                        $q->whereHas('services', function ($sub) {
+                            $sub->where('is_active', true);
+                        })->orWhereHas('primaryServices', function ($sub) {
+                            $sub->where('is_active', true);
+                        });
+                    })
+                    ->select($serviceCategoryColumns);
                 if (Schema::hasColumn('service_categories', 'updated_at')) {
                     $serviceCategoriesQuery->orderBy('updated_at', 'desc');
                 }

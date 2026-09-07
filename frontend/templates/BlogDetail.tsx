@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { pageService, blogCategoryService } from '../services/api';
 import BlockRenderer from '../components/BlockRenderer';
 import SeoHead from '../components/seo/SeoHead';
@@ -38,16 +39,27 @@ const BlogDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
 
     const prevNext = useMemo(() => {
         const list = (recentPosts as any)?.data || [];
-        const index = list.findIndex((p: any) => p.id === page?.id);
-        if (index === -1) return { prev: null, next: null };
+        if (!page) return { prev: null, next: null };
+        const idx = list.findIndex((p: Page) => p.id === page.id);
+        if (idx === -1) return { prev: null, next: null };
         return {
-            prev: index < list.length - 1 ? list[index + 1] : null,
-            next: index > 0 ? list[index - 1] : null
+            prev: idx > 0 ? list[idx - 1] : null,
+            next: idx < list.length - 1 ? list[idx + 1] : null,
         };
-    }, [recentPosts, page?.id]);
+    }, [recentPosts, page]);
 
     if (isLoading && !page) return <div className="text-center py-20 text-white">Loading article...</div>;
-    if (error || !page) return <div className="text-center py-20 text-white">Article not found</div>;
+    if (error || !page) {
+        return (
+            <div className="text-center py-20 text-white">
+                <Helmet>
+                    <title>Article Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
+                Article not found
+            </div>
+        );
+    }
 
     const sortedSections: PageSection[] = [...(page.sections || [])].sort((a, b) => a.order - b.order);
 

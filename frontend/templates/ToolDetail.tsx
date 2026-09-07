@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
+import { Helmet } from 'react-helmet-async';
 import { solutionService } from '../services/api';
 
 const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
@@ -22,6 +23,10 @@ const ToolDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
     if (error || !tool) {
         return (
             <div className="bg-slate-900 min-h-screen flex items-center justify-center">
+                <Helmet>
+                    <title>Tool Not Found | Totan.ai</title>
+                    <meta name="robots" content="noindex, follow" />
+                </Helmet>
                 <p className="text-slate-200 text-lg">Tool not found</p>
             </div>
         );
