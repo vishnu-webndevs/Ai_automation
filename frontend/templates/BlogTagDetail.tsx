@@ -114,7 +114,7 @@ const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                     className="w-full text-left px-6 py-4 flex justify-between items-center text-slate-100 hover:text-white font-medium focus:outline-none"
                                 >
                                     <span>{faq.question}</span>
-                                    <span className="text-purple-400 text-lg">{activeFaq === idx ? '&minus;' : '+'}</span>
+                                    <span className="text-purple-400 text-lg">{activeFaq === idx ? '−' : '+'}</span>
                                 </button>
                                 {activeFaq === idx && (
                                     <div className="px-6 pb-4 text-slate-400 text-sm leading-relaxed border-t border-slate-850 pt-3">
