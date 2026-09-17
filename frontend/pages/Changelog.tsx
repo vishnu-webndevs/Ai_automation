@@ -39,7 +39,7 @@ const Changelog: React.FC = () => {
   ];
 
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
@@ -50,7 +50,7 @@ const Changelog: React.FC = () => {
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 1, x: 0 },
     visible: {
       opacity: 1,
       x: 0,
