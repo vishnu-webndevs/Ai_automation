@@ -26,11 +26,11 @@ const nextConfig = {
       },
       {
         source: '/sitemap.index.xml',
-        destination: `${apiUrl}/sitemap.index.xml`,
+        destination: `${apiUrl}/sitemap.xml`,
       },
       {
         source: '/sitemap-index.xml',
-        destination: `${apiUrl}/sitemap.index.xml`,
+        destination: `${apiUrl}/sitemap.xml`,
       },
       {
         source: '/sitemap.xml',
