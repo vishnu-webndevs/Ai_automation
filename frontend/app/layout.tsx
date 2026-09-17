@@ -2,15 +2,15 @@ import React from 'react';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import Particles from '@/components/Particles';
+import dynamicImport from 'next/dynamic';
 import Script from 'next/script';
 import { menuService } from '@/services/api';
 
 import '@/index.css';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const Particles = dynamicImport(() => import('@/components/Particles'), { ssr: false });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
-// We set this to dynamic because it fetches menu data from backend API
 export const dynamic = 'force-dynamic';
 
 export const metadata = {

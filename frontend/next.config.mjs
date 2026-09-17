@@ -4,9 +4,12 @@ import path from 'path';
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
   output: 'standalone',
   images: {
-    unoptimized: true, 
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
   },
   webpack: (config) => {
     config.resolve.alias = {
@@ -48,6 +51,15 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [
