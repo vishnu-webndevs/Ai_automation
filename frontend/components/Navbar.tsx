@@ -6,12 +6,24 @@ import useSWR from 'swr';
 import { menuService } from '../services/api';
 import { MenuItem } from '../types';
 
+const DEFAULT_MENU_ITEMS: MenuItem[] = [
+    { id: 1, label: 'Home', url: '/' },
+    { id: 2, label: 'Services', url: '/services' },
+    { id: 3, label: 'Solutions', url: '/solutions' },
+    { id: 4, label: 'Integrations', url: '/integrations' },
+    { id: 5, label: 'Blog', url: '/blog' },
+    { id: 6, label: 'Pricing', url: '/pricing' }
+];
+
 const DesktopMenuItem = ({ item }: { item: MenuItem }) => {
     const location = useLocation();
     const hasChildren = item.children && item.children.length > 0;
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = (path: string) => {
+        if (path === '/') return location.pathname === '/';
+        return location.pathname === path || location.pathname.startsWith(path + '/');
+    };
     const linkClass = (path: string) => 
-        `text-sm font-medium transition-colors ${isActive(path) ? 'text-white' : 'text-slate-300 hover:text-white'}`;
+        `text-sm font-medium transition-all ${isActive(path) ? 'text-white font-semibold border-b-2 border-purple-400 pb-0.5' : 'text-slate-300 hover:text-white'}`;
 
     if (hasChildren) {
         return (
@@ -60,8 +72,13 @@ const DesktopMenuItem = ({ item }: { item: MenuItem }) => {
 };
 
 const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => void }) => {
+    const location = useLocation();
     const hasChildren = item.children && item.children.length > 0;
     const [isOpen, setIsOpen] = useState(false);
+    const isActive = (path: string) => {
+        if (path === '/') return location.pathname === '/';
+        return location.pathname === path || location.pathname.startsWith(path + '/');
+    };
 
     if (hasChildren) {
         return (
@@ -70,7 +87,7 @@ const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => 
                     <Link
                         to={item.url}
                         onClick={closeMenu}
-                        className="flex-1 text-left"
+                        className={`flex-1 text-left ${isActive(item.url) ? 'text-purple-400 font-semibold' : ''}`}
                         target={item.target}
                     >
                         {item.label}
@@ -107,7 +124,7 @@ const MobileMenuItem = ({ item, closeMenu }: { item: MenuItem, closeMenu: () => 
         <Link 
             to={item.url} 
             onClick={closeMenu} 
-            className="text-slate-300 hover:text-white py-3 px-4 block w-full text-left" 
+            className={`py-3 px-4 block w-full text-left transition-colors ${isActive(item.url) ? 'text-purple-400 font-semibold bg-white/5' : 'text-slate-300 hover:text-white'}`} 
             target={item.target}
         >
             {item.label}
@@ -139,8 +156,15 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
   });
 
   const sanitizedItems = React.useMemo(() => {
-    if (!menuData?.items) return [];
-    return sanitizeMenuItems(menuData.items);
+    let items = menuData?.items ? sanitizeMenuItems(menuData.items) : [];
+    if (!items || items.length === 0) {
+        return DEFAULT_MENU_ITEMS;
+    }
+    const hasHome = items.some(item => item.label.toLowerCase() === 'home' || item.url === '/');
+    if (!hasHome) {
+        items = [{ id: 9999, label: 'Home', url: '/' }, ...items];
+    }
+    return items;
   }, [menuData]);
 
   useEffect(() => {
@@ -154,9 +178,12 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
     setMobileMenuOpen(false);
   }, [location]);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
   const linkClass = (path: string) => 
-    `text-sm font-medium transition-colors ${isActive(path) ? 'text-white' : 'text-slate-300 hover:text-white'}`;
+    `text-sm font-medium transition-all ${isActive(path) ? 'text-white font-semibold border-b-2 border-purple-400 pb-0.5' : 'text-slate-300 hover:text-white'}`;
 
   return (
     <header className={`fixed top-0 w-full max-w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-900/80 backdrop-blur-md border-b border-white/10' : 'bg-transparent'}`}>
@@ -175,14 +202,6 @@ const Navbar: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
             {sanitizedItems.map((item) => (
                <DesktopMenuItem key={item.id} item={item} />
             ))}
-            {!menuData && (
-                <>
-                    {/* Fallback while loading or if error */}
-                    <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-                    <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-                    <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-                </>
-            )}
             
             <div className="flex items-center gap-4 ml-4">
               <Link to="/signin" className={linkClass('/signin')}>Sign in</Link>

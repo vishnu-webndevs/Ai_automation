@@ -1044,15 +1044,15 @@ const ServiceDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
                                 <div className="flex flex-col sm:flex-row gap-3">
                                     <a
                                         href="/contact-us"
-                                        className="inline-flex items-center justify-center rounded-full bg-white text-slate-950 text-sm font-semibold px-6 py-2.5 hover:bg-slate-200 transition-colors"
+                                        className="inline-flex items-center justify-center rounded-full bg-white text-slate-950 text-sm font-semibold px-6 py-2.5 hover:bg-slate-200 transition-colors shadow-lg"
                                     >
-                                        Book a Free Consultation
+                                        Book a 30-Minute AI Strategy Call
                                     </a>
                                     <a
-                                        href="#process"
-                                        className="inline-flex items-center justify-center rounded-full bg-white/10 border border-white/15 text-sm font-semibold text-white px-6 py-2.5 hover:bg-white/15 transition-colors"
+                                        href="/contact-us"
+                                        className="inline-flex items-center justify-center rounded-full bg-purple-600/30 border border-purple-400/40 text-sm font-semibold text-white px-6 py-2.5 hover:bg-purple-600/50 transition-colors"
                                     >
-                                        Review the process
+                                        Request Project Estimate
                                     </a>
                                 </div>
                             </div>

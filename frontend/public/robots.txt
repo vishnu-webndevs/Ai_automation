@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /search/
 
-Sitemap: https://totan.ai/sitemap.index.xml
+Sitemap: https://totan.ai/sitemap.xml

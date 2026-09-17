@@ -108,15 +108,19 @@ const Footer: React.FC<{ initialMenuData?: any }> = ({ initialMenuData }) => {
                 <Linkedin size={18} />
               </a>
               <a
-                href="#"
-                title="Twitter"
-                aria-label="Visit Twitter Page"
+                href="https://x.com/totan_ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Twitter/X"
+                aria-label="Visit Twitter/X Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"
               >
                 <Twitter size={18} />
               </a>
               <a
-                href="#"
+                href="https://github.com/totan-ai"
+                target="_blank"
+                rel="noopener noreferrer"
                 title="GitHub"
                 aria-label="Visit GitHub Page"
                 className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:border-purple-500 hover:bg-purple-500/10 transition-all"

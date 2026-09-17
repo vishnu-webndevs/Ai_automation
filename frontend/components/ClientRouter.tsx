@@ -149,11 +149,19 @@ function ClientRouter({ slug, initialData }: { slug: string | string[]; initialD
             case 'reset-password':
                 return <ResetPassword />;
 
-            // Static Pages
+            // Static Pages & Aliases
             case 'contact-us':
+            case 'contact':
             case 'login':
             case 'signin':
+            case 'sign-in':
             case 'signup':
+            case 'sign-up':
+            case 'register':
+            case 'case-studies':
+            case 'testimonials':
+            case 'about':
+            case 'about-us':
             case 'style-guide':
             case 'changelog':
             case 'customers':

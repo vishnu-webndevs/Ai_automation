@@ -58,7 +58,7 @@ const ContactPage: React.FC = () => {
     };
 
     return (
-        <div className="bg-slate-950 min-h-screen pt-28 pb-20 overflow-hidden">
+        <div className="bg-slate-950 min-h-screen pt-32 sm:pt-36 lg:pt-40 pb-20 overflow-hidden">
             <Helmet>
                 <title>{metaTitle}</title>
                 <meta name="description" content={metaDescription} />

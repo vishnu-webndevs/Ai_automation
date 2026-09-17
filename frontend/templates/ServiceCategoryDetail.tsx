@@ -32,7 +32,7 @@ const ServiceCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData })
         return toMetaDescription(base);
     }, [category]);
 
-    const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
+    const [activeFaq, setActiveFaq] = React.useState<number | null>(0);
 
     if (isLoading && !category) return <div className="text-center py-20 text-white">Loading category...</div>;
     if (!category) {

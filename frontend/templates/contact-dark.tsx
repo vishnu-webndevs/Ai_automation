@@ -107,7 +107,7 @@ const ContactDark: React.FC<TemplateProps> = ({ page }) => {
     };
     return (
         <div className="bg-slate-950 min-h-screen text-slate-50">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40 pb-16 lg:pb-24">
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-start">
                     <div className="lg:col-span-2 space-y-6">
                         <p className="inline-flex items-center rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1 text-xs font-medium text-slate-300">

@@ -196,29 +196,36 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
     console.error("Failed to generate metadata in SSR:", error);
   }
 
-  if (!meta_title) meta_title = first.charAt(0).toUpperCase() + first.slice(1) + ' | Totan AI';
-  const defaultTitle = 'Totan.ai';
+  if (!meta_title) meta_title = first ? (first.charAt(0).toUpperCase() + first.slice(1)) : 'Custom AI Agent Development Services';
+  const defaultTitle = 'Custom AI Agent Development Services | Totan.ai';
   const defaultDesc = 'Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.';
 
+  let finalTitle = meta_title || defaultTitle;
+  if (finalTitle && !/totan\.?\s*ai/i.test(finalTitle)) {
+    finalTitle = `${finalTitle} | Totan.ai`;
+  }
+
+  const finalOgImage = og_image || 'https://totan.ai/totan_logo.png';
+
   return {
-    title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+    title: finalTitle,
     description: meta_description || defaultDesc,
     alternates: {
       canonical: canonical_url || fullUrl,
     },
     openGraph: {
-      title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+      title: finalTitle,
       description: meta_description || defaultDesc,
       url: canonical_url || fullUrl,
       siteName: 'Totan.ai',
-      images: og_image ? [{ url: og_image }] : [{ url: 'https://totan.ai/totan_logo.png' }],
+      images: [{ url: finalOgImage }],
       type: 'website',
     },
     twitter: {
       card: twitter_card as any,
-      title: meta_title ? `${meta_title} | Totan.ai` : defaultTitle,
+      title: finalTitle,
       description: meta_description || defaultDesc,
-      images: og_image ? [og_image] : ['https://totan.ai/totan_logo.png'],
+      images: [finalOgImage],
     },
     robots: {
       index: !noindex,
@@ -228,21 +235,8 @@ export async function generateMetadata({ params }: { params: { slug: string[] } 
 }
 
 function generateSchema(slugArray: string[], data: any) {
-  if (!data) return null;
-  
-  if (data.seo_meta?.schema_markup) {
-    return data.seo_meta.schema_markup;
-  }
-  if (data.seo?.schema_json) {
-    return data.seo.schema_json;
-  }
-  
-  const first = slugArray[0];
-  const second = slugArray.length > 1 ? slugArray[1] : null;
-  
   const baseUrl = 'https://totan.ai';
-  const url = `${baseUrl}/${slugArray.join('/')}`;
-
+  
   const org = {
     "@type": "Organization",
     "@id": "https://totan.ai/#organization",
@@ -254,6 +248,36 @@ function generateSchema(slugArray: string[], data: any) {
       "caption": "Totan AI Logo"
     }
   };
+
+  if (slugArray.length === 0) {
+    return {
+      "@context": "https://schema.org",
+      "@graph": [
+        org,
+        {
+          "@type": "WebSite",
+          "@id": "https://totan.ai/#website",
+          "url": "https://totan.ai",
+          "name": "Totan AI",
+          "description": "Totan AI builds custom artificial intelligence, ML agents, and scalable automation pipelines to revolutionize your business operations.",
+          "publisher": { "@id": "https://totan.ai/#organization" }
+        }
+      ]
+    };
+  }
+
+  if (!data) return null;
+  
+  if (data.seo_meta?.schema_markup) {
+    return data.seo_meta.schema_markup;
+  }
+  if (data.seo?.schema_json) {
+    return data.seo.schema_json;
+  }
+  
+  const first = slugArray[0];
+  const second = slugArray.length > 1 ? slugArray[1] : null;
+  const url = `${baseUrl}/${slugArray.join('/')}`;
 
   // 1. Service Detail
   if (first === 'services' && second && second !== 'category') {

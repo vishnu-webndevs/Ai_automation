@@ -13,7 +13,7 @@ const BlogTagDetail: React.FC<{ initialData?: any }> = ({ initialData }) => {
         { fallbackData: initialData }
     );
     const tag = tagData || initialData;
-    const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
+    const [activeFaq, setActiveFaq] = React.useState<number | null>(0);
 
     if (isLoading && !tag) return <div className="text-center py-20 text-white">Loading tag...</div>;
     if (!tag) {

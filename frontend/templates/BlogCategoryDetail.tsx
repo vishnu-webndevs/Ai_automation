@@ -13,7 +13,7 @@ const BlogCategoryDetail: React.FC<{ initialData?: any }> = ({ initialData }) =>
         { fallbackData: initialData }
     );
     const activeCategory = category || initialData;
-    const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
+    const [activeFaq, setActiveFaq] = React.useState<number | null>(0);
 
     if (isLoading && !activeCategory) return <div className="text-center py-20 text-white">Loading category...</div>;
     if (!activeCategory) {
