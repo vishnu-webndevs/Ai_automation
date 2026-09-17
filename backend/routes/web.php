@@ -38,7 +38,7 @@ Route::get('/robots.txt', function () {
     if (!$baseUrl || str_contains($baseUrl, 'api.totan.ai')) {
         $baseUrl = 'https://totan.ai';
     }
-    $sitemapUrl = rtrim($baseUrl, '/') . '/sitemap.index.xml';
+    $sitemapUrl = rtrim($baseUrl, '/') . '/sitemap.xml';
 
     return response("User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nSitemap: {$sitemapUrl}\n", 200)->header('Content-Type', 'text/plain; charset=UTF-8');
 });

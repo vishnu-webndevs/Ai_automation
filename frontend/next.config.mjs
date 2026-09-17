@@ -34,7 +34,7 @@ const nextConfig = {
       },
       {
         source: '/sitemap.xml',
-        destination: `${apiUrl}/sitemap.index.xml`,
+        destination: `${apiUrl}/sitemap.xml`,
       },
       {
         source: '/sitemap.xsl',
