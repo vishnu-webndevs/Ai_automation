@@ -31,22 +31,22 @@ const Hero: React.FC<HeroProps> = ({
   const MotionLink = motion.create(Link);
 
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 1 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.05
+        staggerChildren: 0.05,
+        delayChildren: 0
       }
     }
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 1, y: 0 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1.0] as const }
+      transition: { duration: 0.2, ease: "easeOut" }
     }
   };
 
@@ -161,12 +161,8 @@ const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden max-w-full w-full">
       {/* Background Glow */}
-      <motion.div 
-        animate={{ opacity: [0.15, 0.25, 0.15] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full -z-10 pointer-events-none" 
-      />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-blue-600/10 blur-[100px] rounded-full -z-10 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] bg-purple-600/15 blur-[100px] rounded-full -z-10 pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-blue-600/10 blur-[90px] rounded-full -z-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full">
         
